@@ -5,13 +5,44 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 )
 
+func GetPreloads(ctx context.Context) []string {
+	return GetNestedPreloads(
+		graphql.GetRequestContext(ctx),
+		graphql.CollectFieldsCtx(ctx, nil),
+		"",
+	)
+}
+
+func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string) (preloads []string) {
+	for _, column := range fields {
+		prefixColumn := GetPreloadString(prefix, column.Name)
+		preloads = append(preloads, prefixColumn)
+		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.SelectionSet, nil), prefixColumn)...)
+		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn)...)
+	}
+	return
+}
+func GetPreloadString(prefix, name string) string {
+	if len(prefix) > 0 {
+		return prefix + "." + name
+	}
+	return name
+}
+
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
-	return []*model.Course{&courseOne, &courseTwo}, nil
+	preloads := graphql.GetOperationContext(ctx)
+	fmt.Println(preloads.RawQuery)
+
+	c, err := r.resolveCourses(ctx, preloads.RawQuery)
+
+	return c, err
 }
 
 func (r *queryResolver) Sessions(ctx context.Context) ([]*model.Session, error) {

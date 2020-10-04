@@ -24,6 +24,7 @@ type Config struct {
 }
 
 func main() {
+	fmt.Println("We are starting")
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)

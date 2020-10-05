@@ -12,6 +12,30 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 )
 
+func GetPreloads(ctx context.Context) []string {
+	return GetNestedPreloads(
+		graphql.GetRequestContext(ctx),
+		graphql.CollectFieldsCtx(ctx, nil),
+		"",
+	)
+}
+
+func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string) (preloads []string) {
+	for _, column := range fields {
+		prefixColumn := GetPreloadString(prefix, column.Name)
+		preloads = append(preloads, prefixColumn)
+		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.SelectionSet, nil), prefixColumn)...)
+		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn)...)
+	}
+	return
+}
+func GetPreloadString(prefix, name string) string {
+	if len(prefix) > 0 {
+		return prefix + "." + name
+	}
+	return name
+}
+
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	preloads := graphql.GetOperationContext(ctx)
 	fmt.Println(preloads.RawQuery)

@@ -17,18 +17,21 @@ provider "aws" {
 // Provider used to access the ACM SSL Cert from us-east-1
 # https://github.com/hashicorp/terraform/issues/21472#issuecomment-497508239
 provider "aws" {
-  alias                   = "us_east"
-  region                  = "us-east-1"
+  alias  = "us_east"
+  region = "us-east-1"
 }
 
 
 module "mind-hub-ui" {
   source = "../../../modules/mind-hub-api"
 
-#   env = "dev"
+  env                = "dev"
+  auth0_audience     = var.auth0_audience
+  auth0_jwks_uri     = var.auth0_jwks_uri
+  auth0_token_issuer = var.auth0_token_issuer
 
   providers = {
-    aws = aws
+    aws         = aws
     aws.us_east = aws.us_east
   }
 }

@@ -17,8 +17,6 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 )
 
-const defaultPort = "8080"
-
 type Config struct {
 	graphcmsURL string
 }

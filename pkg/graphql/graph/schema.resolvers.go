@@ -12,30 +12,6 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 )
 
-func GetPreloads(ctx context.Context) []string {
-	return GetNestedPreloads(
-		graphql.GetRequestContext(ctx),
-		graphql.CollectFieldsCtx(ctx, nil),
-		"",
-	)
-}
-
-func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedField, prefix string) (preloads []string) {
-	for _, column := range fields {
-		prefixColumn := GetPreloadString(prefix, column.Name)
-		preloads = append(preloads, prefixColumn)
-		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.SelectionSet, nil), prefixColumn)...)
-		preloads = append(preloads, GetNestedPreloads(ctx, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn)...)
-	}
-	return
-}
-func GetPreloadString(prefix, name string) string {
-	if len(prefix) > 0 {
-		return prefix + "." + name
-	}
-	return name
-}
-
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	preloads := graphql.GetOperationContext(ctx)
 	fmt.Println(preloads.RawQuery)
@@ -64,9 +40,4 @@ var (
 	sessionOne   = model.Session{ID: "1", Title: "Session One"}
 	sessionTwo   = model.Session{ID: "2", Title: "Session Two"}
 	sessionThree = model.Session{ID: "3", Title: "Session Three"}
-
-	courseOne = model.Course{ID: "1", Title: "Course One", Sessions: []*model.Session{&sessionOne, &sessionTwo, &sessionThree}}
-	courseTwo = model.Course{ID: "2", Title: "Course Two"}
 )
-
-type mutationResolver struct{ *Resolver }

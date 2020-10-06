@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  variables:
+    ENV: "${env}"
+  parameter-store:
+    TF_VAR_github_token: "codebuild-github-access-key"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      - "cd /usr/bin"
+      - "curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/0.12.26/terraform_0.12.26_linux_amd64.zip"
+      - "unzip -o terraform.zip"
+      - cd "$CODEBUILD_SRC_DIR"
+
+  build:
+    commands:
+      - make validate-terraform APP_ENV=$ENV TERRAFORM_ACTION=plan
+      - make validate-terraform APP_ENV=$ENV TERRAFORM_ACTION=apply OPTS=-auto-approve

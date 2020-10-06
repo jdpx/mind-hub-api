@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.14
+    commands:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+
+  pre_build:
+    commands:
+      - make install
+  build:
+    commands:
+      - make lint
+      - make test
+      - make build-all-lambdas
+
+artifacts:
+  files:
+    - "dist/*"
+  name: "mind_hub_api_build_artifact"
+  base-directory: build

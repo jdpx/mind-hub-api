@@ -20,12 +20,12 @@ cb-lint:
 	golangci-lint run
 
 cmd/lambdas/%/main.go:
-	echo goo
 	cd $(subst main.go,,$@) \
 	&& $(GO_BUILD) -o lambda ./.\
 	&& zip ../../../dist/$*.zip lambda \
 	&& rm lambda
 
 .PHONY: build-all-lambdas
-build-all-lambdas: 
+build-all-lambdas:
+	mkdir -p dist
 	make $(FUNCTIONS_LAMBDAS)

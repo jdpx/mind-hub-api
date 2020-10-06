@@ -16,6 +16,6 @@ phases:
 
 artifacts:
   files:
-    - "dist/*"
+    - "./dist/**/*"
   name: "mind_hub_api_build_artifact"
   base-directory: build

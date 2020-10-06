@@ -11,9 +11,23 @@ type Course {
 type Session {
   id: ID!
   title: String!
+  description: String!
+
+  course: Course!
+}
+
+input CourseQuery {
+  id: ID
+}
+
+input SessionQuery {
+  id: ID
 }
 
 type Query {
   courses: [Course!]!
   sessions: [Session!]!
+
+  course(where: CourseQuery!): Course!
+  session(where: SessionQuery!): Session!
 }

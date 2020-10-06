@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 )
@@ -73,11 +74,20 @@ func (r Resolver) resolveCourses(ctx context.Context, query string) ([]*model.Co
 	return res.Courses, err
 }
 
-func (r Resolver) resolveCourse(ctx context.Context, query string) (*model.Course, error) {
-	req := graphcms.NewRequest(query)
+func (r Resolver) resolveCourse(ctx context.Context, query *graphql.OperationContext) (*model.Course, error) {
+	fmt.Println("222222", query.Variables["id"])
+	req, err := graphcms.NewQueryRequest(query.RawQuery, query.OperationName, map[string]interface{}{
+		"id": query.Variables["id"],
+	})
+	if err != nil {
+		fmt.Println("Error occurred", err)
+
+		return nil, nil
+	}
+	req.Var("Content-Type", "application/json")
 	res := courseResponse{}
 
-	err := r.client.Run(ctx, req, &res)
+	err = r.client.Run(ctx, req, &res)
 	if err != nil {
 		fmt.Println("Error occurred", err)
 

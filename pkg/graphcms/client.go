@@ -15,9 +15,37 @@ type Client struct {
 // Request ...
 type Request = graphql.Request
 
+type QueryRequest struct {
+	OperationName string                 `json:"operationName"`
+	Variables     map[string]interface{} `json:"variables"`
+	Query         string                 `json:"query"`
+}
+
 // NewRequest ...
 func NewRequest(query string) *Request {
 	return graphql.NewRequest(query)
+}
+
+// NewQueryRequest ...
+func NewQueryRequest(query string, name string, variables map[string]interface{}) (*Request, error) {
+	fmt.Println("1111", variables)
+
+	// req := QueryRequest{
+	// 	OperationName: name,
+	// 	Query:         query,
+	// 	Variables:     variables,
+	// }
+
+	// b, err := json.Marshal(req)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return nil, fmt.Errorf("error converting struct to json %v", err)
+	// }
+
+	req := graphql.NewRequest(query)
+
+	req.Var("id", variables["id"])
+	return req, nil
 }
 
 // NewClient ...

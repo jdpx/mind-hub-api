@@ -13,8 +13,7 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 )
 
-const graphCMSURLKey = "GRAPH_CMS_URL"
-
+// Config ...
 type Config struct {
 	GraphCMSURL string
 }

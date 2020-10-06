@@ -7,7 +7,7 @@ resource "aws_lambda_function" "mind_hub_api_graphql_api_lambda" {
   s3_key    = "graphql.zip"
   role      = aws_iam_role.mind_hub_api_graphql_api_role.arn
 
-  handler = "main"
+  handler = "lambda"
   runtime = "go1.x"
   timeout = 30
 

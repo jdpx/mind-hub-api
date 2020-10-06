@@ -2,6 +2,10 @@ GO_BUILD = GOOS=linux go build
 FUNCTIONS_LAMBDAS = $(wildcard cmd/lambdas/*/main.go)
 FUNCTIONS_DIRS = $(shell ls lambdas)
 
+TERRAFORM_ACTION=plan
+APP_ENV=dev
+OPTS=
+
 .PHONY: install
 install:
 	go mod download
@@ -29,3 +33,10 @@ cmd/lambdas/%/main.go:
 build-all-lambdas:
 	mkdir -p dist
 	make $(FUNCTIONS_LAMBDAS)
+
+.PHONY: validate-terraform
+validate-terraform:
+	cd terraform/providers/aws/$(APP_ENV) && \
+	terraform init && \
+	terraform validate && \
+	terraform $(TERRAFORM_ACTION) $(OPTS)

@@ -10,7 +10,7 @@ phases:
       - make install
   build:
     commands:
-      - make lint
+      - make cb-lint
       - make test
       - make build-all-lambdas
 

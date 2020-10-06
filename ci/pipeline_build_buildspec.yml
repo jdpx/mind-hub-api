@@ -12,7 +12,7 @@ phases:
     commands:
       - make cb-lint
       - make test
-      - make build-all-lambdas
+      - make build-all-lambdas -B
 
 artifacts:
   files:

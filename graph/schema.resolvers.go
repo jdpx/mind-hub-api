@@ -19,6 +19,14 @@ func (r *queryResolver) Sessions(ctx context.Context) ([]*model.Session, error) 
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*model.Course, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (*model.Session, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 

@@ -8,7 +8,17 @@ type Course struct {
 	Sessions []*Session `json:"sessions"`
 }
 
+type CourseQuery struct {
+	ID *string `json:"id"`
+}
+
 type Session struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID          string  `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Course      *Course `json:"course"`
+}
+
+type SessionQuery struct {
+	ID *string `json:"id"`
 }

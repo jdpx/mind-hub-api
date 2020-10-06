@@ -7,7 +7,7 @@ resource "aws_codebuild_project" "mind_hub_api_build" {
 
   artifacts {
     encryption_disabled    = false
-    name                   = "mind_hub_api_build_artifact"
+    name                   = aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.bucket
     override_artifact_name = false
     packaging              = "NONE"
     type                   = "CODEPIPELINE"

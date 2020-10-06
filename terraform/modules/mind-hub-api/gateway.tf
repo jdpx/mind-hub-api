@@ -47,18 +47,18 @@ resource "aws_api_gateway_resource" "mind_hub_api_resource" {
 
 resource "aws_api_gateway_method" "mind_hub_api_resource_post_method" {
   authorization = "CUSTOM"
-  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
 
-  rest_api_id = "${aws_api_gateway_rest_api.mind_hub_api.id}"
-  resource_id = "${aws_api_gateway_resource.mind_hub_api_resource.id}"
+  rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
+  resource_id = aws_api_gateway_resource.mind_hub_api_resource.id
   http_method = "POST"
 }
 
 resource "aws_api_gateway_authorizer" "authorizer" {
-  authorizer_credentials = "${module.authorizer.lambda_role_arn}"
+  authorizer_credentials = module.authorizer.lambda_role_arn
   authorizer_uri         = "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/${module.authorizer.lambda_arn}/invocations"
   name                   = "auth0"
-  rest_api_id            = "${aws_api_gateway_rest_api.mind_hub_api.id}"
+  rest_api_id            = aws_api_gateway_rest_api.mind_hub_api.id
 }
 
 resource "aws_api_gateway_method_response" "mind_hub_api_resource_post_method_response_200" {
@@ -113,7 +113,7 @@ resource "aws_api_gateway_integration_response" "mind_hub_api_resource_post_meth
 resource "aws_lambda_permission" "mind_hub_api_graphql_api_lambda_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.mind_hub_api_graphql_api_lambda.function_name}"
+  function_name = aws_lambda_function.mind_hub_api_graphql_api_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.mind_hub_api.execution_arn}/*/${aws_api_gateway_method.mind_hub_api_resource_post_method.http_method}${aws_api_gateway_resource.mind_hub_api_resource.path}"
@@ -122,6 +122,6 @@ resource "aws_lambda_permission" "mind_hub_api_graphql_api_lambda_permission" {
 resource "aws_api_gateway_deployment" "mind_hub_api_deploy" {
   depends_on = [aws_api_gateway_integration.mind_hub_api_integration]
 
-  rest_api_id = "${aws_api_gateway_rest_api.mind_hub_api.id}"
+  rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
   stage_name  = "v1"
 }

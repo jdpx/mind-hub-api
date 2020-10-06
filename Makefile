@@ -14,6 +14,11 @@ test:
 lint:
 	golangci-lint run
 
+.PHONY: cb-lint
+cb-lint:
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+	golangci-lint run
+
 cmd/lambdas/%/main.go:
 	echo goo
 	cd $(subst main.go,,$@) \

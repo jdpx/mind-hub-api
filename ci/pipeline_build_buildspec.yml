@@ -10,8 +10,7 @@ phases:
       - make install
   build:
     commands:
-      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
-      - make lint
+      - make cb-lint
       - make test
       - make build-all-lambdas
 

@@ -68,6 +68,23 @@ resource "aws_codepipeline" "mind_hub_api_pipeline" {
     name = "Deploy"
 
     action {
+      category = "Deploy"
+      configuration = {
+        "BucketName" = data.aws_s3_bucket.mind_hub_api_artifacts_dev.bucket
+        "Extract"    = "true"
+      }
+      input_artifacts = [
+        "BuiltUIArtifact",
+      ]
+      name             = "DeployDev"
+      output_artifacts = []
+      owner            = "AWS"
+      provider         = "S3"
+      run_order        = 1
+      version          = "1"
+    }
+
+    action {
       category = "Build"
       configuration = {
         "EnvironmentVariables" = jsonencode(
@@ -87,7 +104,7 @@ resource "aws_codepipeline" "mind_hub_api_pipeline" {
       name      = "DevTerraformDeploy"
       owner     = "AWS"
       provider  = "CodeBuild"
-      run_order = 1
+      run_order = 2
       version   = "1"
     }
   }

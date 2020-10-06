@@ -4,7 +4,7 @@ resource "aws_lambda_function" "mind_hub_api_graphql_api_lambda" {
   description   = "Lambda that contains the GraphQL API"
 
   s3_bucket = aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.bucket
-  s3_key    = "function.zip"
+  s3_key    = "graphql.zip"
   role      = aws_iam_role.mind_hub_api_graphql_api_role.arn
 
   handler = "main"

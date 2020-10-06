@@ -7,7 +7,7 @@ variable "env" {
 variable "repository_branch" {
   type        = string
   description = "Name of repository branch"
-  default     = "master"
+  default     = "main"
 }
 
 variable "repository_owner" {

@@ -23,6 +23,15 @@ cb-lint:
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
 	golangci-lint run
 
+
+.PHONY: run-api
+run-api:
+	go run ./cmd/api/.
+
+.PHONY: regenerate-types
+regenerate-types:
+	go run github.com/99designs/gqlgen generate
+
 cmd/lambdas/%/main.go:
 	cd $(subst main.go,,$@) \
 	&& $(GO_BUILD) -o lambda ./.\
@@ -40,3 +49,7 @@ validate-terraform:
 	terraform init && \
 	terraform validate && \
 	terraform $(TERRAFORM_ACTION) $(OPTS)
+
+.PHONY: regenerate-all-mocks
+regenerate-all-mocks:
+	@go generate ./...

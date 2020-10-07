@@ -43,9 +43,10 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Course struct {
-		ID       func(childComplexity int) int
-		Sessions func(childComplexity int) int
-		Title    func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Sessions    func(childComplexity int) int
+		Title       func(childComplexity int) int
 	}
 
 	Query struct {
@@ -84,6 +85,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Course.description":
+		if e.complexity.Course.Description == nil {
+			break
+		}
+
+		return e.complexity.Course.Description(childComplexity), true
 
 	case "Course.id":
 		if e.complexity.Course.ID == nil {
@@ -229,6 +237,7 @@ var sources = []*ast.Source{
 type Course {
   id: ID!
   title: String!
+  description: String!
   sessions: [Session]
 }
 
@@ -400,6 +409,41 @@ func (ec *executionContext) _Course_title(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Course_description(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Course",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1966,6 +2010,11 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "title":
 			out.Values[i] = ec._Course_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Course_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

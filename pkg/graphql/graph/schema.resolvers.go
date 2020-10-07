@@ -17,22 +17,22 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	return r.resolveCourses(ctx, preloads.RawQuery)
 }
 
-func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*model.Course, error) {
-	preloads := graphql.GetOperationContext(ctx)
-
-	return r.resolveCourse(ctx, preloads.RawQuery)
-}
-
 func (r *queryResolver) Sessions(ctx context.Context) ([]*model.Session, error) {
 	preloads := graphql.GetOperationContext(ctx)
 
 	return r.resolveSessions(ctx, preloads.RawQuery)
 }
 
+func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*model.Course, error) {
+	preloads := graphql.GetOperationContext(ctx)
+
+	return r.resolveCourse(ctx, preloads)
+}
+
 func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (*model.Session, error) {
 	preloads := graphql.GetOperationContext(ctx)
 
-	return r.resolveSession(ctx, preloads.RawQuery)
+	return r.resolveSession(ctx, preloads)
 }
 
 // Query returns generated.QueryResolver implementation.

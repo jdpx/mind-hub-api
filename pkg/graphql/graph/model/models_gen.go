@@ -3,9 +3,10 @@
 package model
 
 type Course struct {
-	ID       string     `json:"id"`
-	Title    string     `json:"title"`
-	Sessions []*Session `json:"sessions"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Sessions    []*Session `json:"sessions"`
 }
 
 type CourseQuery struct {

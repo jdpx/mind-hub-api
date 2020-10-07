@@ -32,7 +32,7 @@ func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*m
 func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (*model.Session, error) {
 	preloads := graphql.GetOperationContext(ctx)
 
-	return r.resolveSession(ctx, preloads.RawQuery)
+	return r.resolveSession(ctx, preloads)
 }
 
 // Query returns generated.QueryResolver implementation.

@@ -1,3 +1,5 @@
+//go:generate mockgen -source=client.go -destination=./mocks/client.go -package=graphcmsmocks
+
 package graphcms
 
 import (
@@ -7,18 +9,24 @@ import (
 	"github.com/machinebox/graphql"
 )
 
+// CMSRequster ...
+type CMSRequster interface {
+	Run(ctx context.Context, req *graphql.Request, resp interface{}) error
+}
+
 // Client ...
 type Client struct {
-	client *graphql.Client
+	client CMSRequster
 }
 
 // Request ...
 type Request = graphql.Request
 
-type QueryRequest struct {
-	OperationName string                 `json:"operationName"`
-	Variables     map[string]interface{} `json:"variables"`
-	Query         string                 `json:"query"`
+// NewClient ...
+func NewClient(client CMSRequster) *Client {
+	return &Client{
+		client: client,
+	}
 }
 
 // NewRequest ...
@@ -27,39 +35,21 @@ func NewRequest(query string) *Request {
 }
 
 // NewQueryRequest ...
-func NewQueryRequest(query string, name string, variables map[string]interface{}) (*Request, error) {
-	fmt.Println("1111", variables)
-
-	// req := QueryRequest{
-	// 	OperationName: name,
-	// 	Query:         query,
-	// 	Variables:     variables,
-	// }
-
-	// b, err := json.Marshal(req)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return nil, fmt.Errorf("error converting struct to json %v", err)
-	// }
-
+func NewQueryRequest(query string, variables map[string]interface{}) *Request {
 	req := graphql.NewRequest(query)
 
-	req.Var("id", variables["id"])
-	return req, nil
-}
-
-// NewClient ...
-func NewClient(url string) *Client {
-	return &Client{
-		client: graphql.NewClient(url),
+	for k, v := range variables {
+		req.Var(k, v)
 	}
+
+	return req
 }
 
 // Run ...
 func (c Client) Run(ctx context.Context, req *Request, resp interface{}) error {
 	err := c.client.Run(ctx, req, resp)
 	if err != nil {
-		return fmt.Errorf("error occurred making request to GraphCMS %v", err)
+		return fmt.Errorf("error occurred making request to GraphCMS: %v", err)
 	}
 
 	return nil

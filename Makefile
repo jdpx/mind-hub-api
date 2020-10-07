@@ -49,3 +49,7 @@ validate-terraform:
 	terraform init && \
 	terraform validate && \
 	terraform $(TERRAFORM_ACTION) $(OPTS)
+
+.PHONY: regenerate-all-mocks
+regenerate-all-mocks:
+	@go generate ./...

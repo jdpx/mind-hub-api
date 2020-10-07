@@ -11,6 +11,7 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
+	"github.com/machinebox/graphql"
 )
 
 // Config ...
@@ -48,7 +49,9 @@ func NewRouter(config *Config) *gin.Engine {
 
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
-	client := graphcms.NewClient(config.GraphCMSURL)
+	graphCMSClient := graphql.NewClient(config.GraphCMSURL)
+
+	client := graphcms.NewClient(graphCMSClient)
 	resolver := graph.NewResolver(
 		graph.WithClient(client),
 	)

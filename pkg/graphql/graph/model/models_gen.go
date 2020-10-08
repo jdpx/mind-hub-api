@@ -17,9 +17,25 @@ type Session struct {
 	ID          string  `json:"id"`
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
+	Steps       []*Step `json:"steps"`
 	Course      *Course `json:"course"`
 }
 
 type SessionQuery struct {
+	ID *string `json:"id"`
+}
+
+type Step struct {
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Type        string   `json:"type"`
+	VideoURL    *string  `json:"videoUrl"`
+	AudioURL    *string  `json:"audioUrl"`
+	Question    *string  `json:"question"`
+	Session     *Session `json:"session"`
+}
+
+type StepQuery struct {
 	ID *string `json:"id"`
 }

@@ -293,3 +293,71 @@ func TestSessionResolver(t *testing.T) {
 		})
 	}
 }
+
+func TestStepResolver(t *testing.T) {
+	stepsQuery := "{  step(where: {id: 1}) { title  }}"
+	req := graphcms.NewRequest(stepsQuery)
+	title := "some title"
+	step := builder.NewStepBuilder().
+		WithTitle(title).
+		Build()
+	resp := graph.StepResponse{
+		Step: &step,
+	}
+
+	testCases := []struct {
+		desc               string
+		query              string
+		clientExpectations func(client *graphcmsmocks.MockCMSRequster)
+
+		expectedErr error
+	}{
+		{
+			desc:  "given a valid step query, correct step returned",
+			query: stepsQuery,
+			clientExpectations: func(client *graphcmsmocks.MockCMSRequster) {
+				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, resp)
+			},
+		},
+		{
+			desc:  "given the query returns an error, error returned",
+			query: stepsQuery,
+			clientExpectations: func(client *graphcmsmocks.MockCMSRequster) {
+				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).Return(fmt.Errorf("something went wrong"))
+			},
+
+			expectedErr: fmt.Errorf("[{\"message\":\"something went wrong\",\"path\":[\"step\"]}]"),
+		},
+		{
+			desc:  "given an invalid query, error returned",
+			query: "{{{",
+
+			expectedErr: fmt.Errorf("http 422: {\"errors\":[{\"message\":\"Expected Name, found {\",\"locations\":[{\"line\":1,\"column\":2}],\"extensions\":{\"code\":\"GRAPHQL_PARSE_FAILED\"}}],\"data\":null}"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := graphcmsmocks.NewMockCMSRequster(ctrl)
+
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
+
+			resolver := graph.NewResolver(
+				graph.WithClient(clientMock),
+			)
+
+			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
+
+			var resp graph.StepResponse
+			err := c.Post(tt.query, &resp)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				require.Equal(t, title, resp.Step.Title)
+			}
+		})
+	}
+}

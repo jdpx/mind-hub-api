@@ -35,6 +35,12 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	return r.resolveSession(ctx, preloads)
 }
 
+func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model.Step, error) {
+	preloads := graphql.GetOperationContext(ctx)
+
+	return r.resolveStep(ctx, preloads)
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 

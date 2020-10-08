@@ -14,7 +14,20 @@ type Session {
   title: String!
   description: String!
 
+  steps: [Step]
   course: Course!
+}
+
+type Step {
+  id: ID!
+  title: String!
+  description: String!
+  type: String!
+  videoUrl: String
+  audioUrl: String
+  question: String
+
+  session: Session!
 }
 
 input CourseQuery {
@@ -25,10 +38,15 @@ input SessionQuery {
   id: ID
 }
 
+input StepQuery {
+  id: ID
+}
+
 type Query {
   courses: [Course!]!
   sessions: [Session!]!
 
   course(where: CourseQuery!): Course!
   session(where: SessionQuery!): Session!
+  step(where: StepQuery!): Step!
 }

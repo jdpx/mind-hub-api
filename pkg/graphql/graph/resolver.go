@@ -46,6 +46,11 @@ type SessionResponse struct {
 	Session *model.Session `json:"session"`
 }
 
+// StepResponse ...
+type StepResponse struct {
+	Step *model.Step `json:"step"`
+}
+
 // NewResolver ...
 func NewResolver(opts ...ResolverOption) *Resolver {
 	r := &Resolver{}
@@ -118,4 +123,18 @@ func (r Resolver) resolveSession(ctx context.Context, query *graphql.OperationCo
 	}
 
 	return res.Session, err
+}
+
+func (r Resolver) resolveStep(ctx context.Context, query *graphql.OperationContext) (*model.Step, error) {
+	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
+	res := StepResponse{}
+
+	err := r.client.Run(ctx, req, &res)
+	if err != nil {
+		fmt.Println("Error occurred", err)
+
+		return nil, err
+	}
+
+	return res.Step, err
 }

@@ -4,11 +4,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
-	ginHelper "github.com/jdpx/mind-hub-api/pkg/gin"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
+	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/machinebox/graphql"
 )
 
@@ -24,9 +24,9 @@ func NewRouter(config *Config) *gin.Engine {
 	log.Info("Gin cold start")
 	r := gin.Default()
 
-	r.Use(CORSMiddleware())
-	r.Use(RequestLoggerMiddleware())
-	r.Use(ginHelper.RequestContextToContextMiddleware())
+	r.Use(request.CORSMiddleware())
+	r.Use(logging.RequestLoggerMiddleware())
+	r.Use(request.ContextMiddleware())
 
 	// Setting up Gin
 	r.POST("v1/query", graphqlHandler(config))

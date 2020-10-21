@@ -13,6 +13,10 @@ type CourseQuery struct {
 	ID *string `json:"id"`
 }
 
+type CourseStarted struct {
+	CourseID string `json:"courseID"`
+}
+
 type Session struct {
 	ID          string  `json:"id"`
 	Title       string  `json:"title"`

@@ -1,4 +1,4 @@
-package gin
+package request
 
 import (
 	"context"
@@ -17,8 +17,8 @@ const (
 	contextKeyGinContext = contextKey("GinContextKey")
 )
 
-// RequestContextFromContext ...
-func RequestContextFromContext(ctx context.Context) (*gin.Context, error) {
+// GinContext ...
+func GinContext(ctx context.Context) (*gin.Context, error) {
 	ginContext := ctx.Value(contextKeyGinContext)
 	if ginContext == nil {
 		err := fmt.Errorf("could not retrieve gin.Context")
@@ -33,11 +33,12 @@ func RequestContextFromContext(ctx context.Context) (*gin.Context, error) {
 	return gc, nil
 }
 
-// RequestContextToContextMiddleware ...
-func RequestContextToContextMiddleware() gin.HandlerFunc {
+// ContextMiddleware ...
+func ContextMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := context.WithValue(c.Request.Context(), contextKeyGinContext, c)
 		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

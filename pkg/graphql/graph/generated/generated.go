@@ -35,6 +35,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 }
 
@@ -47,6 +48,10 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Sessions    func(childComplexity int) int
 		Title       func(childComplexity int) int
+	}
+
+	Mutation struct {
+		CourseStarted func(childComplexity int, input model.CourseStarted) int
 	}
 
 	Query struct {
@@ -77,6 +82,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error)
+}
 type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
 	Sessions(ctx context.Context) ([]*model.Session, error)
@@ -127,6 +135,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Course.Title(childComplexity), true
+
+	case "Mutation.courseStarted":
+		if e.complexity.Mutation.CourseStarted == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_courseStarted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CourseStarted(childComplexity, args["input"].(model.CourseStarted)), true
 
 	case "Query.course":
 		if e.complexity.Query.Course == nil {
@@ -293,6 +313,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -371,6 +405,14 @@ type Query {
   session(where: SessionQuery!): Session!
   step(where: StepQuery!): Step!
 }
+
+input CourseStarted {
+  courseID: String!
+}
+
+type Mutation {
+  courseStarted(input: CourseStarted!): Boolean!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -378,6 +420,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_courseStarted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CourseStarted
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseStarted(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -612,6 +669,48 @@ func (ec *executionContext) _Course_sessions(ctx context.Context, field graphql.
 	res := resTmp.([]*model.Session)
 	fc.Result = res
 	return ec.marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_courseStarted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_courseStarted_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CourseStarted(rctx, args["input"].(model.CourseStarted))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_courses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2431,6 +2530,26 @@ func (ec *executionContext) unmarshalInputCourseQuery(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCourseStarted(ctx context.Context, obj interface{}) (model.CourseStarted, error) {
+	var it model.CourseStarted
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "courseID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseID"))
+			it.CourseID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSessionQuery(ctx context.Context, obj interface{}) (model.SessionQuery, error) {
 	var it model.SessionQuery
 	var asMap = obj.(map[string]interface{})
@@ -2507,6 +2626,37 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "sessions":
 			out.Values[i] = ec._Course_sessions(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "courseStarted":
+			out.Values[i] = ec._Mutation_courseStarted(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3028,6 +3178,11 @@ func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 
 func (ec *executionContext) unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseQuery(ctx context.Context, v interface{}) (model.CourseQuery, error) {
 	res, err := ec.unmarshalInputCourseQuery(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseStarted(ctx context.Context, v interface{}) (model.CourseStarted, error) {
+	res, err := ec.unmarshalInputCourseStarted(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

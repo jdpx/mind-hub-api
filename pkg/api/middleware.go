@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -40,7 +41,7 @@ func RequestLoggerMiddleware() gin.HandlerFunc {
 			logging.CorrelationIDKey: cID,
 		})
 
-		log.Info("Request %s starting", c.Request.URL.Path)
+		log.Info(fmt.Sprintf("Request %s starting", c.Request.URL.Path))
 
 		t := time.Now()
 
@@ -52,6 +53,6 @@ func RequestLoggerMiddleware() gin.HandlerFunc {
 		log.WithFields(logrus.Fields{
 			logging.RequestDurationKey: latency,
 			logging.HTTPStatusKey:      status,
-		}).Info("Request %s completed ", c.Request.URL.Path)
+		}).Info(fmt.Sprintf("Request %s completed ", c.Request.URL.Path))
 	}
 }

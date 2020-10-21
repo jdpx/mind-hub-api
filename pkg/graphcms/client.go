@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/machinebox/graphql"
 )
 
@@ -29,26 +30,15 @@ func NewClient(client CMSRequster) *Client {
 	}
 }
 
-// NewRequest ...
-func NewRequest(query string) *Request {
-	return graphql.NewRequest(query)
-}
-
-// NewQueryRequest ...
-func NewQueryRequest(query string, variables map[string]interface{}) *Request {
-	req := graphql.NewRequest(query)
-
-	for k, v := range variables {
-		req.Var(k, v)
-	}
-
-	return req
-}
-
 // Run ...
 func (c Client) Run(ctx context.Context, req *Request, resp interface{}) error {
+	log := logging.NewWithContext(ctx)
+
 	err := c.client.Run(ctx, req, resp)
 	if err != nil {
+		log.WithError(err).
+			Error("Error occurred making request to GraphCMS")
+
 		return fmt.Errorf("error occurred making request to GraphCMS: %v", err)
 	}
 

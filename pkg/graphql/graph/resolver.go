@@ -7,6 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+	"github.com/jdpx/mind-hub-api/pkg/logging"
 )
 
 // This file will not be regenerated automatically.
@@ -70,6 +71,9 @@ func WithClient(c Requester) func(*Resolver) {
 }
 
 func (r Resolver) resolveCourses(ctx context.Context, query string) ([]*model.Course, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
+	log.Info("Resolving Courses")
+
 	req := graphcms.NewRequest(query)
 	res := CoursesResponse{}
 
@@ -84,6 +88,9 @@ func (r Resolver) resolveCourses(ctx context.Context, query string) ([]*model.Co
 }
 
 func (r Resolver) resolveCourse(ctx context.Context, query *graphql.OperationContext) (*model.Course, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
+	log.Info("Resolving Course")
+
 	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
 	res := CourseResponse{}
 
@@ -98,6 +105,9 @@ func (r Resolver) resolveCourse(ctx context.Context, query *graphql.OperationCon
 }
 
 func (r Resolver) resolveSessions(ctx context.Context, query string) ([]*model.Session, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
+	log.Info("Resolving Sessions")
+
 	req := graphcms.NewRequest(query)
 	res := SessionsResponse{}
 
@@ -112,6 +122,9 @@ func (r Resolver) resolveSessions(ctx context.Context, query string) ([]*model.S
 }
 
 func (r Resolver) resolveSession(ctx context.Context, query *graphql.OperationContext) (*model.Session, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
+	log.Info("Resolving Session")
+
 	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
 	res := SessionResponse{}
 
@@ -126,6 +139,9 @@ func (r Resolver) resolveSession(ctx context.Context, query *graphql.OperationCo
 }
 
 func (r Resolver) resolveStep(ctx context.Context, query *graphql.OperationContext) (*model.Step, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
+	log.Info("Resolving Step")
+
 	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
 	res := StepResponse{}
 

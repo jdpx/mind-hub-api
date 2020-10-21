@@ -39,7 +39,10 @@ func New() *logrus.Entry {
 func NewFromResolver(ctx context.Context) *logrus.Entry {
 	log := New()
 
-	gc, _ := gin.RequestContextFromContext(ctx)
+	gc, err := gin.RequestContextFromContext(ctx)
+	if err != nil {
+		return log.WithContext(ctx)
+	}
 
 	cID := gc.Request.Header.Get(correlationIDHeader)
 	if cID == "" {

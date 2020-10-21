@@ -27,31 +27,6 @@ type Resolver struct {
 	client Requester
 }
 
-// CoursesResponse ...
-type CoursesResponse struct {
-	Courses []*model.Course `json:"courses"`
-}
-
-// CourseResponse ...
-type CourseResponse struct {
-	Course *model.Course `json:"course"`
-}
-
-// SessionsResponse ...
-type SessionsResponse struct {
-	Sessions []*model.Session `json:"sessions"`
-}
-
-// SessionResponse ...
-type SessionResponse struct {
-	Session *model.Session `json:"session"`
-}
-
-// StepResponse ...
-type StepResponse struct {
-	Step *model.Step `json:"step"`
-}
-
 // NewResolver ...
 func NewResolver(opts ...ResolverOption) *Resolver {
 	r := &Resolver{}

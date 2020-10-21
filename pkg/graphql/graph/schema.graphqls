@@ -50,3 +50,11 @@ type Query {
   session(where: SessionQuery!): Session!
   step(where: StepQuery!): Step!
 }
+
+input CourseStarted {
+  courseID: String!
+}
+
+type Mutation {
+  courseStarted(input: CourseStarted!): Boolean!
+}

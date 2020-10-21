@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/jdpx/mind-hub-api/pkg/gin"
+	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,15 +39,9 @@ func New() *logrus.Entry {
 func NewFromResolver(ctx context.Context) *logrus.Entry {
 	log := New()
 
-	gc, err := gin.RequestContextFromContext(ctx)
+	cID, err := request.ContextCorrelationID(ctx)
 	if err != nil {
-		return log.WithContext(ctx)
-	}
-
-	cID := gc.Request.Header.Get(correlationIDHeader)
-	if cID == "" {
-		id, _ := uuid.NewUUID()
-		cID = id.String()
+		log.WithContext(ctx)
 	}
 
 	return log.WithContext(ctx).

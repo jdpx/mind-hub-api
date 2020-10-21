@@ -9,7 +9,19 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+	"github.com/jdpx/mind-hub-api/pkg/logging"
+	"github.com/jdpx/mind-hub-api/pkg/request"
 )
+
+func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error) {
+	log := logging.NewFromResolver(ctx)
+
+	userID, _ := request.GetUserID(ctx)
+
+	log.Info("CourseStarted called", userID)
+
+	return false, nil
+}
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	preloads := graphql.GetOperationContext(ctx)
@@ -41,7 +53,11 @@ func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model
 	return r.resolveStep(ctx, preloads)
 }
 
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

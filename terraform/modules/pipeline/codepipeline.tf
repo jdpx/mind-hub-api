@@ -84,28 +84,28 @@ resource "aws_codepipeline" "mind_hub_api_pipeline" {
       version          = "1"
     }
 
-    action {
-      category = "Build"
-      configuration = {
-        "EnvironmentVariables" = jsonencode(
-          [
-            {
-              name  = "env"
-              type  = "PLAINTEXT"
-              value = "dev"
-            },
-          ]
-        )
-        "ProjectName" = aws_codebuild_project.mind_hub_api_terraform_deploy.name
-      }
-      input_artifacts = [
-        "SourceArtifact",
-      ]
-      name      = "DevTerraformDeploy"
-      owner     = "AWS"
-      provider  = "CodeBuild"
-      run_order = 2
-      version   = "1"
-    }
+    # action {
+    #   category = "Build"
+    #   configuration = {
+    #     "EnvironmentVariables" = jsonencode(
+    #       [
+    #         {
+    #           name  = "env"
+    #           type  = "PLAINTEXT"
+    #           value = "dev"
+    #         },
+    #       ]
+    #     )
+    #     "ProjectName" = aws_codebuild_project.mind_hub_api_terraform_deploy.name
+    #   }
+    #   input_artifacts = [
+    #     "SourceArtifact",
+    #   ]
+    #   name      = "DevTerraformDeploy"
+    #   owner     = "AWS"
+    #   provider  = "CodeBuild"
+    #   run_order = 2
+    #   version   = "1"
+    # }
   }
 }

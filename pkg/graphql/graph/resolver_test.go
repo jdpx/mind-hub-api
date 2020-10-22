@@ -70,7 +70,7 @@ func TestCoursesResolver(t *testing.T) {
 			}
 
 			resolver := graph.NewResolver(
-				graph.WithClient(clientMock),
+				graph.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
@@ -138,7 +138,7 @@ func TestCourseResolver(t *testing.T) {
 			}
 
 			resolver := graph.NewResolver(
-				graph.WithClient(clientMock),
+				graph.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
@@ -209,7 +209,7 @@ func TestSessionsResolver(t *testing.T) {
 			}
 
 			resolver := graph.NewResolver(
-				graph.WithClient(clientMock),
+				graph.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
@@ -277,7 +277,7 @@ func TestSessionResolver(t *testing.T) {
 			}
 
 			resolver := graph.NewResolver(
-				graph.WithClient(clientMock),
+				graph.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
@@ -345,7 +345,7 @@ func TestStepResolver(t *testing.T) {
 			}
 
 			resolver := graph.NewResolver(
-				graph.WithClient(clientMock),
+				graph.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))

@@ -17,14 +17,20 @@ import (
 // ResolverOption ...
 type ResolverOption func(*Resolver)
 
-// Requester ...
-type Requester interface {
+// CMSRequester ...
+type CMSRequester interface {
 	Run(ctx context.Context, req *graphcms.Request, resp interface{}) error
+}
+
+// Storer ...
+type Storer interface {
+	Put(ctx context.Context, i interface{}) error
 }
 
 // Resolver ...
 type Resolver struct {
-	client Requester
+	client CMSRequester
+	store  Storer
 }
 
 // NewResolver ...
@@ -38,10 +44,17 @@ func NewResolver(opts ...ResolverOption) *Resolver {
 	return r
 }
 
-// WithClient ...
-func WithClient(c Requester) func(*Resolver) {
+// WithCMSClient ...
+func WithCMSClient(c CMSRequester) func(*Resolver) {
 	return func(r *Resolver) {
 		r.client = c
+	}
+}
+
+// WithStore ...
+func WithStore(s Storer) func(*Resolver) {
+	return func(r *Resolver) {
+		r.store = s
 	}
 }
 

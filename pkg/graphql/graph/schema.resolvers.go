@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/jdpx/mind-hub-api/pkg/event"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
@@ -16,9 +17,22 @@ import (
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error) {
 	log := logging.NewFromResolver(ctx)
 
-	userID, _ := request.GetUserID(ctx)
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	event := event.CourseStarted{
+		CourseID: input.CourseID,
+		UserID:   userID,
+	}
 
 	log.Info("CourseStarted called", userID)
+
+	err = r.store.Put(ctx, event)
+	if err != nil {
+		return false, err
+	}
 
 	return false, nil
 }

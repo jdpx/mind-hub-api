@@ -7,6 +7,8 @@ type Course {
   title: String!
   description: String!
   sessions: [Session]
+
+  progress: Progress
 }
 
 type Session {
@@ -28,6 +30,10 @@ type Step {
   question: String
 
   session: Session!
+}
+
+type Progress {
+  value: String!
 }
 
 input CourseQuery {

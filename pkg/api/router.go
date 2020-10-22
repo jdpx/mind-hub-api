@@ -4,6 +4,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
+	"github.com/jdpx/mind-hub-api/pkg/dynamo"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
@@ -43,10 +44,14 @@ func NewRouter(config *Config) *gin.Engine {
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
 	graphCMSClient := graphql.NewClient(config.GraphCMSURL)
+	storeConfig := dynamo.Config{}
 
-	client := graphcms.NewClient(graphCMSClient)
+	cms := graphcms.NewClient(graphCMSClient)
+	store := dynamo.NewClient(storeConfig)
+
 	resolver := graph.NewResolver(
-		graph.WithClient(client),
+		graph.WithCMSClient(cms),
+		graph.WithStore(store),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

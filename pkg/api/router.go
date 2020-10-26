@@ -4,12 +4,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
-	"github.com/jdpx/mind-hub-api/pkg/dynamo"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
+	"github.com/jdpx/mind-hub-api/pkg/stream"
 	"github.com/machinebox/graphql"
 )
 
@@ -44,10 +44,10 @@ func NewRouter(config *Config) *gin.Engine {
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
 	graphCMSClient := graphql.NewClient(config.GraphCMSURL)
-	storeConfig := dynamo.Config{}
+	storeConfig := stream.Config{}
 
 	cms := graphcms.NewClient(graphCMSClient)
-	store := dynamo.NewClient(storeConfig)
+	store := stream.NewClient(storeConfig)
 
 	resolver := graph.NewResolver(
 		graph.WithCMSClient(cms),

@@ -7,6 +7,7 @@ type Course struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Sessions    []*Session `json:"sessions"`
+	Progress    *Progress  `json:"progress"`
 }
 
 type CourseQuery struct {
@@ -15,6 +16,10 @@ type CourseQuery struct {
 
 type CourseStarted struct {
 	CourseID string `json:"courseID"`
+}
+
+type Progress struct {
+	Value string `json:"value"`
 }
 
 type Session struct {

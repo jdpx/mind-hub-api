@@ -32,7 +32,9 @@ func NewClient(client CMSRequster) *Client {
 
 // Run ...
 func (c Client) Run(ctx context.Context, req *Request, resp interface{}) error {
-	log := logging.NewWithContext(ctx)
+	log := logging.NewFromResolver(ctx)
+
+	log.Info("Making request to GraphCMS")
 
 	err := c.client.Run(ctx, req, resp)
 	if err != nil {

@@ -8,7 +8,7 @@ type Course {
   description: String!
   sessions: [Session]
 
-  progress: Progress
+  progress: Progress!
 }
 
 type Session {
@@ -50,7 +50,7 @@ input StepQuery {
 
 type Query {
   courses: [Course!]!
-  sessions: [Session!]!
+  # sessions: [Session!]!
 
   course(where: CourseQuery!): Course!
   session(where: SessionQuery!): Session!

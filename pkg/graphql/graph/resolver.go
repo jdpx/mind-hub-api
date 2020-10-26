@@ -62,7 +62,7 @@ func (r Resolver) resolveCourses(ctx context.Context, query string) ([]*model.Co
 	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
 	log.Info("Resolving Courses")
 
-	req := graphcms.NewRequest(query)
+	req := graphcms.NewRequest(graphcms.GetAllCoursesQuery)
 	res := CoursesResponse{}
 
 	err := r.client.Run(ctx, req, &res)
@@ -72,14 +72,14 @@ func (r Resolver) resolveCourses(ctx context.Context, query string) ([]*model.Co
 		return nil, err
 	}
 
-	return res.Courses, err
+	return res.Courses, nil
 }
 
 func (r Resolver) resolveCourse(ctx context.Context, query *graphql.OperationContext) (*model.Course, error) {
 	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
 	log.Info("Resolving Course")
 
-	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
+	req := graphcms.NewQueryRequest(graphcms.GetCourseByID, query.Variables)
 	res := CourseResponse{}
 
 	err := r.client.Run(ctx, req, &res)
@@ -92,11 +92,12 @@ func (r Resolver) resolveCourse(ctx context.Context, query *graphql.OperationCon
 	return res.Course, err
 }
 
-func (r Resolver) resolveSessions(ctx context.Context, query string) ([]*model.Session, error) {
-	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
-	log.Info("Resolving Sessions")
+func (r Resolver) resolveCourseSessions(ctx context.Context, id string) ([]*model.Session, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, graphcms.GetSessionsByCourseID)
+	log.Info("Resolving Course Sessions")
 
-	req := graphcms.NewRequest(query)
+	req := graphcms.NewRequest(graphcms.GetSessionsByCourseID)
+	req.Var("id", id)
 	res := SessionsResponse{}
 
 	err := r.client.Run(ctx, req, &res)
@@ -113,7 +114,7 @@ func (r Resolver) resolveSession(ctx context.Context, query *graphql.OperationCo
 	log := logging.NewFromResolver(ctx).WithField(logging.QueryKey, query)
 	log.Info("Resolving Session")
 
-	req := graphcms.NewQueryRequest(query.RawQuery, query.Variables)
+	req := graphcms.NewQueryRequest(graphcms.GetSessionByID, query.Variables)
 	res := SessionResponse{}
 
 	err := r.client.Run(ctx, req, &res)

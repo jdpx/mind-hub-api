@@ -25,7 +25,13 @@ const (
 // New ...
 func New() *logrus.Entry {
 	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{})
+	// log.SetFormatter(&logrus.JSONFormatter{})
+
+	log.SetFormatter(&logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	})
+
 	log.SetOutput(os.Stdout)
 	log.SetReportCaller(true)
 

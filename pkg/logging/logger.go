@@ -16,6 +16,10 @@ const (
 	CorrelationIDKey = "correlation_id"
 	// QueryKey ...
 	QueryKey = "query"
+	// CourseIDKey ...
+	CourseIDKey = "course_id"
+	// SessionKey ...
+	SessionIDKey = "session_id"
 	// RequestDurationKey ...
 	RequestDurationKey = "request_duration"
 	// HTTPStatusKey ...
@@ -25,7 +29,13 @@ const (
 // New ...
 func New() *logrus.Entry {
 	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{})
+	// log.SetFormatter(&logrus.JSONFormatter{})
+
+	log.SetFormatter(&logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	})
+
 	log.SetOutput(os.Stdout)
 	log.SetReportCaller(true)
 

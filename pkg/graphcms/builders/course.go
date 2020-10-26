@@ -1,17 +1,30 @@
 package builder
 
-import "github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+import (
+	"github.com/icrowley/fake"
+	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+)
 
 // CourseBuilder ...
 type CourseBuilder struct {
-	course model.Course
+	course graphcms.Course
 }
 
 // NewCourseBuilder ...
 func NewCourseBuilder() *CourseBuilder {
 	return &CourseBuilder{
-		course: model.Course{},
+		course: graphcms.Course{
+			ID:          fake.CharactersN(10),
+			Title:       fake.Title(),
+			Description: fake.Sentences(),
+		},
 	}
+}
+
+// WithID ...
+func (c CourseBuilder) WithID(id string) CourseBuilder {
+	c.course.ID = id
+	return c
 }
 
 // WithTitle ...
@@ -21,6 +34,6 @@ func (c CourseBuilder) WithTitle(title string) CourseBuilder {
 }
 
 // Build ...
-func (c CourseBuilder) Build() model.Course {
+func (c CourseBuilder) Build() graphcms.Course {
 	return c.course
 }

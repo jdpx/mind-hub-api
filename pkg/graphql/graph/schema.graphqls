@@ -7,6 +7,8 @@ type Course {
   title: String!
   description: String!
   sessions: [Session]
+
+  progress: Progress!
 }
 
 type Session {
@@ -30,25 +32,29 @@ type Step {
   session: Session!
 }
 
+type Progress {
+  value: String!
+}
+
 input CourseQuery {
-  id: ID
+  id: ID!
 }
 
 input SessionQuery {
-  id: ID
+  id: ID!
 }
 
 input StepQuery {
-  id: ID
+  id: ID!
 }
 
 type Query {
   courses: [Course!]!
-  sessions: [Session!]!
+  # sessions: [Session!]!
 
   course(where: CourseQuery!): Course!
   session(where: SessionQuery!): Session!
-  step(where: StepQuery!): Step!
+  # step(where: StepQuery!): Step!
 }
 
 input CourseStarted {

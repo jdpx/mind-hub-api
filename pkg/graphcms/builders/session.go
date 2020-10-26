@@ -1,17 +1,30 @@
 package builder
 
-import "github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+import (
+	"github.com/icrowley/fake"
+	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+)
 
 // SessionBuilder ...
 type SessionBuilder struct {
-	session model.Session
+	session graphcms.Session
 }
 
 // NewSessionBuilder ...
 func NewSessionBuilder() *SessionBuilder {
 	return &SessionBuilder{
-		session: model.Session{},
+		session: graphcms.Session{
+			ID:          fake.CharactersN(10),
+			Title:       fake.Title(),
+			Description: fake.Sentences(),
+		},
 	}
+}
+
+// WithID ...
+func (c SessionBuilder) WithID(id string) SessionBuilder {
+	c.session.ID = id
+	return c
 }
 
 // WithTitle ...
@@ -21,6 +34,6 @@ func (c SessionBuilder) WithTitle(title string) SessionBuilder {
 }
 
 // Build ...
-func (c SessionBuilder) Build() model.Session {
+func (c SessionBuilder) Build() graphcms.Session {
 	return c.session
 }

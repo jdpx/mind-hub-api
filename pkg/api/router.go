@@ -47,10 +47,11 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	storeConfig := stream.Config{}
 
 	cms := graphcms.NewClient(graphCMSClient)
+	cmsResolver := graphcms.NewResolver(cms)
 	store := stream.NewClient(storeConfig)
 
 	resolver := graph.NewResolver(
-		graph.WithCMSClient(cms),
+		graph.WithCMSClient(cmsResolver),
 		graph.WithStore(store),
 	)
 

@@ -2,9 +2,9 @@ package stream
 
 import "context"
 
-var (
-	db map[string]interface{}
-)
+// var (
+// 	db map[string]interface{}
+// )
 
 // Client ...
 type Client struct {

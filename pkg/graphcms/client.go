@@ -10,27 +10,27 @@ import (
 	"github.com/machinebox/graphql"
 )
 
-// CMSRequster ...
-type CMSRequster interface {
-	Run(ctx context.Context, req *graphql.Request, resp interface{}) error
+// CMSRequester defines the functionality to make requests to GraphCMS
+type CMSRequester interface {
+	Run(ctx context.Context, req *Request, resp interface{}) error
 }
 
-// Client ...
+// Client makes request to GraphCMS
 type Client struct {
-	client CMSRequster
+	client CMSRequester
 }
 
 // Request ...
 type Request = graphql.Request
 
-// NewClient ...
-func NewClient(client CMSRequster) *Client {
+// NewClient initalises a new Client
+func NewClient(client CMSRequester) *Client {
 	return &Client{
 		client: client,
 	}
 }
 
-// Run ...
+// Run makes a request to GraphCMS
 func (c Client) Run(ctx context.Context, req *Request, resp interface{}) error {
 	log := logging.NewFromResolver(ctx)
 

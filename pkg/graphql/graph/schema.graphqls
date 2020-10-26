@@ -37,15 +37,15 @@ type Progress {
 }
 
 input CourseQuery {
-  id: ID
+  id: ID!
 }
 
 input SessionQuery {
-  id: ID
+  id: ID!
 }
 
 input StepQuery {
-  id: ID
+  id: ID!
 }
 
 type Query {
@@ -54,7 +54,7 @@ type Query {
 
   course(where: CourseQuery!): Course!
   session(where: SessionQuery!): Session!
-  step(where: StepQuery!): Step!
+  # step(where: StepQuery!): Step!
 }
 
 input CourseStarted {

@@ -1,7 +1,6 @@
 package graphcms
 
-// GetAllCoursesQuery ...
-const GetAllCoursesQuery = `{
+const getAllCoursesQuery = `{
   courses {
     id
     title
@@ -9,38 +8,24 @@ const GetAllCoursesQuery = `{
   }
 }`
 
-// GetCourseByID ...
-const GetCourseByID = `
+const getCourseByID = `
   query Course($id: ID) {
       course(where: { id: $id }) {
           id
           title
           description
       }
-  }
-`
+  }`
 
-// GetCourseSessionsQuery ...
-const GetCourseSessionsQuery = `{
-  sessions {
+const getSessionsByCourseID = `query sessions($id: ID){
+  sessions(where: { course: { id: $id } }) {
     id
     title
     description
   }
 }`
 
-// GetSessionsByCourseID ...
-const GetSessionsByCourseID = `query sessions($id: ID){
-  sessions(where: { course: { id: $id } }) {
-    id
-    title
-    description
-  }
-}
-`
-
-// GetSessionByID ...
-const GetSessionByID = `query Session($id: ID) {
+const getSessionByID = `query Session($id: ID) {
     session(where: { id: $id }) {
         id
         title
@@ -59,6 +44,7 @@ const GetSessionByID = `query Session($id: ID) {
         course {
             id
             title
+            description
         }
     }
 }`

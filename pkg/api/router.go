@@ -9,7 +9,7 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
-	"github.com/jdpx/mind-hub-api/pkg/stream"
+	"github.com/jdpx/mind-hub-api/pkg/store"
 	"github.com/machinebox/graphql"
 )
 
@@ -44,11 +44,10 @@ func NewRouter(config *Config) *gin.Engine {
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
 	graphCMSClient := graphql.NewClient(config.GraphCMSURL)
-	storeConfig := stream.Config{}
 
 	cms := graphcms.NewClient(graphCMSClient)
 	cmsResolver := graphcms.NewResolver(cms)
-	store := stream.NewClient(storeConfig)
+	store := store.NewClient()
 
 	resolver := graph.NewResolver(
 		graph.WithCMSClient(cmsResolver),

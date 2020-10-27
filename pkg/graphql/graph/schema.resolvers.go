@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 
-	"github.com/jdpx/mind-hub-api/pkg/event"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
@@ -28,6 +27,20 @@ func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*mo
 	return ss, nil
 }
 
+func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Note, error) {
+	log := logging.NewFromResolver(ctx)
+
+	log.Info("Course Note resolver got called", obj.ID)
+
+	n := r.store.Get(ctx, obj.ID)
+
+	if n == nil {
+		return nil, nil
+	}
+
+	return n.(*model.Note), nil
+}
+
 func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.Progress, error) {
 	log := logging.NewFromResolver(ctx)
 
@@ -37,26 +50,47 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error) {
+	// log := logging.NewFromResolver(ctx)
+
+	// userID, err := request.GetUserID(ctx)
+	// if err != nil {
+	// 	return false, err
+	// }
+
+	// event := event.CourseStarted{
+	// 	CourseID: input.CourseID,
+	// 	UserID:   userID,
+	// }
+
+	// log.Info("CourseStarted called", userID)
+
+	// err = r.store.Put(ctx, event)
+	// if err != nil {
+	// 	return false, err
+	// }
+
+	return false, nil
+}
+
+func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Note, error) {
 	log := logging.NewFromResolver(ctx)
+
+	log.Info("Update Course Note resolver called")
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	event := event.CourseStarted{
-		CourseID: input.CourseID,
-		UserID:   userID,
+	note := model.Note{
+		ID:     input.CourseID,
+		UserID: userID,
+		Value:  &input.Value,
 	}
 
-	log.Info("CourseStarted called", userID)
+	err = r.store.Put(ctx, input.CourseID, &note)
 
-	err = r.store.Put(ctx, event)
-	if err != nil {
-		return false, err
-	}
-
-	return false, nil
+	return &note, err
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {

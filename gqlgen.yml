@@ -60,3 +60,5 @@ models:
         resolver: true
       sessions:
         resolver: true
+      note:
+        resolver: true

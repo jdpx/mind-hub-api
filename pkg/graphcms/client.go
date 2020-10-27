@@ -44,5 +44,7 @@ func (c Client) Run(ctx context.Context, req *Request, resp interface{}) error {
 		return fmt.Errorf("error occurred making request to GraphCMS: %v", err)
 	}
 
+	log.Info("Completed request to GraphCMS")
+
 	return nil
 }

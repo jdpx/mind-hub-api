@@ -12,6 +12,19 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/request"
 )
 
+func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (int, error) {
+	log := logging.NewFromResolver(ctx)
+
+	log.Info("course sessions count resolver got called", obj.ID)
+
+	gss, err := r.graphcms.ResolveCourseSessions(ctx, obj.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	return len(gss), nil
+}
+
 func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error) {
 	log := logging.NewFromResolver(ctx)
 
@@ -46,7 +59,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 
 	log.Info("progress resolver got called")
 
-	return &model.Progress{Value: "foo"}, nil
+	return &model.Progress{SessionsCompleted: 1, Started: true}, nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error) {

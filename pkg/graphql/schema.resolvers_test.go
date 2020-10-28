@@ -17,7 +17,7 @@ import (
 )
 
 func TestCoursesResolver(t *testing.T) {
-	coursesQuery := "{ courses { id title description sessions { id title description } } }"
+	coursesQuery := "{ courses { id title description sessionCount sessions { id title description } } }"
 	cmsCourse := builder.NewCourseBuilder().
 		Build()
 
@@ -40,7 +40,7 @@ func TestCoursesResolver(t *testing.T) {
 				}, nil)
 				client.EXPECT().ResolveCourseSessions(gomock.Any(), cmsCourse.ID).Return([]*graphcms.Session{
 					&session,
-				}, nil)
+				}, nil).AnyTimes()
 			},
 		},
 		{
@@ -59,10 +59,10 @@ func TestCoursesResolver(t *testing.T) {
 				client.EXPECT().ResolveCourses(gomock.Any()).Return([]*graphcms.Course{
 					&cmsCourse,
 				}, nil)
-				client.EXPECT().ResolveCourseSessions(gomock.Any(), cmsCourse.ID).Return(nil, fmt.Errorf("something went wrong"))
+				client.EXPECT().ResolveCourseSessions(gomock.Any(), cmsCourse.ID).Return(nil, fmt.Errorf("something went wrong")).AnyTimes()
 			},
 
-			expectedErr: fmt.Errorf("[{\"message\":\"something went wrong\",\"path\":[\"courses\",0,\"sessions\"]}]"),
+			expectedErr: fmt.Errorf("[{\"message\":\"something went wrong\",\"path\":[\"courses\",0,\"sessionCount\"]},{\"message\":\"something went wrong\",\"path\":[\"courses\",0,\"sessions\"]}]"),
 		},
 	}
 	for _, tt := range testCases {
@@ -90,6 +90,7 @@ func TestCoursesResolver(t *testing.T) {
 				assert.Equal(t, cmsCourse.ID, resp.Courses[0].ID)
 				assert.Equal(t, cmsCourse.Title, resp.Courses[0].Title)
 				assert.Equal(t, cmsCourse.Description, resp.Courses[0].Description)
+				assert.Equal(t, 1, resp.Courses[0].SessionCount)
 				assert.Equal(t, session.ID, resp.Courses[0].Sessions[0].ID)
 				assert.Equal(t, session.Title, resp.Courses[0].Sessions[0].Title)
 				assert.Equal(t, session.Description, resp.Courses[0].Sessions[0].Description)

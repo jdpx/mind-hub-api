@@ -27,7 +27,7 @@ func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*mo
 	return ss, nil
 }
 
-func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Note, error) {
+func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.CourseNote, error) {
 	log := logging.NewFromResolver(ctx)
 
 	log.Info("Course Note resolver got called", obj.ID)
@@ -38,7 +38,7 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.No
 		return nil, nil
 	}
 
-	return n.(*model.Note), nil
+	return n.(*model.CourseNote), nil
 }
 
 func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.Progress, error) {
@@ -72,7 +72,7 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 	return false, nil
 }
 
-func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Note, error) {
+func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error) {
 	log := logging.NewFromResolver(ctx)
 
 	log.Info("Update Course Note resolver called")
@@ -82,10 +82,11 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 		return nil, err
 	}
 
-	note := model.Note{
-		ID:     input.CourseID,
-		UserID: userID,
-		Value:  &input.Value,
+	note := model.CourseNote{
+		ID:       "111",
+		CourseID: input.CourseID,
+		UserID:   userID,
+		Value:    &input.Value,
 	}
 
 	err = r.store.Put(ctx, input.CourseID, &note)

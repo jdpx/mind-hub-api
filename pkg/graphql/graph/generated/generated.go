@@ -53,15 +53,16 @@ type ComplexityRoot struct {
 		Title       func(childComplexity int) int
 	}
 
+	CourseNote struct {
+		CourseID func(childComplexity int) int
+		ID       func(childComplexity int) int
+		UserID   func(childComplexity int) int
+		Value    func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CourseStarted    func(childComplexity int, input model.CourseStarted) int
 		UpdateCourseNote func(childComplexity int, input model.UpdatedCourseNote) int
-	}
-
-	Note struct {
-		ID     func(childComplexity int) int
-		UserID func(childComplexity int) int
-		Value  func(childComplexity int) int
 	}
 
 	Progress struct {
@@ -96,12 +97,12 @@ type ComplexityRoot struct {
 
 type CourseResolver interface {
 	Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error)
-	Note(ctx context.Context, obj *model.Course) (*model.Note, error)
+	Note(ctx context.Context, obj *model.Course) (*model.CourseNote, error)
 	Progress(ctx context.Context, obj *model.Course) (*model.Progress, error)
 }
 type MutationResolver interface {
 	CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error)
-	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Note, error)
+	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error)
 }
 type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
@@ -166,6 +167,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Course.Title(childComplexity), true
 
+	case "CourseNote.courseID":
+		if e.complexity.CourseNote.CourseID == nil {
+			break
+		}
+
+		return e.complexity.CourseNote.CourseID(childComplexity), true
+
+	case "CourseNote.id":
+		if e.complexity.CourseNote.ID == nil {
+			break
+		}
+
+		return e.complexity.CourseNote.ID(childComplexity), true
+
+	case "CourseNote.userID":
+		if e.complexity.CourseNote.UserID == nil {
+			break
+		}
+
+		return e.complexity.CourseNote.UserID(childComplexity), true
+
+	case "CourseNote.value":
+		if e.complexity.CourseNote.Value == nil {
+			break
+		}
+
+		return e.complexity.CourseNote.Value(childComplexity), true
+
 	case "Mutation.courseStarted":
 		if e.complexity.Mutation.CourseStarted == nil {
 			break
@@ -189,27 +218,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateCourseNote(childComplexity, args["input"].(model.UpdatedCourseNote)), true
-
-	case "Note.id":
-		if e.complexity.Note.ID == nil {
-			break
-		}
-
-		return e.complexity.Note.ID(childComplexity), true
-
-	case "Note.userID":
-		if e.complexity.Note.UserID == nil {
-			break
-		}
-
-		return e.complexity.Note.UserID(childComplexity), true
-
-	case "Note.value":
-		if e.complexity.Note.Value == nil {
-			break
-		}
-
-		return e.complexity.Note.Value(childComplexity), true
 
 	case "Progress.value":
 		if e.complexity.Progress.Value == nil {
@@ -414,7 +422,7 @@ type Course {
   description: String!
   sessions: [Session]
 
-  note: Note
+  note: CourseNote
   progress: Progress
 }
 
@@ -455,8 +463,9 @@ input StepQuery {
   id: ID!
 }
 
-type Note {
+type CourseNote {
   id: ID!
+  courseID: ID!
   userID: ID!
   value: String
 }
@@ -479,7 +488,7 @@ input UpdatedCourseNote {
 
 type Mutation {
   courseStarted(input: CourseStarted!): Boolean!
-  updateCourseNote(input: UpdatedCourseNote!): Note!
+  updateCourseNote(input: UpdatedCourseNote!): CourseNote!
 }
 `, BuiltIn: false},
 }
@@ -766,9 +775,9 @@ func (ec *executionContext) _Course_note(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Note)
+	res := resTmp.(*model.CourseNote)
 	fc.Result = res
-	return ec.marshalONote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐNote(ctx, field.Selections, res)
+	return ec.marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Course_progress(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
@@ -801,6 +810,143 @@ func (ec *executionContext) _Course_progress(ctx context.Context, field graphql.
 	res := resTmp.(*model.Progress)
 	fc.Result = res
 	return ec.marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐProgress(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseNote_id(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseNote",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseNote_courseID(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseNote",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CourseID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseNote_userID(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseNote",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseNote_value(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseNote",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_courseStarted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -882,111 +1028,9 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Note)
+	res := resTmp.(*model.CourseNote)
 	fc.Result = res
-	return ec.marshalNNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐNote(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Note_id(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Note_userID(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Note_value(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Value, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Progress_value(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
@@ -2930,6 +2974,45 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var courseNoteImplementors = []string{"CourseNote"}
+
+func (ec *executionContext) _CourseNote(ctx context.Context, sel ast.SelectionSet, obj *model.CourseNote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, courseNoteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CourseNote")
+		case "id":
+			out.Values[i] = ec._CourseNote_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "courseID":
+			out.Values[i] = ec._CourseNote_courseID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._CourseNote_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+			out.Values[i] = ec._CourseNote_value(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2955,40 +3038,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var noteImplementors = []string{"Note"}
-
-func (ec *executionContext) _Note(ctx context.Context, sel ast.SelectionSet, obj *model.Note) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, noteImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Note")
-		case "id":
-			out.Values[i] = ec._Note_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "userID":
-			out.Values[i] = ec._Note_userID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "value":
-			out.Values[i] = ec._Note_value(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3507,6 +3556,20 @@ func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 	return ec._Course(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v model.CourseNote) graphql.Marshaler {
+	return ec._CourseNote(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CourseNote(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseQuery(ctx context.Context, v interface{}) (model.CourseQuery, error) {
 	res, err := ec.unmarshalInputCourseQuery(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3530,20 +3593,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐNote(ctx context.Context, sel ast.SelectionSet, v model.Note) graphql.Marshaler {
-	return ec._Note(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐNote(ctx context.Context, sel ast.SelectionSet, v *model.Note) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Note(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNSession2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v model.Session) graphql.Marshaler {
@@ -3838,11 +3887,11 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalONote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐNote(ctx context.Context, sel ast.SelectionSet, v *model.Note) graphql.Marshaler {
+func (ec *executionContext) marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._Note(ctx, sel, v)
+	return ec._CourseNote(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐProgress(ctx context.Context, sel ast.SelectionSet, v *model.Progress) graphql.Marshaler {

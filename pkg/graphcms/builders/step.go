@@ -1,6 +1,6 @@
 package builder
 
-import "github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+import "github.com/jdpx/mind-hub-api/pkg/graphql/model"
 
 // StepBuilder ...
 type StepBuilder struct {

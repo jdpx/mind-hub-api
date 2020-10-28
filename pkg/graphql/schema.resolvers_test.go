@@ -1,4 +1,4 @@
-package graph_test
+package graphql_test
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	builder "github.com/jdpx/mind-hub-api/pkg/graphcms/builders"
 	graphcmsmocks "github.com/jdpx/mind-hub-api/pkg/graphcms/mocks"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
+	"github.com/jdpx/mind-hub-api/pkg/graphql"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -74,13 +74,13 @@ func TestCoursesResolver(t *testing.T) {
 				tt.clientExpectations(clientMock)
 			}
 
-			resolver := graph.NewResolver(
-				graph.WithCMSClient(clientMock),
+			resolver := graphql.NewResolver(
+				graphql.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
-			var resp graph.CoursesResponse
+			var resp graphql.CoursesResponse
 			err := c.Post(tt.query, &resp)
 
 			if tt.expectedErr != nil {
@@ -139,13 +139,13 @@ func TestCourseResolver(t *testing.T) {
 				tt.clientExpectations(clientMock)
 			}
 
-			resolver := graph.NewResolver(
-				graph.WithCMSClient(clientMock),
+			resolver := graphql.NewResolver(
+				graphql.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
-			var resp graph.CourseResponse
+			var resp graphql.CourseResponse
 			err := c.Post(tt.query, &resp)
 
 			if tt.expectedErr != nil {
@@ -202,13 +202,13 @@ func TestSessionResolver(t *testing.T) {
 				tt.clientExpectations(clientMock)
 			}
 
-			resolver := graph.NewResolver(
-				graph.WithCMSClient(clientMock),
+			resolver := graphql.NewResolver(
+				graphql.WithCMSClient(clientMock),
 			)
 
 			c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
-			var resp graph.SessionResponse
+			var resp graphql.SessionResponse
 			err := c.Post(tt.query, &resp)
 
 			if tt.expectedErr != nil {

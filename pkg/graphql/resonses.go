@@ -1,8 +1,8 @@
-package graph
+package graphql
 
 import (
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 )
 
 // CourseFromCMS ...

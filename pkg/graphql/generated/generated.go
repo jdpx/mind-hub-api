@@ -12,7 +12,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/model"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -412,7 +412,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "pkg/graphql/graph/schema.graphqls", Input: `# GraphQL schema example
+	{Name: "pkg/graphql/schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
@@ -504,7 +504,7 @@ func (ec *executionContext) field_Mutation_courseStarted_args(ctx context.Contex
 	var arg0 model.CourseStarted
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseStarted(ctx, tmp)
+		arg0, err = ec.unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseStarted(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -519,7 +519,7 @@ func (ec *executionContext) field_Mutation_updateCourseNote_args(ctx context.Con
 	var arg0 model.UpdatedCourseNote
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐUpdatedCourseNote(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedCourseNote(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -549,7 +549,7 @@ func (ec *executionContext) field_Query_course_args(ctx context.Context, rawArgs
 	var arg0 model.CourseQuery
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseQuery(ctx, tmp)
+		arg0, err = ec.unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseQuery(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -564,7 +564,7 @@ func (ec *executionContext) field_Query_session_args(ctx context.Context, rawArg
 	var arg0 model.SessionQuery
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg0, err = ec.unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSessionQuery(ctx, tmp)
+		arg0, err = ec.unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSessionQuery(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -745,7 +745,7 @@ func (ec *executionContext) _Course_sessions(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Session)
 	fc.Result = res
-	return ec.marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx, field.Selections, res)
+	return ec.marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Course_note(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
@@ -777,7 +777,7 @@ func (ec *executionContext) _Course_note(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.CourseNote)
 	fc.Result = res
-	return ec.marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx, field.Selections, res)
+	return ec.marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Course_progress(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
@@ -809,7 +809,7 @@ func (ec *executionContext) _Course_progress(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.Progress)
 	fc.Result = res
-	return ec.marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐProgress(ctx, field.Selections, res)
+	return ec.marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐProgress(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseNote_id(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
@@ -1030,7 +1030,7 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 	}
 	res := resTmp.(*model.CourseNote)
 	fc.Result = res
-	return ec.marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx, field.Selections, res)
+	return ec.marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Progress_value(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
@@ -1100,7 +1100,7 @@ func (ec *executionContext) _Query_courses(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_course(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1142,7 +1142,7 @@ func (ec *executionContext) _Query_course(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_session(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1184,7 +1184,7 @@ func (ec *executionContext) _Query_session(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.Session)
 	fc.Result = res
-	return ec.marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx, field.Selections, res)
+	return ec.marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1392,7 +1392,7 @@ func (ec *executionContext) _Session_steps(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Step)
 	fc.Result = res
-	return ec.marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐStep(ctx, field.Selections, res)
+	return ec.marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Session_course(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
@@ -1427,7 +1427,7 @@ func (ec *executionContext) _Session_course(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Step_id(ctx context.Context, field graphql.CollectedField, obj *model.Step) (ret graphql.Marshaler) {
@@ -1698,7 +1698,7 @@ func (ec *executionContext) _Step_session(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.Session)
 	fc.Result = res
-	return ec.marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx, field.Selections, res)
+	return ec.marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3505,11 +3505,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCourse2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v model.Course) graphql.Marshaler {
 	return ec._Course(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Course) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3533,7 +3533,7 @@ func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhu
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourse(ctx, sel, v[i])
+			ret[i] = ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3546,7 +3546,7 @@ func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhu
 	return ret
 }
 
-func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v *model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v *model.Course) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3556,11 +3556,11 @@ func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 	return ec._Course(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v model.CourseNote) graphql.Marshaler {
+func (ec *executionContext) marshalNCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v model.CourseNote) graphql.Marshaler {
 	return ec._CourseNote(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
+func (ec *executionContext) marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3570,12 +3570,12 @@ func (ec *executionContext) marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑh
 	return ec._CourseNote(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseQuery(ctx context.Context, v interface{}) (model.CourseQuery, error) {
+func (ec *executionContext) unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseQuery(ctx context.Context, v interface{}) (model.CourseQuery, error) {
 	res, err := ec.unmarshalInputCourseQuery(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseStarted(ctx context.Context, v interface{}) (model.CourseStarted, error) {
+func (ec *executionContext) unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseStarted(ctx context.Context, v interface{}) (model.CourseStarted, error) {
 	res, err := ec.unmarshalInputCourseStarted(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3595,11 +3595,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNSession2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v model.Session) graphql.Marshaler {
+func (ec *executionContext) marshalNSession2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v model.Session) graphql.Marshaler {
 	return ec._Session(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {
+func (ec *executionContext) marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3609,7 +3609,7 @@ func (ec *executionContext) marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 	return ec._Session(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSessionQuery(ctx context.Context, v interface{}) (model.SessionQuery, error) {
+func (ec *executionContext) unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSessionQuery(ctx context.Context, v interface{}) (model.SessionQuery, error) {
 	res, err := ec.unmarshalInputSessionQuery(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3629,7 +3629,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐUpdatedCourseNote(ctx context.Context, v interface{}) (model.UpdatedCourseNote, error) {
+func (ec *executionContext) unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedCourseNote(ctx context.Context, v interface{}) (model.UpdatedCourseNote, error) {
 	res, err := ec.unmarshalInputUpdatedCourseNote(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3887,21 +3887,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
+func (ec *executionContext) marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CourseNote(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐProgress(ctx context.Context, sel ast.SelectionSet, v *model.Progress) graphql.Marshaler {
+func (ec *executionContext) marshalOProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐProgress(ctx context.Context, sel ast.SelectionSet, v *model.Progress) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Progress(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v []*model.Session) graphql.Marshaler {
+func (ec *executionContext) marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v []*model.Session) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -3928,7 +3928,7 @@ func (ec *executionContext) marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑh
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx, sel, v[i])
+			ret[i] = ec.marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3941,14 +3941,14 @@ func (ec *executionContext) marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑh
 	return ret
 }
 
-func (ec *executionContext) marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {
+func (ec *executionContext) marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Session(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v []*model.Step) graphql.Marshaler {
+func (ec *executionContext) marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v []*model.Step) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -3975,7 +3975,7 @@ func (ec *executionContext) marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐStep(ctx, sel, v[i])
+			ret[i] = ec.marshalOStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3988,7 +3988,7 @@ func (ec *executionContext) marshalOStep2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 	return ret
 }
 
-func (ec *executionContext) marshalOStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋgraphᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v *model.Step) graphql.Marshaler {
+func (ec *executionContext) marshalOStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v *model.Step) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

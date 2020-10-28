@@ -5,12 +5,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph"
-	"github.com/jdpx/mind-hub-api/pkg/graphql/graph/generated"
+	"github.com/jdpx/mind-hub-api/pkg/graphql"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/jdpx/mind-hub-api/pkg/store"
-	"github.com/machinebox/graphql"
+	graphqlClient "github.com/machinebox/graphql"
 )
 
 // Config ...
@@ -43,15 +43,15 @@ func NewRouter(config *Config) *gin.Engine {
 
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
-	graphCMSClient := graphql.NewClient(config.GraphCMSURL)
+	graphCMSClient := graphqlClient.NewClient(config.GraphCMSURL)
 
 	cms := graphcms.NewClient(graphCMSClient)
 	cmsResolver := graphcms.NewResolver(cms)
 	store := store.NewClient()
 
-	resolver := graph.NewResolver(
-		graph.WithCMSClient(cmsResolver),
-		graph.WithStore(store),
+	resolver := graphql.NewResolver(
+		graphql.WithCMSClient(cmsResolver),
+		graphql.WithStore(store),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

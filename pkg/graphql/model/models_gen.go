@@ -3,12 +3,13 @@
 package model
 
 type Course struct {
-	ID          string      `json:"id"`
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Sessions    []*Session  `json:"sessions"`
-	Note        *CourseNote `json:"note"`
-	Progress    *Progress   `json:"progress"`
+	ID           string      `json:"id"`
+	Title        string      `json:"title"`
+	Description  string      `json:"description"`
+	SessionCount int         `json:"sessionCount"`
+	Sessions     []*Session  `json:"sessions"`
+	Note         *CourseNote `json:"note"`
+	Progress     *Progress   `json:"progress"`
 }
 
 type CourseNote struct {
@@ -27,7 +28,8 @@ type CourseStarted struct {
 }
 
 type Progress struct {
-	Value string `json:"value"`
+	Started           bool `json:"started"`
+	SessionsCompleted int  `json:"sessionsCompleted"`
 }
 
 type Session struct {

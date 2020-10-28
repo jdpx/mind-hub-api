@@ -6,6 +6,8 @@ type Course {
   id: ID!
   title: String!
   description: String!
+  sessionCount: Int!
+
   sessions: [Session]
 
   note: CourseNote
@@ -34,7 +36,8 @@ type Step {
 }
 
 type Progress {
-  value: String!
+  started: Boolean!
+  sessionsCompleted: Int!
 }
 
 input CourseQuery {

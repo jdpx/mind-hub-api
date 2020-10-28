@@ -45,12 +45,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Course struct {
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Note        func(childComplexity int) int
-		Progress    func(childComplexity int) int
-		Sessions    func(childComplexity int) int
-		Title       func(childComplexity int) int
+		Description  func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Note         func(childComplexity int) int
+		Progress     func(childComplexity int) int
+		SessionCount func(childComplexity int) int
+		Sessions     func(childComplexity int) int
+		Title        func(childComplexity int) int
 	}
 
 	CourseNote struct {
@@ -66,7 +67,8 @@ type ComplexityRoot struct {
 	}
 
 	Progress struct {
-		Value func(childComplexity int) int
+		SessionsCompleted func(childComplexity int) int
+		Started           func(childComplexity int) int
 	}
 
 	Query struct {
@@ -96,6 +98,7 @@ type ComplexityRoot struct {
 }
 
 type CourseResolver interface {
+	SessionCount(ctx context.Context, obj *model.Course) (int, error)
 	Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error)
 	Note(ctx context.Context, obj *model.Course) (*model.CourseNote, error)
 	Progress(ctx context.Context, obj *model.Course) (*model.Progress, error)
@@ -152,6 +155,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Course.Progress(childComplexity), true
+
+	case "Course.sessionCount":
+		if e.complexity.Course.SessionCount == nil {
+			break
+		}
+
+		return e.complexity.Course.SessionCount(childComplexity), true
 
 	case "Course.sessions":
 		if e.complexity.Course.Sessions == nil {
@@ -219,12 +229,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateCourseNote(childComplexity, args["input"].(model.UpdatedCourseNote)), true
 
-	case "Progress.value":
-		if e.complexity.Progress.Value == nil {
+	case "Progress.sessionsCompleted":
+		if e.complexity.Progress.SessionsCompleted == nil {
 			break
 		}
 
-		return e.complexity.Progress.Value(childComplexity), true
+		return e.complexity.Progress.SessionsCompleted(childComplexity), true
+
+	case "Progress.started":
+		if e.complexity.Progress.Started == nil {
+			break
+		}
+
+		return e.complexity.Progress.Started(childComplexity), true
 
 	case "Query.course":
 		if e.complexity.Query.Course == nil {
@@ -420,6 +437,8 @@ type Course {
   id: ID!
   title: String!
   description: String!
+  sessionCount: Int!
+
   sessions: [Session]
 
   note: CourseNote
@@ -448,7 +467,8 @@ type Step {
 }
 
 type Progress {
-  value: String!
+  started: Boolean!
+  sessionsCompleted: Int!
 }
 
 input CourseQuery {
@@ -714,6 +734,41 @@ func (ec *executionContext) _Course_description(ctx context.Context, field graph
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Course_sessionCount(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Course",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Course().SessionCount(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Course_sessions(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
@@ -1033,7 +1088,7 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 	return ec.marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Progress_value(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
+func (ec *executionContext) _Progress_started(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1051,7 +1106,7 @@ func (ec *executionContext) _Progress_value(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Value, nil
+		return obj.Started, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1063,9 +1118,44 @@ func (ec *executionContext) _Progress_value(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Progress_sessionsCompleted(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Progress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SessionsCompleted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_courses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2930,6 +3020,20 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "sessionCount":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Course_sessionCount(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "sessions":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3060,8 +3164,13 @@ func (ec *executionContext) _Progress(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Progress")
-		case "value":
-			out.Values[i] = ec._Progress_value(ctx, field, obj)
+		case "started":
+			out.Values[i] = ec._Progress_started(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "sessionsCompleted":
+			out.Values[i] = ec._Progress_sessionsCompleted(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3587,6 +3696,21 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

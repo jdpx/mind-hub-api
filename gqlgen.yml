@@ -56,6 +56,8 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
   Course:
     fields:
+      sessionCount:
+        resolver: true
       progress:
         resolver: true
       sessions:

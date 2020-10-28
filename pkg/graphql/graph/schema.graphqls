@@ -8,7 +8,7 @@ type Course {
   description: String!
   sessions: [Session]
 
-  note: Note
+  note: CourseNote
   progress: Progress
 }
 
@@ -49,8 +49,9 @@ input StepQuery {
   id: ID!
 }
 
-type Note {
+type CourseNote {
   id: ID!
+  courseID: ID!
   userID: ID!
   value: String
 }
@@ -73,5 +74,5 @@ input UpdatedCourseNote {
 
 type Mutation {
   courseStarted(input: CourseStarted!): Boolean!
-  updateCourseNote(input: UpdatedCourseNote!): Note!
+  updateCourseNote(input: UpdatedCourseNote!): CourseNote!
 }

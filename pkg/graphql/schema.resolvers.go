@@ -6,7 +6,7 @@ package graphql
 import (
 	"context"
 
-	generated1 "github.com/jdpx/mind-hub-api/pkg/graphql/generated"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
@@ -140,14 +140,14 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	return s, nil
 }
 
-// Course returns generated1.CourseResolver implementation.
-func (r *Resolver) Course() generated1.CourseResolver { return &courseResolver{r} }
+// Course returns generated.CourseResolver implementation.
+func (r *Resolver) Course() generated.CourseResolver { return &courseResolver{r} }
 
-// Mutation returns generated1.MutationResolver implementation.
-func (r *Resolver) Mutation() generated1.MutationResolver { return &mutationResolver{r} }
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
-// Query returns generated1.QueryResolver implementation.
-func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type courseResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }

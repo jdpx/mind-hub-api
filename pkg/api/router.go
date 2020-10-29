@@ -43,9 +43,12 @@ func NewRouter(config *Config) *gin.Engine {
 
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
-	graphCMSClient := graphqlClient.NewClient(config.GraphCMSURL)
+	graphqlClient := graphqlClient.NewClient(
+		config.GraphCMSURL,
+		graphqlClient.WithHTTPClient(graphcms.DefaultHTTPClient()),
+	)
 
-	cms := graphcms.NewClient(graphCMSClient)
+	cms := graphcms.NewClient(graphqlClient)
 	cmsResolver := graphcms.NewResolver(cms)
 	store := store.NewClient()
 

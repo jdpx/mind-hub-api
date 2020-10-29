@@ -5,6 +5,8 @@ package graphcms
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/machinebox/graphql"
@@ -22,6 +24,13 @@ type Client struct {
 
 // Request ...
 type Request = graphql.Request
+
+// DefaultHTTPClient ...
+func DefaultHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout: 10 * time.Second,
+	}
+}
 
 // NewClient initalises a new Client
 func NewClient(client CMSRequester) *Client {

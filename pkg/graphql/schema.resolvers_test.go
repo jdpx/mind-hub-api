@@ -24,10 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	authorizationHeader = "Authorization"
-)
-
 func TestCoursesResolver(t *testing.T) {
 	coursesQuery := "{ courses { id title description sessionCount sessions { id title description } } }"
 	cmsCourse := builder.NewCourseBuilder().

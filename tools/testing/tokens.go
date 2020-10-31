@@ -24,7 +24,7 @@ func GenerateTestTokenString(tokenClaims jwt.MapClaims) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
 	ts, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Error creating test token: %s", err))
+		fmt.Printf("Error creating test token: %s", err)
 	}
 	return ts
 }

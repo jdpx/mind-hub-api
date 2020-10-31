@@ -9,6 +9,7 @@ data "aws_acm_certificate" "api_mind_jdpx_co_uk_cert" {
 resource "aws_api_gateway_domain_name" "mind_hub_api_domain" {
   domain_name     = "api.${var.env}.mind.jdpx.co.uk"
   certificate_arn = data.aws_acm_certificate.api_mind_jdpx_co_uk_cert.arn
+  security_policy = "TLS_1_2"
 }
 
 module "cors" {

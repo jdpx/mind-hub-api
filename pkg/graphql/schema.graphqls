@@ -67,7 +67,7 @@ type Query {
 }
 
 input CourseStarted {
-  courseID: String!
+  courseID: ID!
 }
 
 input UpdatedCourseNote {
@@ -76,6 +76,6 @@ input UpdatedCourseNote {
 }
 
 type Mutation {
-  courseStarted(input: CourseStarted!): Boolean!
+  courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): CourseNote!
 }

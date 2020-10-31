@@ -23,6 +23,9 @@ cb-lint:
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
 	golangci-lint run
 
+.PHONY: run-tfsec
+run-tfsec:
+	tfsec . -e AWS002,AWS017
 
 .PHONY: run-api
 run-api:

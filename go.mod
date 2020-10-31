@@ -12,9 +12,11 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/golang/mock v1.4.4
 	github.com/google/uuid v1.1.2
+	github.com/gorilla/websocket v1.4.2
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/onsi/ginkgo v1.14.1 // indirect
 	github.com/onsi/gomega v1.10.2 // indirect
 	github.com/sirupsen/logrus v1.7.0

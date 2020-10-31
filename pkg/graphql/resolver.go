@@ -20,8 +20,8 @@ type CMSRequester interface {
 
 // Storer ...
 type Storer interface {
-	Get(ctx context.Context, key string) interface{}
-	Put(ctx context.Context, key string, i interface{}) error
+	Get(ctx context.Context, tableName string, key string) (interface{}, error)
+	Put(ctx context.Context, tableName string, key string, i interface{}) error
 }
 
 // CMSClienter ...

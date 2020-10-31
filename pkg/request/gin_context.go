@@ -14,14 +14,15 @@ func (c contextKey) String() string {
 }
 
 const (
-	contextKeyGinContext = contextKey("GinContextKey")
+	// ContextKeyGinContext ...
+	ContextKeyGinContext = contextKey("GinContextKey")
 )
 
 // GinContext ...
 func GinContext(ctx context.Context) (*gin.Context, error) {
-	ginContext := ctx.Value(contextKeyGinContext)
+	ginContext := ctx.Value(ContextKeyGinContext)
 	if ginContext == nil {
-		err := fmt.Errorf("could not retrieve gin.Context")
+		err := fmt.Errorf("could not retrieve gin.Context from context")
 		return nil, err
 	}
 
@@ -36,7 +37,7 @@ func GinContext(ctx context.Context) (*gin.Context, error) {
 // ContextMiddleware ...
 func ContextMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := context.WithValue(c.Request.Context(), contextKeyGinContext, c)
+		ctx := context.WithValue(c.Request.Context(), ContextKeyGinContext, c)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()

@@ -5,11 +5,13 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
+	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
 func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (int, error) {
@@ -45,7 +47,10 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 
 	log.Info("Course Note resolver got called", obj.ID)
 
-	n := r.store.Get(ctx, obj.ID)
+	n, err := r.store.Get(ctx, "course_note", obj.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	if n == nil {
 		return nil, nil
@@ -57,32 +62,45 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.Progress, error) {
 	log := logging.NewFromResolver(ctx)
 
-	log.Info("progress resolver got called")
+	log.Info("get progress resolver got called")
 
-	return &model.Progress{SessionsCompleted: 1, Started: true}, nil
+	progress, err := r.store.Get(ctx, "course_progress", obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Progress{SessionsCompleted: 0, Started: progress != nil}, nil
 }
 
-func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error) {
-	// log := logging.NewFromResolver(ctx)
+func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
+	log := logging.NewFromResolver(ctx)
 
-	// userID, err := request.GetUserID(ctx)
-	// if err != nil {
-	// 	return false, err
-	// }
+	log.Info("course started resolver got called")
 
-	// event := event.CourseStarted{
-	// 	CourseID: input.CourseID,
-	// 	UserID:   userID,
-	// }
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
 
-	// log.Info("CourseStarted called", userID)
+	event := store.Progress{
+		CourseID: input.CourseID,
+		UserID:   userID,
+	}
 
-	// err = r.store.Put(ctx, event)
-	// if err != nil {
-	// 	return false, err
-	// }
+	err = r.store.Put(ctx, "course_progress", input.CourseID, event)
+	if err != nil {
+		log.Error("error putting record in store", err)
+		return nil, err
+	}
 
-	return false, nil
+	return &model.Course{
+		ID: input.CourseID,
+
+		Progress: &model.Progress{
+			Started: true,
+		},
+	}, nil
 }
 
 func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error) {
@@ -102,7 +120,7 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 		Value:    &input.Value,
 	}
 
-	err = r.store.Put(ctx, input.CourseID, &note)
+	err = r.store.Put(ctx, "course_note", input.CourseID, &note)
 
 	return &note, err
 }

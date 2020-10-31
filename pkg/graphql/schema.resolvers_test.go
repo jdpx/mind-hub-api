@@ -1,11 +1,14 @@
 package graphql_test
 
 import (
+	"context"
 	"fmt"
+	"strings"
 	"testing"
 
-	"github.com/99designs/gqlgen/client"
+	gqlgen "github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
 	"github.com/icrowley/fake"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
@@ -13,6 +16,11 @@ import (
 	graphcmsmocks "github.com/jdpx/mind-hub-api/pkg/graphcms/mocks"
 	"github.com/jdpx/mind-hub-api/pkg/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
+	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
+	"github.com/jdpx/mind-hub-api/pkg/store"
+	storemocks "github.com/jdpx/mind-hub-api/pkg/store/mocks"
+	"github.com/jdpx/mind-hub-api/tools/client"
+	tools "github.com/jdpx/mind-hub-api/tools/testing"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -219,6 +227,94 @@ func TestSessionResolver(t *testing.T) {
 				assert.Equal(t, session.ID, resp.Session.ID)
 				assert.Equal(t, session.Title, resp.Session.Title)
 				assert.Equal(t, session.Description, resp.Session.Description)
+			}
+		})
+	}
+}
+
+func TestCourseStartedResolver(t *testing.T) {
+	courseID := fake.CharactersN(10)
+	testUserID := tools.GenerateTestUserID()
+	uS := strings.Split(testUserID, "|")
+	userID := uS[1]
+
+	mutation := `mutation courseStarted ($courseID: ID!) { courseStarted(input: {courseID: $courseID}) { id progress { started } } }`
+
+	event := store.Progress{
+		CourseID: courseID,
+		UserID:   userID,
+	}
+
+	testCases := []struct {
+		desc               string
+		query              string
+		tokenClaims        jwt.MapClaims
+		clientExpectations func(client *storemocks.MockStorer)
+
+		expectedErr error
+	}{
+		{
+			desc:  "given a valid mutation, event stored in database",
+			query: mutation,
+			tokenClaims: jwt.MapClaims{
+				"sub": testUserID,
+			},
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), "course_progress", courseID, event).Return(nil)
+				client.EXPECT().Get(gomock.Any(), "course_progress", courseID).Return(&model.Progress{}, nil)
+			},
+		},
+		{
+			desc:        "given there is no user ID in the request token, error returned",
+			query:       mutation,
+			tokenClaims: jwt.MapClaims{},
+
+			expectedErr: fmt.Errorf("[{\"message\":\"error occurred getting request user ID token user ID is an invalid Auth0 user ID\",\"path\":[\"courseStarted\"]}]"),
+		},
+		{
+			desc:  "given an error occurs when saving the event to the store, error returned",
+			query: mutation,
+			tokenClaims: jwt.MapClaims{
+				"sub": testUserID,
+			},
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), "course_progress", courseID, event).Return(fmt.Errorf("something went wrong"))
+			},
+
+			expectedErr: fmt.Errorf("[{\"message\":\"something went wrong\",\"path\":[\"courseStarted\"]}]"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
+
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
+
+			resolver := graphql.NewResolver(
+				graphql.WithStore(clientMock),
+			)
+
+			h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
+
+			h.AroundOperations(func(ctx context.Context, next gqlgen.OperationHandler) gqlgen.ResponseHandler {
+				return next(tools.GenerateTestGinContext(ctx, tt.tokenClaims))
+			})
+
+			c := client.New(h)
+
+			var resp graphql.CourseStartedResponse
+
+			err := c.Post(tt.query, &resp, client.Var("courseID", courseID))
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, courseID, resp.CourseStarted.ID)
+				assert.True(t, resp.CourseStarted.Progress.Started)
 			}
 		})
 	}

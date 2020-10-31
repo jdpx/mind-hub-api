@@ -12,6 +12,11 @@ type CourseResponse struct {
 	Course *model.Course `json:"course"`
 }
 
+// CourseStartedResponse ...
+type CourseStartedResponse struct {
+	CourseStarted *model.Course `json:"courseStarted"`
+}
+
 // SessionsResponse ...
 type SessionsResponse struct {
 	Sessions []*model.Session `json:"sessions"`

@@ -104,7 +104,7 @@ type CourseResolver interface {
 	Progress(ctx context.Context, obj *model.Course) (*model.Progress, error)
 }
 type MutationResolver interface {
-	CourseStarted(ctx context.Context, input model.CourseStarted) (bool, error)
+	CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error)
 	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error)
 }
 type QueryResolver interface {
@@ -498,7 +498,7 @@ type Query {
 }
 
 input CourseStarted {
-  courseID: String!
+  courseID: ID!
 }
 
 input UpdatedCourseNote {
@@ -507,7 +507,7 @@ input UpdatedCourseNote {
 }
 
 type Mutation {
-  courseStarted(input: CourseStarted!): Boolean!
+  courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): CourseNote!
 }
 `, BuiltIn: false},
@@ -1041,9 +1041,9 @@ func (ec *executionContext) _Mutation_courseStarted(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.Course)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2908,7 +2908,7 @@ func (ec *executionContext) unmarshalInputCourseStarted(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseID"))
-			it.CourseID, err = ec.unmarshalNString2string(ctx, v)
+			it.CourseID, err = ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

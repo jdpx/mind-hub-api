@@ -74,6 +74,10 @@ func NewClient(config Config) (*Client, error) {
 			WriteCapacityUnits: aws.Int64(10),
 		},
 	})
+	if err != nil {
+		log.Println(err)
+	}
+
 	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
 		TableName: aws.String("course_note"),
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -101,10 +105,8 @@ func NewClient(config Config) (*Client, error) {
 			WriteCapacityUnits: aws.Int64(10),
 		},
 	})
-
 	if err != nil {
 		log.Println(err)
-		// return nil, err
 	}
 
 	result, err := dbSvc.ListTables(&dynamodb.ListTablesInput{})

@@ -91,10 +91,12 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	}
 
 	return &model.Progress{
+		// nolint:staticcheck
 		ID:                progress.ID,
 		SessionsCompleted: 0,
-		Started:           progress != nil,
-		DateStarted:       progress.DateStarted.String(),
+		Started:           true,
+		// nolint:staticcheck
+		DateStarted: progress.DateStarted.String(),
 	}, nil
 }
 

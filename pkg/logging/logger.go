@@ -32,7 +32,7 @@ func New() *logrus.Entry {
 	// log.SetFormatter(&logrus.JSONFormatter{})
 
 	log.SetFormatter(&logrus.TextFormatter{
-		DisableColors: true,
+		// DisableColors: true,
 		FullTimestamp: true,
 	})
 

@@ -47,16 +47,27 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 
 	log.Info("Course Note resolver got called", obj.ID)
 
-	n, err := r.store.Get(ctx, "course_note", obj.ID)
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	note, err := r.courseNoteHandler.GetNote(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	if n == nil {
+	if note == nil {
 		return nil, nil
 	}
 
-	return n.(*model.CourseNote), nil
+	return &model.CourseNote{
+		ID:       note.ID,
+		CourseID: note.CourseID,
+		UserID:   note.UserID,
+		Value:    &note.Value,
+	}, nil
 }
 
 func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.Progress, error) {
@@ -64,12 +75,27 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 
 	log.Info("get progress resolver got called")
 
-	progress, err := r.store.Get(ctx, "course_progress", obj.ID)
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	progress, err := r.courseProgressHandler.GetCourseProgress(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Progress{SessionsCompleted: 0, Started: progress != nil}, nil
+	if progress == nil {
+		return &model.Progress{}, nil
+	}
+
+	return &model.Progress{
+		ID:                progress.ID,
+		SessionsCompleted: 0,
+		Started:           progress != nil,
+		DateStarted:       progress.DateStarted.String(),
+	}, nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
@@ -83,12 +109,7 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	event := store.Progress{
-		CourseID: input.CourseID,
-		UserID:   userID,
-	}
-
-	err = r.store.Put(ctx, "course_progress", input.CourseID, event)
+	_, err = r.courseProgressHandler.StartCourse(ctx, input.CourseID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -96,10 +117,6 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 
 	return &model.Course{
 		ID: input.CourseID,
-
-		Progress: &model.Progress{
-			Started: true,
-		},
 	}, nil
 }
 
@@ -113,16 +130,43 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 		return nil, err
 	}
 
-	note := model.CourseNote{
-		ID:       "111",
-		CourseID: input.CourseID,
-		UserID:   userID,
-		Value:    &input.Value,
+	var note *store.CourseNote
+
+	if input.ID == nil {
+		m := store.CourseNote{
+			CourseID: input.CourseID,
+			UserID:   userID,
+			Value:    input.Value,
+		}
+
+		note, err = r.courseNoteHandler.CreateNote(ctx, m)
+		if err != nil {
+			log.Error("An error occurred creating Note", err)
+
+			return nil, err
+		}
+	} else {
+		m := store.CourseNote{
+			ID:       *input.ID,
+			CourseID: input.CourseID,
+			UserID:   userID,
+			Value:    input.Value,
+		}
+
+		note, err = r.courseNoteHandler.UpdateNote(ctx, m)
+		if err != nil {
+			log.Error("An error occurred updating Note", err)
+
+			return nil, err
+		}
 	}
 
-	err = r.store.Put(ctx, "course_note", input.CourseID, &note)
-
-	return &note, err
+	return &model.CourseNote{
+		ID:       note.ID,
+		CourseID: note.CourseID,
+		UserID:   note.UserID,
+		Value:    &note.Value,
+	}, err
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {

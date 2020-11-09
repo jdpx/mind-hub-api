@@ -1,9 +1,8 @@
 package graphql
 
 import (
-	"context"
-
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
 // This file will not be regenerated automatically.
@@ -13,29 +12,11 @@ import (
 // ResolverOption ...
 type ResolverOption func(*Resolver)
 
-// CMSRequester ...
-type CMSRequester interface {
-	Run(ctx context.Context, req *graphcms.Request, resp interface{}) error
-}
-
-// Storer ...
-type Storer interface {
-	Get(ctx context.Context, tableName string, key string) (interface{}, error)
-	Put(ctx context.Context, tableName string, key string, i interface{}) error
-}
-
-// CMSClienter ...
-type CMSClienter interface {
-	ResolveCourses(ctx context.Context) ([]*graphcms.Course, error)
-	ResolveCourse(ctx context.Context, id string) (*graphcms.Course, error)
-	ResolveCourseSessions(ctx context.Context, id string) ([]*graphcms.Session, error)
-	ResolveSession(ctx context.Context, id string) (*graphcms.Session, error)
-}
-
 // Resolver ...
 type Resolver struct {
-	graphcms CMSClienter
-	store    Storer
+	graphcms              graphcms.Resolverer
+	courseProgressHandler store.CourseProgressRepositor
+	courseNoteHandler     store.CourseNoteRepositor
 }
 
 // NewResolver ...
@@ -50,15 +31,22 @@ func NewResolver(opts ...ResolverOption) *Resolver {
 }
 
 // WithCMSClient ...
-func WithCMSClient(c CMSClienter) func(*Resolver) {
+func WithCMSClient(c graphcms.Resolverer) func(*Resolver) {
 	return func(r *Resolver) {
 		r.graphcms = c
 	}
 }
 
-// WithStore ...
-func WithStore(s Storer) func(*Resolver) {
+// WithCourseProgressHandler ...
+func WithCourseProgressHandler(s store.CourseProgressRepositor) func(*Resolver) {
 	return func(r *Resolver) {
-		r.store = s
+		r.courseProgressHandler = s
+	}
+}
+
+// WithCourseNoteRepositor ...
+func WithCourseNoteRepositor(s store.CourseNoteRepositor) func(*Resolver) {
+	return func(r *Resolver) {
+		r.courseNoteHandler = s
 	}
 }

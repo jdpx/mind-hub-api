@@ -11,6 +11,7 @@ func CourseFromCMS(gc *graphcms.Course) *model.Course {
 		ID:          gc.ID,
 		Title:       gc.Title,
 		Description: gc.Description,
+		Sessions:    []*model.Session{},
 	}
 }
 
@@ -31,6 +32,7 @@ func SessionFromCMS(gs *graphcms.Session) *model.Session {
 		ID:          gs.ID,
 		Title:       gs.Title,
 		Description: gs.Description,
+		Steps:       []*model.Step{},
 	}
 
 	for _, step := range gs.Steps {

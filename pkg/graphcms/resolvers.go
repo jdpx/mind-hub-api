@@ -11,7 +11,7 @@ import (
 
 // Resolver defines the resolver used to retreive data from GraphCMS
 type Resolver struct {
-	client CMSRequester
+	client Requester
 }
 
 // Resolverer ...
@@ -23,7 +23,7 @@ type Resolverer interface {
 }
 
 // NewResolver initialises a new Resolver
-func NewResolver(client CMSRequester) *Resolver {
+func NewResolver(client Requester) *Resolver {
 	return &Resolver{
 		client: client,
 	}

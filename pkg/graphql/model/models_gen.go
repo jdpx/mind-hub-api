@@ -28,8 +28,10 @@ type CourseStarted struct {
 }
 
 type Progress struct {
-	Started           bool `json:"started"`
-	SessionsCompleted int  `json:"sessionsCompleted"`
+	ID                string `json:"id"`
+	Started           bool   `json:"started"`
+	SessionsCompleted int    `json:"sessionsCompleted"`
+	DateStarted       string `json:"dateStarted"`
 }
 
 type Session struct {
@@ -60,6 +62,7 @@ type StepQuery struct {
 }
 
 type UpdatedCourseNote struct {
-	CourseID string `json:"courseID"`
-	Value    string `json:"value"`
+	ID       *string `json:"id"`
+	CourseID string  `json:"courseID"`
+	Value    string  `json:"value"`
 }

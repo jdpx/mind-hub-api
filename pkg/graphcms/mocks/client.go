@@ -11,31 +11,31 @@ import (
 	reflect "reflect"
 )
 
-// MockCMSRequester is a mock of CMSRequester interface
-type MockCMSRequester struct {
+// MockRequester is a mock of Requester interface
+type MockRequester struct {
 	ctrl     *gomock.Controller
-	recorder *MockCMSRequesterMockRecorder
+	recorder *MockRequesterMockRecorder
 }
 
-// MockCMSRequesterMockRecorder is the mock recorder for MockCMSRequester
-type MockCMSRequesterMockRecorder struct {
-	mock *MockCMSRequester
+// MockRequesterMockRecorder is the mock recorder for MockRequester
+type MockRequesterMockRecorder struct {
+	mock *MockRequester
 }
 
-// NewMockCMSRequester creates a new mock instance
-func NewMockCMSRequester(ctrl *gomock.Controller) *MockCMSRequester {
-	mock := &MockCMSRequester{ctrl: ctrl}
-	mock.recorder = &MockCMSRequesterMockRecorder{mock}
+// NewMockRequester creates a new mock instance
+func NewMockRequester(ctrl *gomock.Controller) *MockRequester {
+	mock := &MockRequester{ctrl: ctrl}
+	mock.recorder = &MockRequesterMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockCMSRequester) EXPECT() *MockCMSRequesterMockRecorder {
+func (m *MockRequester) EXPECT() *MockRequesterMockRecorder {
 	return m.recorder
 }
 
 // Run mocks base method
-func (m *MockCMSRequester) Run(ctx context.Context, req *graphcms.Request, resp interface{}) error {
+func (m *MockRequester) Run(ctx context.Context, req *graphcms.Request, resp interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Run", ctx, req, resp)
 	ret0, _ := ret[0].(error)
@@ -43,7 +43,7 @@ func (m *MockCMSRequester) Run(ctx context.Context, req *graphcms.Request, resp 
 }
 
 // Run indicates an expected call of Run
-func (mr *MockCMSRequesterMockRecorder) Run(ctx, req, resp interface{}) *gomock.Call {
+func (mr *MockRequesterMockRecorder) Run(ctx, req, resp interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockCMSRequester)(nil).Run), ctx, req, resp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockRequester)(nil).Run), ctx, req, resp)
 }

@@ -35,20 +35,20 @@ func TestResolverResolveCourses(t *testing.T) {
 
 	testCases := []struct {
 		desc               string
-		clientExpectations func(client *graphcmsmocks.MockCMSRequester)
+		clientExpectations func(client *graphcmsmocks.MockRequester)
 
 		expectedCourse *graphcms.Course
 		expectedErr    error
 	}{
 		{
 			desc: "given a successful request to GraphCMS, Courses model returned",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, resp)
 			},
 		},
 		{
 			desc: "given an error is returned from the client",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).Return(fmt.Errorf("something went wrong"))
 			},
 
@@ -58,7 +58,7 @@ func TestResolverResolveCourses(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			clientMock := graphcmsmocks.NewMockCMSRequester(ctrl)
+			clientMock := graphcmsmocks.NewMockRequester(ctrl)
 
 			if tt.clientExpectations != nil {
 				tt.clientExpectations(clientMock)
@@ -101,20 +101,20 @@ func TestResolverResolveCourse(t *testing.T) {
 
 	testCases := []struct {
 		desc               string
-		clientExpectations func(client *graphcmsmocks.MockCMSRequester)
+		clientExpectations func(client *graphcmsmocks.MockRequester)
 
 		expectedCourse *graphcms.Course
 		expectedErr    error
 	}{
 		{
 			desc: "given a successful request to GraphCMS, Courses model returned",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, resp)
 			},
 		},
 		{
 			desc: "given an error is returned from the client",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).Return(fmt.Errorf("something went wrong"))
 			},
 
@@ -124,7 +124,7 @@ func TestResolverResolveCourse(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			clientMock := graphcmsmocks.NewMockCMSRequester(ctrl)
+			clientMock := graphcmsmocks.NewMockRequester(ctrl)
 
 			if tt.clientExpectations != nil {
 				tt.clientExpectations(clientMock)
@@ -169,20 +169,20 @@ func TestResolverResolveCourseSessions(t *testing.T) {
 
 	testCases := []struct {
 		desc               string
-		clientExpectations func(client *graphcmsmocks.MockCMSRequester)
+		clientExpectations func(client *graphcmsmocks.MockRequester)
 
 		expectedCourse *graphcms.Course
 		expectedErr    error
 	}{
 		{
 			desc: "given a successful request to GraphCMS, Sessions model returned",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, resp)
 			},
 		},
 		{
 			desc: "given an error is returned from the client",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).Return(fmt.Errorf("something went wrong"))
 			},
 
@@ -192,7 +192,7 @@ func TestResolverResolveCourseSessions(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			clientMock := graphcmsmocks.NewMockCMSRequester(ctrl)
+			clientMock := graphcmsmocks.NewMockRequester(ctrl)
 
 			if tt.clientExpectations != nil {
 				tt.clientExpectations(clientMock)
@@ -250,20 +250,20 @@ func TestResolverResolveSession(t *testing.T) {
 
 	testCases := []struct {
 		desc               string
-		clientExpectations func(client *graphcmsmocks.MockCMSRequester)
+		clientExpectations func(client *graphcmsmocks.MockRequester)
 
 		expectedSession *graphcms.Session
 		expectedErr     error
 	}{
 		{
 			desc: "given a successful request to GraphCMS, Sessions model returned",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, resp)
 			},
 		},
 		{
 			desc: "given an error is returned from the client",
-			clientExpectations: func(client *graphcmsmocks.MockCMSRequester) {
+			clientExpectations: func(client *graphcmsmocks.MockRequester) {
 				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).Return(fmt.Errorf("something went wrong"))
 			},
 
@@ -273,7 +273,7 @@ func TestResolverResolveSession(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			clientMock := graphcmsmocks.NewMockCMSRequester(ctrl)
+			clientMock := graphcmsmocks.NewMockRequester(ctrl)
 
 			if tt.clientExpectations != nil {
 				tt.clientExpectations(clientMock)

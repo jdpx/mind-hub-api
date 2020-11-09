@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
@@ -50,11 +52,20 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 
 	cms := graphcms.NewClient(graphqlClient)
 	cmsResolver := graphcms.NewResolver(cms)
-	store := store.NewClient()
+
+	sConfig := store.Config{}
+	s, err := store.NewClient(sConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	courseProgressHandler := store.NewCourseProgressHandler(s)
+	courseNoteHandler := store.NewCourseNoteHandler(s)
 
 	resolver := graphql.NewResolver(
 		graphql.WithCMSClient(cmsResolver),
-		graphql.WithStore(store),
+		graphql.WithCourseProgressHandler(courseProgressHandler),
+		graphql.WithCourseNoteRepositor(courseNoteHandler),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

@@ -12,14 +12,14 @@ import (
 	"github.com/machinebox/graphql"
 )
 
-// CMSRequester defines the functionality to make requests to GraphCMS
-type CMSRequester interface {
+// Requester defines the functionality to make requests to GraphCMS
+type Requester interface {
 	Run(ctx context.Context, req *Request, resp interface{}) error
 }
 
 // Client makes request to GraphCMS
 type Client struct {
-	client CMSRequester
+	client Requester
 }
 
 // Request ...
@@ -33,7 +33,7 @@ func DefaultHTTPClient() *http.Client {
 }
 
 // NewClient initalises a new Client
-func NewClient(client CMSRequester) *Client {
+func NewClient(client Requester) *Client {
 	return &Client{
 		client: client,
 	}

@@ -34,30 +34,43 @@ func (m *MockStorer) EXPECT() *MockStorerMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockStorer) Get(ctx context.Context, tableName, key string) (interface{}, error) {
+func (m *MockStorer) Get(ctx context.Context, tableName string, searchBody, i interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, tableName, key)
-	ret0, _ := ret[0].(interface{})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Get", ctx, tableName, searchBody, i)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Get indicates an expected call of Get
-func (mr *MockStorerMockRecorder) Get(ctx, tableName, key interface{}) *gomock.Call {
+func (mr *MockStorerMockRecorder) Get(ctx, tableName, searchBody, i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStorer)(nil).Get), ctx, tableName, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStorer)(nil).Get), ctx, tableName, searchBody, i)
 }
 
 // Put mocks base method
-func (m *MockStorer) Put(ctx context.Context, tableName, key string, i interface{}) error {
+func (m *MockStorer) Put(ctx context.Context, tableName string, body interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Put", ctx, tableName, key, i)
+	ret := m.ctrl.Call(m, "Put", ctx, tableName, body)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Put indicates an expected call of Put
-func (mr *MockStorerMockRecorder) Put(ctx, tableName, key, i interface{}) *gomock.Call {
+func (mr *MockStorerMockRecorder) Put(ctx, tableName, body interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockStorer)(nil).Put), ctx, tableName, key, i)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockStorer)(nil).Put), ctx, tableName, body)
+}
+
+// Update mocks base method
+func (m *MockStorer) Update(ctx context.Context, tableName string, keys map[string]string, expression string, body, i interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, tableName, keys, expression, body, i)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update
+func (mr *MockStorerMockRecorder) Update(ctx, tableName, keys, expression, body, i interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStorer)(nil).Update), ctx, tableName, keys, expression, body, i)
 }

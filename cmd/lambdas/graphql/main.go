@@ -21,6 +21,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		fmt.Println("Start Graphql Lambda API")
 
 		c := api.Config{
+			Env:         "prod",
 			GraphCMSURL: os.Getenv(graphCMSURLKey),
 		}
 

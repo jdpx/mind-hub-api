@@ -11,9 +11,10 @@ import (
 const graphCMSURLKey = "GRAPH_CMS_URL"
 
 func main() {
-	fmt.Println("Start Graphql API")
+	fmt.Println("Start Local Graphql API")
 
 	c := api.Config{
+		Env:         "local",
 		GraphCMSURL: os.Getenv(graphCMSURLKey),
 	}
 

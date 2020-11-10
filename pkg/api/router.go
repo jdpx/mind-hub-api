@@ -17,6 +17,7 @@ import (
 
 // Config ...
 type Config struct {
+	Env         string
 	GraphCMSURL string
 }
 
@@ -53,7 +54,9 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	cms := graphcms.NewClient(graphqlClient)
 	cmsResolver := graphcms.NewResolver(cms)
 
-	sConfig := store.Config{}
+	sConfig := store.Config{
+		Env: config.Env,
+	}
 	s, err := store.NewClient(sConfig)
 	if err != nil {
 		log.Fatal(err)

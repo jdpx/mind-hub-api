@@ -19,6 +19,11 @@ var (
 	ErrNotFound = fmt.Errorf("record not found")
 )
 
+const (
+	dbRegion         = "eu-west-1"
+	localDynamoDBURL = "http://localhost:8000"
+)
+
 // Storer ...
 type Storer interface {
 	Get(ctx context.Context, tableName string, searchBody interface{}, i interface{}) error
@@ -33,90 +38,29 @@ type Client struct {
 
 // Config ...
 type Config struct {
+	Env string
 }
 
 // NewClient ...
 func NewClient(config Config) (*Client, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-1"),
-	})
+	awsConfig := aws.Config{
+		Region: aws.String(dbRegion),
+	}
+
+	if config.Env != "local" {
+		awsConfig.Endpoint = aws.String(localDynamoDBURL)
+	}
+
+	sess, err := session.NewSession(&awsConfig)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	dbSvc := dynamodb.New(sess)
-	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-		TableName: aws.String("course_progress"),
-		AttributeDefinitions: []*dynamodb.AttributeDefinition{
-			{
-				AttributeName: aws.String("courseID"),
-				AttributeType: aws.String("S"),
-			},
-			{
-				AttributeName: aws.String("userID"),
-				AttributeType: aws.String("S"),
-			},
-		},
-		KeySchema: []*dynamodb.KeySchemaElement{
-			{
-				AttributeName: aws.String("courseID"),
-				KeyType:       aws.String("HASH"),
-			},
-			{
-				AttributeName: aws.String("userID"),
-				KeyType:       aws.String("RANGE"),
-			},
-		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-	})
-	if err != nil {
-		log.Println(err)
-	}
 
-	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-		TableName: aws.String("course_note"),
-		AttributeDefinitions: []*dynamodb.AttributeDefinition{
-			{
-				AttributeName: aws.String("courseID"),
-				AttributeType: aws.String("S"),
-			},
-			{
-				AttributeName: aws.String("userID"),
-				AttributeType: aws.String("S"),
-			},
-		},
-		KeySchema: []*dynamodb.KeySchemaElement{
-			{
-				AttributeName: aws.String("courseID"),
-				KeyType:       aws.String("HASH"),
-			},
-			{
-				AttributeName: aws.String("userID"),
-				KeyType:       aws.String("RANGE"),
-			},
-		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-	})
-	if err != nil {
-		log.Println(err)
-	}
-
-	result, err := dbSvc.ListTables(&dynamodb.ListTablesInput{})
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	log.Println("Tables:")
-	for _, table := range result.TableNames {
-		log.Println(*table)
+	if config.Env == "local" {
+		setupDbTables(dbSvc)
 	}
 
 	return &Client{
@@ -220,4 +164,68 @@ func (c Client) Update(ctx context.Context, tableName string, keys map[string]st
 	}
 
 	return nil
+}
+
+func setupDbTables(dbSvc *dynamodb.DynamoDB) {
+	_, err := dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("course_progress"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("courseID"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("courseID"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("course_note"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("courseID"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("courseID"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
 }

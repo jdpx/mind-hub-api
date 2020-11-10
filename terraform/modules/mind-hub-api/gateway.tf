@@ -6,6 +6,10 @@ data "aws_acm_certificate" "api_mind_jdpx_co_uk_cert" {
   statuses = ["ISSUED"]
 }
 
+resource "aws_api_gateway_account" "mind_hub_api" {
+  cloudwatch_role_arn = aws_iam_role.mind_hub_api_cloudwatch.arn
+}
+
 resource "aws_api_gateway_domain_name" "mind_hub_api_domain" {
   domain_name     = "api.${var.env}.mind.jdpx.co.uk"
   certificate_arn = data.aws_acm_certificate.api_mind_jdpx_co_uk_cert.arn
@@ -41,9 +45,9 @@ resource "aws_api_gateway_rest_api" "mind_hub_api" {
 }
 
 resource "aws_api_gateway_base_path_mapping" "base_path_mapping" {
-  api_id = "${aws_api_gateway_rest_api.mind_hub_api.id}"
+  api_id = aws_api_gateway_rest_api.mind_hub_api.id
 
-  domain_name = "${aws_api_gateway_domain_name.mind_hub_api_domain.domain_name}"
+  domain_name = aws_api_gateway_domain_name.mind_hub_api_domain.domain_name
 }
 
 resource "aws_api_gateway_resource" "mind_hub_proxy" {
@@ -63,6 +67,17 @@ resource "aws_api_gateway_method" "proxy_method" {
 
   request_parameters = {
     "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_method_settings" "proxy_method_settings" {
+  rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
+  stage_name  = "v1"
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
   }
 }
 

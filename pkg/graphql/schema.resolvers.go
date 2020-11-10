@@ -87,7 +87,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	}
 
 	if progress == nil {
-		return &model.Progress{}, nil
+		return nil, nil
 	}
 
 	return &model.Progress{

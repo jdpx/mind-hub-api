@@ -38,8 +38,7 @@ type Config struct {
 // NewClient ...
 func NewClient(config Config) (*Client, error) {
 	sess, err := session.NewSession(&aws.Config{
-		Region:   aws.String("eu-west-1"),
-		Endpoint: aws.String("http://localhost:8000"),
+		Region: aws.String("eu-west-1"),
 	})
 	if err != nil {
 		log.Println(err)

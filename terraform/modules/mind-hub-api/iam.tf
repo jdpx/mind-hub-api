@@ -1,4 +1,50 @@
 
+resource "aws_iam_role" "mind_hub_api_cloudwatch" {
+  name = "api_gateway_cloudwatch_global"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "mind_hub_api_cloudwatch_policy" {
+  name = "default"
+  role = aws_iam_role.mind_hub_api_cloudwatch.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_iam_role" "mind_hub_api_graphql_api_role" {
   name = "mind_hub_api_graphql_${var.env}_api_role"
 
@@ -35,6 +81,28 @@ resource "aws_iam_role_policy" "mind_hub_api_graphql_api_role_policy" {
       ],
       "Resource": "*",
       "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "dynamodb:ListTables"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "${aws_dynamodb_table.mind_hub_api_db.arn}"
+      ]
     }
   ],
   "Version": "2012-10-17"

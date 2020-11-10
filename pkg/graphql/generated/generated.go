@@ -107,7 +107,7 @@ type CourseResolver interface {
 }
 type MutationResolver interface {
 	CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error)
-	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error)
+	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Course, error)
 }
 type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
@@ -527,7 +527,7 @@ input UpdatedCourseNote {
 
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
-  updateCourseNote(input: UpdatedCourseNote!): CourseNote!
+  updateCourseNote(input: UpdatedCourseNote!): Course!
 }
 `, BuiltIn: false},
 }
@@ -1105,9 +1105,9 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CourseNote)
+	res := resTmp.(*model.Course)
 	fc.Result = res
-	return ec.marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Progress_id(ctx context.Context, field graphql.CollectedField, obj *model.Progress) (ret graphql.Marshaler) {
@@ -3776,20 +3776,6 @@ func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 		return graphql.Null
 	}
 	return ec._Course(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v model.CourseNote) graphql.Marshaler {
-	return ec._CourseNote(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._CourseNote(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCourseQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseQuery(ctx context.Context, v interface{}) (model.CourseQuery, error) {

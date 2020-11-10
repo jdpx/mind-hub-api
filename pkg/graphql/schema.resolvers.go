@@ -122,7 +122,7 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 	}, nil
 }
 
-func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.CourseNote, error) {
+func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Course, error) {
 	log := logging.NewFromResolver(ctx)
 
 	log.Info("Update Course Note resolver called")
@@ -163,12 +163,15 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 		}
 	}
 
-	return &model.CourseNote{
-		ID:       note.ID,
-		CourseID: note.CourseID,
-		UserID:   note.UserID,
-		Value:    &note.Value,
-	}, err
+	return &model.Course{
+		ID: input.CourseID,
+		Note: &model.CourseNote{
+			ID:       note.ID,
+			CourseID: note.CourseID,
+			UserID:   note.UserID,
+			Value:    &note.Value,
+		},
+	}, nil
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {

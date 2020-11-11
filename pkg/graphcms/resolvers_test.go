@@ -155,6 +155,11 @@ func TestResolverResolveCourseSessions(t *testing.T) {
     id
     title
     description
+
+    steps {
+      id
+      title
+    }
   }
 }`)
 	req.Var("id", courseID)

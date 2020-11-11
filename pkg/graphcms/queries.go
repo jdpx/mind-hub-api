@@ -22,6 +22,11 @@ const getSessionsByCourseID = `query sessions($id: ID){
     id
     title
     description
+
+    steps {
+      id
+      title
+    }
   }
 }`
 

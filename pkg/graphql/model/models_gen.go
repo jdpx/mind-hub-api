@@ -3,13 +3,13 @@
 package model
 
 type Course struct {
-	ID           string      `json:"id"`
-	Title        string      `json:"title"`
-	Description  string      `json:"description"`
-	SessionCount int         `json:"sessionCount"`
-	Sessions     []*Session  `json:"sessions"`
-	Note         *CourseNote `json:"note"`
-	Progress     *Progress   `json:"progress"`
+	ID           string          `json:"id"`
+	Title        string          `json:"title"`
+	Description  string          `json:"description"`
+	SessionCount int             `json:"sessionCount"`
+	Sessions     []*Session      `json:"sessions"`
+	Note         *CourseNote     `json:"note"`
+	Progress     *CourseProgress `json:"progress"`
 }
 
 type CourseNote struct {
@@ -19,19 +19,17 @@ type CourseNote struct {
 	Value    *string `json:"value"`
 }
 
+type CourseProgress struct {
+	ID          string `json:"id"`
+	DateStarted string `json:"dateStarted"`
+}
+
 type CourseQuery struct {
 	ID string `json:"id"`
 }
 
 type CourseStarted struct {
 	CourseID string `json:"courseID"`
-}
-
-type Progress struct {
-	ID                string `json:"id"`
-	Started           bool   `json:"started"`
-	SessionsCompleted int    `json:"sessionsCompleted"`
-	DateStarted       string `json:"dateStarted"`
 }
 
 type Session struct {
@@ -47,14 +45,28 @@ type SessionQuery struct {
 }
 
 type Step struct {
-	ID          string   `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Type        string   `json:"type"`
-	VideoURL    *string  `json:"videoUrl"`
-	AudioURL    *string  `json:"audioUrl"`
-	Question    *string  `json:"question"`
-	Session     *Session `json:"session"`
+	ID          string        `json:"id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	Type        string        `json:"type"`
+	VideoURL    *string       `json:"videoUrl"`
+	AudioURL    *string       `json:"audioUrl"`
+	Question    *string       `json:"question"`
+	Session     *Session      `json:"session"`
+	Note        *StepNote     `json:"note"`
+	Progress    *StepProgress `json:"progress"`
+}
+
+type StepNote struct {
+	ID     string  `json:"id"`
+	StepID string  `json:"stepID"`
+	UserID string  `json:"userID"`
+	Value  *string `json:"value"`
+}
+
+type StepProgress struct {
+	ID          string `json:"id"`
+	DateStarted string `json:"dateStarted"`
 }
 
 type StepQuery struct {

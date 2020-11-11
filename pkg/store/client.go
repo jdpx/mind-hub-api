@@ -228,4 +228,66 @@ func setupDbTables(dbSvc *dynamodb.DynamoDB) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("step_progress"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("stepID"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("stepID"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("step_note"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("stepID"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("stepID"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("userID"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
 }

@@ -17,8 +17,8 @@ const (
 
 // CourseProgressRepositor ...
 type CourseProgressRepositor interface {
-	GetCourseProgress(ctx context.Context, cID, uID string) (*Progress, error)
-	StartCourse(ctx context.Context, cID, uID string) (*Progress, error)
+	GetCourseProgress(ctx context.Context, cID, uID string) (*CourseProgress, error)
+	StartCourse(ctx context.Context, cID, uID string) (*CourseProgress, error)
 }
 
 // CourseProgressHandler ...
@@ -34,13 +34,13 @@ func NewCourseProgressHandler(client Storer) CourseProgressHandler {
 }
 
 // GetCourseProgress ...
-func (c CourseProgressHandler) GetCourseProgress(ctx context.Context, cID, uID string) (*Progress, error) {
+func (c CourseProgressHandler) GetCourseProgress(ctx context.Context, cID, uID string) (*CourseProgress, error) {
 	p := map[string]string{
 		"courseID": cID,
 		"userID":   uID,
 	}
 
-	res := Progress{}
+	res := CourseProgress{}
 	err := c.db.Get(ctx, courseProgressTableName, p, &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
@@ -55,17 +55,17 @@ func (c CourseProgressHandler) GetCourseProgress(ctx context.Context, cID, uID s
 }
 
 // StartCourse ...
-func (c CourseProgressHandler) StartCourse(ctx context.Context, cID, uID string) (*Progress, error) {
+func (c CourseProgressHandler) StartCourse(ctx context.Context, cID, uID string) (*CourseProgress, error) {
 	id, _ := uuid.NewV4()
 
-	input := Progress{
+	input := CourseProgress{
 		ID:          id.String(),
 		CourseID:    cID,
 		UserID:      uID,
 		DateStarted: time.Now(),
 	}
 
-	res := Progress{}
+	res := CourseProgress{}
 	err := c.db.Put(ctx, courseProgressTableName, input)
 	if err != nil {
 		log.Error("error getting item from store", err)

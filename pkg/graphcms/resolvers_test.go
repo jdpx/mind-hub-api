@@ -154,7 +154,12 @@ func TestResolverResolveCourseSessions(t *testing.T) {
   sessions(where: { course: { id: $id } }) {
     id
     title
-    description
+	description
+	
+	steps {
+      id
+      title
+    }
   }
 }`)
 	req.Var("id", courseID)

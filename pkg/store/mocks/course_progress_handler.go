@@ -35,10 +35,10 @@ func (m *MockCourseProgressRepositor) EXPECT() *MockCourseProgressRepositorMockR
 }
 
 // GetCourseProgress mocks base method
-func (m *MockCourseProgressRepositor) GetCourseProgress(ctx context.Context, cID, uID string) (*store.Progress, error) {
+func (m *MockCourseProgressRepositor) GetCourseProgress(ctx context.Context, cID, uID string) (*store.CourseProgress, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCourseProgress", ctx, cID, uID)
-	ret0, _ := ret[0].(*store.Progress)
+	ret0, _ := ret[0].(*store.CourseProgress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockCourseProgressRepositorMockRecorder) GetCourseProgress(ctx, cID, u
 }
 
 // StartCourse mocks base method
-func (m *MockCourseProgressRepositor) StartCourse(ctx context.Context, cID, uID string) (*store.Progress, error) {
+func (m *MockCourseProgressRepositor) StartCourse(ctx context.Context, cID, uID string) (*store.CourseProgress, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StartCourse", ctx, cID, uID)
-	ret0, _ := ret[0].(*store.Progress)
+	ret0, _ := ret[0].(*store.CourseProgress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

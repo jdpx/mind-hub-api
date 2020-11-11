@@ -11,7 +11,7 @@ type Course {
   sessions: [Session]!
 
   note: CourseNote
-  progress: Progress
+  progress: CourseProgress
 }
 
 type Session {
@@ -33,12 +33,17 @@ type Step {
   question: String
 
   session: Session!
+  note: StepNote
+  progress: StepProgress
 }
 
-type Progress {
+type CourseProgress {
   id: ID!
-  started: Boolean!
-  sessionsCompleted: Int!
+  dateStarted: String!
+}
+
+type StepProgress {
+  id: ID!
   dateStarted: String!
 }
 
@@ -57,6 +62,13 @@ input StepQuery {
 type CourseNote {
   id: ID!
   courseID: ID!
+  userID: ID!
+  value: String
+}
+
+type StepNote {
+  id: ID!
+  stepID: ID!
   userID: ID!
   value: String
 }

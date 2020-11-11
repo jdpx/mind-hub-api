@@ -16,7 +16,9 @@ type ResolverOption func(*Resolver)
 type Resolver struct {
 	graphcms              graphcms.Resolverer
 	courseProgressHandler store.CourseProgressRepositor
+	stepProgressHandler   store.StepProgressRepositor
 	courseNoteHandler     store.CourseNoteRepositor
+	stepNoteHandler       store.StepNoteRepositor
 }
 
 // NewResolver ...
@@ -48,5 +50,19 @@ func WithCourseProgressHandler(s store.CourseProgressRepositor) func(*Resolver) 
 func WithCourseNoteRepositor(s store.CourseNoteRepositor) func(*Resolver) {
 	return func(r *Resolver) {
 		r.courseNoteHandler = s
+	}
+}
+
+// WithStepProgressHandler ...
+func WithStepProgressHandler(s store.StepProgressRepositor) func(*Resolver) {
+	return func(r *Resolver) {
+		r.stepProgressHandler = s
+	}
+}
+
+// WithStepNoteRepositor ...
+func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
+	return func(r *Resolver) {
+		r.stepNoteHandler = s
 	}
 }

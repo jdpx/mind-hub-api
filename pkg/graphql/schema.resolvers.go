@@ -16,7 +16,6 @@ import (
 
 func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (int, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("course sessions count resolver got called", obj.ID)
 
 	gss, err := r.graphcms.ResolveCourseSessions(ctx, obj.ID)
@@ -29,7 +28,6 @@ func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (i
 
 func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("course sessions resolver got called", obj.ID)
 
 	gss, err := r.graphcms.ResolveCourseSessions(ctx, obj.ID)
@@ -44,7 +42,6 @@ func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*mo
 
 func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.CourseNote, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("Course Note resolver got called", obj.ID)
 
 	userID, err := request.GetUserID(ctx)
@@ -70,9 +67,8 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 	}, nil
 }
 
-func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.Progress, error) {
+func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.CourseProgress, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("get progress resolver got called")
 
 	userID, err := request.GetUserID(ctx)
@@ -90,19 +86,14 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return nil, nil
 	}
 
-	return &model.Progress{
-		// nolint:staticcheck
-		ID:                progress.ID,
-		SessionsCompleted: 0,
-		Started:           true,
-		// nolint:staticcheck
+	return &model.CourseProgress{
+		ID:          progress.ID,
 		DateStarted: progress.DateStarted.String(),
 	}, nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("course started resolver got called")
 
 	userID, err := request.GetUserID(ctx)
@@ -124,7 +115,6 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 
 func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Course, error) {
 	log := logging.NewFromResolver(ctx)
-
 	log.Info("Update Course Note resolver called")
 
 	userID, err := request.GetUserID(ctx)
@@ -207,6 +197,58 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	return s, nil
 }
 
+func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNote, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("Step Note resolver got called", obj.ID)
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	note, err := r.stepNoteHandler.GetNote(ctx, obj.ID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if note == nil {
+		return nil, nil
+	}
+
+	return &model.StepNote{
+		ID:     note.ID,
+		StepID: note.StepID,
+		UserID: note.UserID,
+		Value:  &note.Value,
+	}, nil
+}
+
+func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.StepProgress, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("Step Progress resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	progress, err := r.stepProgressHandler.GetStepProgress(ctx, obj.ID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if progress == nil {
+		return nil, nil
+	}
+
+	return &model.StepProgress{
+		ID:          progress.ID,
+		DateStarted: progress.DateStarted.String(),
+	}, nil
+}
+
 // Course returns generated.CourseResolver implementation.
 func (r *Resolver) Course() generated.CourseResolver { return &courseResolver{r} }
 
@@ -216,6 +258,10 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Step returns generated.StepResolver implementation.
+func (r *Resolver) Step() generated.StepResolver { return &stepResolver{r} }
+
 type courseResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type stepResolver struct{ *Resolver }

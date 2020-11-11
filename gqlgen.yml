@@ -64,3 +64,9 @@ models:
         resolver: true
       note:
         resolver: true
+  Step:
+    fields:
+      progress:
+        resolver: true
+      note:
+        resolver: true

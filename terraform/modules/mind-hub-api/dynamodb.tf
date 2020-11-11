@@ -45,7 +45,7 @@ resource "aws_dynamodb_table" "mind_hub_api_step_progress" {
   stream_enabled    = false
 
   attribute {
-    name = "courseID"
+    name = "stepID"
     type = "S"
   }
 
@@ -64,7 +64,7 @@ resource "aws_dynamodb_table" "mind_hub_api_step_note" {
   stream_enabled    = false
 
   attribute {
-    name = "courseID"
+    name = "stepID"
     type = "S"
   }
 

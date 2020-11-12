@@ -78,3 +78,9 @@ type UpdatedCourseNote struct {
 	CourseID string  `json:"courseID"`
 	Value    string  `json:"value"`
 }
+
+type UpdatedStepNote struct {
+	ID     *string `json:"id"`
+	StepID string  `json:"stepID"`
+	Value  string  `json:"value"`
+}

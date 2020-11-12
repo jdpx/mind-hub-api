@@ -164,6 +164,57 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 	}, nil
 }
 
+func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.UpdatedStepNote) (*model.Step, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("Update Step Note resolver called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var note *store.StepNote
+
+	if input.ID == nil {
+		m := store.StepNote{
+			StepID: input.StepID,
+			UserID: userID,
+			Value:  input.Value,
+		}
+
+		note, err = r.stepNoteHandler.CreateNote(ctx, m)
+		if err != nil {
+			log.Error("An error occurred creating Note", err)
+
+			return nil, err
+		}
+	} else {
+		m := store.StepNote{
+			ID:     *input.ID,
+			StepID: input.StepID,
+			UserID: userID,
+			Value:  input.Value,
+		}
+
+		note, err = r.stepNoteHandler.UpdateNote(ctx, m)
+		if err != nil {
+			log.Error("An error occurred updating Note", err)
+
+			return nil, err
+		}
+	}
+
+	return &model.Step{
+		ID: input.StepID,
+		Note: &model.StepNote{
+			ID:     note.ID,
+			StepID: note.StepID,
+			UserID: note.UserID,
+			Value:  &note.Value,
+		},
+	}, nil
+}
+
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	cgs, err := r.graphcms.ResolveCourses(ctx)
 	if err != nil {

@@ -47,7 +47,7 @@ func NewClient(config Config) (*Client, error) {
 		Region: aws.String(dbRegion),
 	}
 
-	if config.Env != "local" {
+	if config.Env == "local" {
 		awsConfig.Endpoint = aws.String(localDynamoDBURL)
 	}
 
@@ -82,7 +82,7 @@ func (c Client) Get(ctx context.Context, tableName string, searchBody interface{
 		TableName: aws.String(tableName),
 	}
 
-	result, err := c.db.GetItem(&input)
+	result, err := c.db.GetItemWithContext(ctx, &input)
 	if err != nil {
 		log.Error("error getting item from store", err)
 

@@ -70,6 +70,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CourseStarted    func(childComplexity int, input model.CourseStarted) int
 		UpdateCourseNote func(childComplexity int, input model.UpdatedCourseNote) int
+		UpdateStepNote   func(childComplexity int, input model.UpdatedStepNote) int
 	}
 
 	Query struct {
@@ -121,6 +122,7 @@ type CourseResolver interface {
 type MutationResolver interface {
 	CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error)
 	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Course, error)
+	UpdateStepNote(ctx context.Context, input model.UpdatedStepNote) (*model.Step, error)
 }
 type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
@@ -261,6 +263,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateCourseNote(childComplexity, args["input"].(model.UpdatedCourseNote)), true
+
+	case "Mutation.updateStepNote":
+		if e.complexity.Mutation.UpdateStepNote == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStepNote_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateStepNote(childComplexity, args["input"].(model.UpdatedStepNote)), true
 
 	case "Query.course":
 		if e.complexity.Query.Course == nil {
@@ -596,9 +610,16 @@ input UpdatedCourseNote {
   value: String!
 }
 
+input UpdatedStepNote {
+  id: ID
+  stepID: ID!
+  value: String!
+}
+
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): Course!
+  updateStepNote(input: UpdatedStepNote!): Step!
 }
 `, BuiltIn: false},
 }
@@ -630,6 +651,21 @@ func (ec *executionContext) field_Mutation_updateCourseNote_args(ctx context.Con
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedCourseNote(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStepNote_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdatedStepNote
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdatedStepNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedStepNote(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1249,6 +1285,48 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 	res := resTmp.(*model.Course)
 	fc.Result = res
 	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateStepNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateStepNote_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateStepNote(rctx, args["input"].(model.UpdatedStepNote))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Step)
+	fc.Result = res
+	return ec.marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_courses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3358,6 +3436,42 @@ func (ec *executionContext) unmarshalInputUpdatedCourseNote(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdatedStepNote(ctx context.Context, obj interface{}) (model.UpdatedStepNote, error) {
+	var it model.UpdatedStepNote
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "stepID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stepID"))
+			it.StepID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3546,6 +3660,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateCourseNote":
 			out.Values[i] = ec._Mutation_updateCourseNote(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateStepNote":
+			out.Values[i] = ec._Mutation_updateStepNote(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4229,6 +4348,20 @@ func (ec *executionContext) unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNStep2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v model.Step) graphql.Marshaler {
+	return ec._Step(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v *model.Step) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Step(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4246,6 +4379,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 
 func (ec *executionContext) unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedCourseNote(ctx context.Context, v interface{}) (model.UpdatedCourseNote, error) {
 	res, err := ec.unmarshalInputUpdatedCourseNote(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdatedStepNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedStepNote(ctx context.Context, v interface{}) (model.UpdatedStepNote, error) {
+	res, err := ec.unmarshalInputUpdatedStepNote(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

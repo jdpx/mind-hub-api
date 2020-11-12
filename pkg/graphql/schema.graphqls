@@ -90,7 +90,14 @@ input UpdatedCourseNote {
   value: String!
 }
 
+input UpdatedStepNote {
+  id: ID
+  stepID: ID!
+  value: String!
+}
+
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): Course!
+  updateStepNote(input: UpdatedStepNote!): Step!
 }

@@ -20,10 +20,11 @@ type CourseNote struct {
 
 // StepProgress ...
 type StepProgress struct {
-	ID          string    `json:"id"`
-	StepID      string    `json:"stepID"`
-	UserID      string    `json:"userID"`
-	DateStarted time.Time `json:"dateStarted"`
+	ID            string     `json:"id,omitempty"`
+	StepID        string     `json:"stepID,omitempty"`
+	UserID        string     `json:"userID,omitempty"`
+	DateStarted   *time.Time `json:"dateStarted,omitempty"`
+	DateCompleted *time.Time `json:"dateCompleted,omitempty"`
 }
 
 // StepNote ...

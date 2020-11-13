@@ -5,6 +5,7 @@ package store
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -17,8 +18,9 @@ const (
 
 // StepProgressRepositor ...
 type StepProgressRepositor interface {
-	GetStepProgress(ctx context.Context, cID, uID string) (*StepProgress, error)
-	StartStep(ctx context.Context, cID, uID string) (*StepProgress, error)
+	GetStepProgress(ctx context.Context, sID, uID string) (*StepProgress, error)
+	StartStep(ctx context.Context, sID, uID string) (*StepProgress, error)
+	CompleteStep(ctx context.Context, sID, uID string) (*StepProgress, error)
 }
 
 // StepProgressHandler ...
@@ -34,9 +36,9 @@ func NewStepProgressHandler(client Storer) StepProgressHandler {
 }
 
 // GetStepProgress ...
-func (c StepProgressHandler) GetStepProgress(ctx context.Context, cID, uID string) (*StepProgress, error) {
+func (c StepProgressHandler) GetStepProgress(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	p := map[string]string{
-		"stepID": cID,
+		"stepID": sID,
 		"userID": uID,
 	}
 
@@ -55,20 +57,46 @@ func (c StepProgressHandler) GetStepProgress(ctx context.Context, cID, uID strin
 }
 
 // StartStep ...
-func (c StepProgressHandler) StartStep(ctx context.Context, cID, uID string) (*StepProgress, error) {
+func (c StepProgressHandler) StartStep(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	id, _ := uuid.NewV4()
 
+	now := time.Now()
 	input := StepProgress{
 		ID:          id.String(),
-		StepID:      cID,
+		StepID:      sID,
 		UserID:      uID,
-		DateStarted: time.Now(),
+		DateStarted: &now,
 	}
 
 	res := StepProgress{}
 	err := c.db.Put(ctx, stepProgressTableName, input)
 	if err != nil {
-		log.Error("error getting item from store", err)
+		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+// StartStep ...
+func (c StepProgressHandler) CompleteStep(ctx context.Context, sID, uID string) (*StepProgress, error) {
+	now := time.Now()
+
+	input := map[string]interface{}{
+		":dateCompleted": now,
+	}
+
+	keys := map[string]string{
+		"stepID": sID,
+		"userID": uID,
+	}
+
+	expression := "SET dateCompleted = :dateCompleted"
+
+	res := StepProgress{}
+	err := c.db.Update(ctx, stepProgressTableName, keys, expression, input, &res)
+	if err != nil {
+		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
 		return nil, err
 	}
 

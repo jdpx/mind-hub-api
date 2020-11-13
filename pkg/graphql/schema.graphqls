@@ -21,6 +21,7 @@ type Session {
 
   steps: [Step]
   course: Course!
+  # progress: SessionProgress
 }
 
 type Step {
@@ -42,9 +43,15 @@ type CourseProgress {
   dateStarted: String!
 }
 
+# type SessionProgress {
+#   id: ID!
+#   dateStarted: String!
+# }
+
 type StepProgress {
   id: ID!
   dateStarted: String!
+  dateCompleted: String!
 }
 
 input CourseQuery {
@@ -84,6 +91,14 @@ input CourseStarted {
   courseID: ID!
 }
 
+input StepCompleted {
+  id: ID!
+}
+
+input StepStarted {
+  id: ID!
+}
+
 input UpdatedCourseNote {
   id: ID
   courseID: ID!
@@ -99,5 +114,8 @@ input UpdatedStepNote {
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): Course!
+
+  stepStarted(input: StepStarted!): Step!
+  stepCompleted(input: StepCompleted!): Step!
   updateStepNote(input: UpdatedStepNote!): Step!
 }

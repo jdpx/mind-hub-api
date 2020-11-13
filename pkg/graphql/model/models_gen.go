@@ -57,6 +57,10 @@ type Step struct {
 	Progress    *StepProgress `json:"progress"`
 }
 
+type StepCompleted struct {
+	ID string `json:"id"`
+}
+
 type StepNote struct {
 	ID     string  `json:"id"`
 	StepID string  `json:"stepID"`
@@ -65,11 +69,16 @@ type StepNote struct {
 }
 
 type StepProgress struct {
-	ID          string `json:"id"`
-	DateStarted string `json:"dateStarted"`
+	ID            string `json:"id"`
+	DateStarted   string `json:"dateStarted"`
+	DateCompleted string `json:"dateCompleted"`
 }
 
 type StepQuery struct {
+	ID string `json:"id"`
+}
+
+type StepStarted struct {
 	ID string `json:"id"`
 }
 

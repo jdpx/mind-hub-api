@@ -69,6 +69,8 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CourseStarted    func(childComplexity int, input model.CourseStarted) int
+		StepCompleted    func(childComplexity int, input model.StepCompleted) int
+		StepStarted      func(childComplexity int, input model.StepStarted) int
 		UpdateCourseNote func(childComplexity int, input model.UpdatedCourseNote) int
 		UpdateStepNote   func(childComplexity int, input model.UpdatedStepNote) int
 	}
@@ -108,8 +110,9 @@ type ComplexityRoot struct {
 	}
 
 	StepProgress struct {
-		DateStarted func(childComplexity int) int
-		ID          func(childComplexity int) int
+		DateCompleted func(childComplexity int) int
+		DateStarted   func(childComplexity int) int
+		ID            func(childComplexity int) int
 	}
 }
 
@@ -122,6 +125,8 @@ type CourseResolver interface {
 type MutationResolver interface {
 	CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error)
 	UpdateCourseNote(ctx context.Context, input model.UpdatedCourseNote) (*model.Course, error)
+	StepStarted(ctx context.Context, input model.StepStarted) (*model.Step, error)
+	StepCompleted(ctx context.Context, input model.StepCompleted) (*model.Step, error)
 	UpdateStepNote(ctx context.Context, input model.UpdatedStepNote) (*model.Step, error)
 }
 type QueryResolver interface {
@@ -251,6 +256,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CourseStarted(childComplexity, args["input"].(model.CourseStarted)), true
+
+	case "Mutation.stepCompleted":
+		if e.complexity.Mutation.StepCompleted == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_stepCompleted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.StepCompleted(childComplexity, args["input"].(model.StepCompleted)), true
+
+	case "Mutation.stepStarted":
+		if e.complexity.Mutation.StepStarted == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_stepStarted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.StepStarted(childComplexity, args["input"].(model.StepStarted)), true
 
 	case "Mutation.updateCourseNote":
 		if e.complexity.Mutation.UpdateCourseNote == nil {
@@ -440,6 +469,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StepNote.Value(childComplexity), true
 
+	case "StepProgress.dateCompleted":
+		if e.complexity.StepProgress.DateCompleted == nil {
+			break
+		}
+
+		return e.complexity.StepProgress.DateCompleted(childComplexity), true
+
 	case "StepProgress.dateStarted":
 		if e.complexity.StepProgress.DateStarted == nil {
 			break
@@ -541,6 +577,7 @@ type Session {
 
   steps: [Step]
   course: Course!
+  # progress: SessionProgress
 }
 
 type Step {
@@ -562,9 +599,15 @@ type CourseProgress {
   dateStarted: String!
 }
 
+# type SessionProgress {
+#   id: ID!
+#   dateStarted: String!
+# }
+
 type StepProgress {
   id: ID!
   dateStarted: String!
+  dateCompleted: String!
 }
 
 input CourseQuery {
@@ -604,6 +647,14 @@ input CourseStarted {
   courseID: ID!
 }
 
+input StepCompleted {
+  id: ID!
+}
+
+input StepStarted {
+  id: ID!
+}
+
 input UpdatedCourseNote {
   id: ID
   courseID: ID!
@@ -619,6 +670,9 @@ input UpdatedStepNote {
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): Course!
+
+  stepStarted(input: StepStarted!): Step!
+  stepCompleted(input: StepCompleted!): Step!
   updateStepNote(input: UpdatedStepNote!): Step!
 }
 `, BuiltIn: false},
@@ -636,6 +690,36 @@ func (ec *executionContext) field_Mutation_courseStarted_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCourseStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseStarted(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_stepCompleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.StepCompleted
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNStepCompleted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStepCompleted(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_stepStarted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.StepStarted
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNStepStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStepStarted(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1285,6 +1369,90 @@ func (ec *executionContext) _Mutation_updateCourseNote(ctx context.Context, fiel
 	res := resTmp.(*model.Course)
 	fc.Result = res
 	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_stepStarted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_stepStarted_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().StepStarted(rctx, args["input"].(model.StepStarted))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Step)
+	fc.Result = res
+	return ec.marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_stepCompleted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_stepCompleted_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().StepCompleted(rctx, args["input"].(model.StepCompleted))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Step)
+	fc.Result = res
+	return ec.marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateStepNote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2217,6 +2385,41 @@ func (ec *executionContext) _StepProgress_dateStarted(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DateStarted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StepProgress_dateCompleted(ctx context.Context, field graphql.CollectedField, obj *model.StepProgress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StepProgress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DateCompleted, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3380,8 +3583,48 @@ func (ec *executionContext) unmarshalInputSessionQuery(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputStepCompleted(ctx context.Context, obj interface{}) (model.StepCompleted, error) {
+	var it model.StepCompleted
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStepQuery(ctx context.Context, obj interface{}) (model.StepQuery, error) {
 	var it model.StepQuery
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputStepStarted(ctx context.Context, obj interface{}) (model.StepStarted, error) {
+	var it model.StepStarted
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -3663,6 +3906,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "stepStarted":
+			out.Values[i] = ec._Mutation_stepStarted(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "stepCompleted":
+			out.Values[i] = ec._Mutation_stepCompleted(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateStepNote":
 			out.Values[i] = ec._Mutation_updateStepNote(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -3927,6 +4180,11 @@ func (ec *executionContext) _StepProgress(ctx context.Context, sel ast.Selection
 			}
 		case "dateStarted":
 			out.Values[i] = ec._StepProgress_dateStarted(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "dateCompleted":
+			out.Values[i] = ec._StepProgress_dateCompleted(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4360,6 +4618,16 @@ func (ec *executionContext) marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑa
 		return graphql.Null
 	}
 	return ec._Step(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNStepCompleted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStepCompleted(ctx context.Context, v interface{}) (model.StepCompleted, error) {
+	res, err := ec.unmarshalInputStepCompleted(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNStepStarted2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStepStarted(ctx context.Context, v interface{}) (model.StepStarted, error) {
+	res, err := ec.unmarshalInputStepStarted(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

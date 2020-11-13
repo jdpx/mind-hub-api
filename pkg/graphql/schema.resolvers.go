@@ -164,6 +164,48 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 	}, nil
 }
 
+func (r *mutationResolver) StepStarted(ctx context.Context, input model.StepStarted) (*model.Step, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("step started resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	_, err = r.stepProgressHandler.StartStep(ctx, input.ID, userID)
+	if err != nil {
+		log.Error("error putting record in store", err)
+		return nil, err
+	}
+
+	return &model.Step{
+		ID: input.ID,
+	}, nil
+}
+
+func (r *mutationResolver) StepCompleted(ctx context.Context, input model.StepCompleted) (*model.Step, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("step completed resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	_, err = r.stepProgressHandler.CompleteStep(ctx, input.ID, userID)
+	if err != nil {
+		log.Error("error putting record in store", err)
+		return nil, err
+	}
+
+	return &model.Step{
+		ID: input.ID,
+	}, nil
+}
+
 func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.UpdatedStepNote) (*model.Step, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("Update Step Note resolver called")
@@ -294,10 +336,18 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 		return nil, nil
 	}
 
-	return &model.StepProgress{
-		ID:          progress.ID,
-		DateStarted: progress.DateStarted.String(),
-	}, nil
+	res := &model.StepProgress{
+		ID: progress.ID,
+	}
+
+	if progress.DateStarted != nil {
+		res.DateStarted = progress.DateStarted.String()
+	}
+	if progress.DateCompleted != nil {
+		res.DateCompleted = progress.DateCompleted.String()
+	}
+
+	return res, nil
 }
 
 // Course returns generated.CourseResolver implementation.

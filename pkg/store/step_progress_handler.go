@@ -65,6 +65,7 @@ func (c StepProgressHandler) StartStep(ctx context.Context, sID, uID string) (*S
 		ID:          id.String(),
 		StepID:      sID,
 		UserID:      uID,
+		Status:      STATUS_STARTED,
 		DateStarted: &now,
 	}
 
@@ -84,6 +85,7 @@ func (c StepProgressHandler) CompleteStep(ctx context.Context, sID, uID string) 
 
 	input := map[string]interface{}{
 		":dateCompleted": now,
+		":status":        COMPLETED_STARTED,
 	}
 
 	keys := map[string]string{
@@ -91,7 +93,7 @@ func (c StepProgressHandler) CompleteStep(ctx context.Context, sID, uID string) 
 		"userID": uID,
 	}
 
-	expression := "SET dateCompleted = :dateCompleted"
+	expression := "SET dateCompleted = :dateCompleted, status = :status"
 
 	res := StepProgress{}
 	err := c.db.Update(ctx, stepProgressTableName, keys, expression, input, &res)

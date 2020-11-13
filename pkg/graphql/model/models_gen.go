@@ -70,6 +70,7 @@ type StepNote struct {
 
 type StepProgress struct {
 	ID            string `json:"id"`
+	Status        string `json:"status"`
 	DateStarted   string `json:"dateStarted"`
 	DateCompleted string `json:"dateCompleted"`
 }

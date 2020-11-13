@@ -2,6 +2,11 @@ package store
 
 import "time"
 
+const (
+	STATUS_STARTED    = "STARTED"
+	COMPLETED_STARTED = "COMPLETED"
+)
+
 // CourseProgress ...
 type CourseProgress struct {
 	ID          string    `json:"id"`
@@ -23,6 +28,7 @@ type StepProgress struct {
 	ID            string     `json:"id,omitempty"`
 	StepID        string     `json:"stepID,omitempty"`
 	UserID        string     `json:"userID,omitempty"`
+	Status        string     `json:"status"`
 	DateStarted   *time.Time `json:"dateStarted,omitempty"`
 	DateCompleted *time.Time `json:"dateCompleted,omitempty"`
 }

@@ -337,7 +337,8 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 	}
 
 	res := &model.StepProgress{
-		ID: progress.ID,
+		ID:     progress.ID,
+		Status: progress.Status,
 	}
 
 	if progress.DateStarted != nil {

@@ -50,6 +50,7 @@ type CourseProgress {
 
 type StepProgress {
   id: ID!
+  status: String!
   dateStarted: String!
   dateCompleted: String!
 }

@@ -62,6 +62,7 @@ func (c CourseProgressHandler) StartCourse(ctx context.Context, cID, uID string)
 		ID:          id.String(),
 		CourseID:    cID,
 		UserID:      uID,
+		State:       STATUS_STARTED,
 		DateStarted: time.Now(),
 	}
 

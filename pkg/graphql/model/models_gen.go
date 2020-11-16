@@ -21,6 +21,7 @@ type CourseNote struct {
 
 type CourseProgress struct {
 	ID          string `json:"id"`
+	State       string `json:"state"`
 	DateStarted string `json:"dateStarted"`
 }
 
@@ -70,6 +71,7 @@ type StepNote struct {
 
 type StepProgress struct {
 	ID            string `json:"id"`
+	State         string `json:"state"`
 	DateStarted   string `json:"dateStarted"`
 	DateCompleted string `json:"dateCompleted"`
 }

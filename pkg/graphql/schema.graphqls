@@ -87,8 +87,8 @@ type StepNote {
 type Query {
   courses: [Course!]!
 
-  course(where: CourseQuery!): Course!
-  session(where: SessionQuery!): Session!
+  course(where: CourseQuery!): Course
+  session(where: SessionQuery!): Session
 }
 
 input CourseStarted {

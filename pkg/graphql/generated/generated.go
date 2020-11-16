@@ -676,8 +676,8 @@ type StepNote {
 type Query {
   courses: [Course!]!
 
-  course(where: CourseQuery!): Course!
-  session(where: SessionQuery!): Session!
+  course(where: CourseQuery!): Course
+  session(where: SessionQuery!): Session
 }
 
 input CourseStarted {
@@ -1706,14 +1706,11 @@ func (ec *executionContext) _Query_course(ctx context.Context, field graphql.Col
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalOCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_session(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1748,14 +1745,11 @@ func (ec *executionContext) _Query_session(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Session)
 	fc.Result = res
-	return ec.marshalNSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
+	return ec.marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4171,9 +4165,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_course(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "session":
@@ -4185,9 +4176,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_session(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "__type":
@@ -4756,10 +4744,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNSession2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v model.Session) graphql.Marshaler {
-	return ec._Session(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v []*model.Session) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -5112,6 +5096,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) marshalOCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v *model.Course) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Course(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOCourseNote2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseNote(ctx context.Context, sel ast.SelectionSet, v *model.CourseNote) graphql.Marshaler {

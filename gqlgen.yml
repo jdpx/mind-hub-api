@@ -58,6 +58,8 @@ models:
     fields:
       sessionCount:
         resolver: true
+      stepCount:
+        resolver: true
       progress:
         resolver: true
       sessions:

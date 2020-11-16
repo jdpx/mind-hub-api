@@ -7,6 +7,7 @@ type Course {
   title: String!
   description: String!
   sessionCount: Int!
+  stepCount: Int!
 
   sessions: [Session]!
 
@@ -41,6 +42,7 @@ type Step {
 type CourseProgress {
   id: ID!
   state: String!
+  completedSteps: Int!
   dateStarted: String!
 }
 

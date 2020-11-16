@@ -19,6 +19,7 @@ const (
 // StepProgressRepositor ...
 type StepProgressRepositor interface {
 	GetStepProgress(ctx context.Context, sID, uID string) (*StepProgress, error)
+	GetCompletedProgressByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error)
 	StartStep(ctx context.Context, sID, uID string) (*StepProgress, error)
 	CompleteStep(ctx context.Context, sID, uID string) (*StepProgress, error)
 }
@@ -54,6 +55,41 @@ func (c StepProgressHandler) GetStepProgress(ctx context.Context, sID, uID strin
 	}
 
 	return &res, nil
+}
+
+// GetStepProgress ...
+func (c StepProgressHandler) GetCompletedProgressByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
+	res := []*StepProgress{}
+
+	keys := []map[string]string{}
+
+	for _, id := range ids {
+		m := map[string]string{
+			"userID": uID,
+			"stepID": id,
+		}
+
+		keys = append(keys, m)
+	}
+
+	err := c.db.Query(ctx, stepProgressTableName, keys, &res)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	fP := []*StepProgress{}
+
+	for _, p := range res {
+		if p.State == STATUS_COMPLETED {
+			fP = append(fP, p)
+		}
+	}
+
+	return fP, nil
 }
 
 // StartStep ...

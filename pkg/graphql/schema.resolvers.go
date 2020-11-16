@@ -26,6 +26,19 @@ func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (i
 	return len(gss), nil
 }
 
+func (r *courseResolver) StepCount(ctx context.Context, obj *model.Course) (int, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("course step count resolver got called", obj.ID)
+
+	gss, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
+	if err != nil {
+		return 0, err
+	}
+
+	return len(gss), nil
+
+}
+
 func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("course sessions resolver got called", obj.ID)
@@ -74,7 +87,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
 		log.Error("error getting user", err)
-		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
 	progress, err := r.courseProgressHandler.GetCourseProgress(ctx, obj.ID, userID)
@@ -86,10 +99,23 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return nil, nil
 	}
 
+	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
+	if err != nil {
+		log.Error("error getting course steps", err)
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+	}
+
+	steps, err := r.stepProgressHandler.GetCompletedProgressByStepID(ctx, userID, courseStepIDs...)
+	if err != nil {
+		log.Error("error getting completed steps", err)
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+	}
+
 	return &model.CourseProgress{
-		ID:          progress.ID,
-		State:       progress.State,
-		DateStarted: progress.DateStarted.String(),
+		ID:             progress.ID,
+		State:          progress.State,
+		CompletedSteps: len(steps),
+		DateStarted:    progress.DateStarted.String(),
 	}, nil
 }
 

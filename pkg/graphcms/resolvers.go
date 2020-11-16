@@ -20,6 +20,7 @@ type Resolverer interface {
 	ResolveCourse(ctx context.Context, id string) (*Course, error)
 	ResolveCourseSessions(ctx context.Context, id string) ([]*Session, error)
 	ResolveSession(ctx context.Context, id string) (*Session, error)
+	ResolveCourseStepIDs(ctx context.Context, id string) ([]string, error)
 }
 
 // NewResolver initialises a new Resolver
@@ -94,4 +95,29 @@ func (r Resolver) ResolveSession(ctx context.Context, id string) (*Session, erro
 	}
 
 	return res.Session, err
+}
+
+// ResolveCourseStepIDs retreives a Session from GraphCMS based on the Session ID
+func (r Resolver) ResolveCourseStepIDs(ctx context.Context, id string) ([]string, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.SessionIDKey, id)
+	log.Info(fmt.Sprintf("Resolving Graphcms Step IDs for Course %s", id))
+
+	req := NewRequest(getSessionsByCourseID)
+	req.Var("id", id)
+	res := sessionsResponse{}
+
+	err := r.client.Run(ctx, req, &res)
+	if err != nil {
+		return nil, fmt.Errorf("error occurred getting GraphCMS Session By Course ID")
+	}
+
+	ids := []string{}
+
+	for _, session := range res.Sessions {
+		for _, step := range session.Steps {
+			ids = append(ids, step.ID)
+		}
+	}
+
+	return ids, err
 }

@@ -7,6 +7,7 @@ type Course struct {
 	Title        string          `json:"title"`
 	Description  string          `json:"description"`
 	SessionCount int             `json:"sessionCount"`
+	StepCount    int             `json:"stepCount"`
 	Sessions     []*Session      `json:"sessions"`
 	Note         *CourseNote     `json:"note"`
 	Progress     *CourseProgress `json:"progress"`
@@ -20,9 +21,10 @@ type CourseNote struct {
 }
 
 type CourseProgress struct {
-	ID          string `json:"id"`
-	State       string `json:"state"`
-	DateStarted string `json:"dateStarted"`
+	ID             string `json:"id"`
+	State          string `json:"state"`
+	CompletedSteps int    `json:"completedSteps"`
+	DateStarted    string `json:"dateStarted"`
 }
 
 type CourseQuery struct {

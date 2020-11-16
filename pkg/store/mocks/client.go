@@ -47,6 +47,20 @@ func (mr *MockStorerMockRecorder) Get(ctx, tableName, searchBody, i interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStorer)(nil).Get), ctx, tableName, searchBody, i)
 }
 
+// Query mocks base method
+func (m *MockStorer) Query(ctx context.Context, tableName string, searchKeys []map[string]string, i interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, tableName, searchKeys, i)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query
+func (mr *MockStorerMockRecorder) Query(ctx, tableName, searchKeys, i interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockStorer)(nil).Query), ctx, tableName, searchKeys, i)
+}
+
 // Put mocks base method
 func (m *MockStorer) Put(ctx context.Context, tableName string, body interface{}) error {
 	m.ctrl.T.Helper()

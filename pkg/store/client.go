@@ -27,6 +27,7 @@ const (
 // Storer ...
 type Storer interface {
 	Get(ctx context.Context, tableName string, searchBody interface{}, i interface{}) error
+	Query(ctx context.Context, tableName string, searchKeys []map[string]string, i interface{}) error
 	Put(ctx context.Context, tableName string, body interface{}) error
 	Update(ctx context.Context, tableName string, keys map[string]string, expression string, body interface{}, i interface{}) error
 }
@@ -96,6 +97,52 @@ func (c Client) Get(ctx context.Context, tableName string, searchBody interface{
 	}
 
 	err = dynamodbattribute.UnmarshalMap(result.Item, &i)
+	if err != nil {
+		log.Error("error unmarshalling from store", err)
+
+		return err
+	}
+
+	return nil
+}
+
+// Query ...
+func (c Client) Query(ctx context.Context, tableName string, searchKeys []map[string]string, i interface{}) error {
+	log := logging.NewFromResolver(ctx)
+
+	mapOfAttrKeys := []map[string]*dynamodb.AttributeValue{}
+
+	for _, place := range searchKeys {
+		k, err := dynamodbattribute.MarshalMap(place)
+		if err != nil {
+			return err
+		}
+		mapOfAttrKeys = append(mapOfAttrKeys, k)
+	}
+
+	input := dynamodb.BatchGetItemInput{
+		RequestItems: map[string]*dynamodb.KeysAndAttributes{
+			tableName: {
+				Keys: mapOfAttrKeys,
+			},
+		},
+	}
+
+	result, err := c.db.BatchGetItemWithContext(ctx, &input)
+	if err != nil {
+		log.Error("error getting item from store", err)
+
+		return err
+	}
+
+	if len(result.Responses) == 0 {
+		log.Info("no resposnes queried")
+		return nil
+	}
+
+	data := result.Responses[tableName]
+
+	err = dynamodbattribute.UnmarshalListOfMaps(data, &i)
 	if err != nil {
 		log.Error("error unmarshalling from store", err)
 

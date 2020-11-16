@@ -36,7 +36,6 @@ func (r *courseResolver) StepCount(ctx context.Context, obj *model.Course) (int,
 	}
 
 	return len(gss), nil
-
 }
 
 func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error) {
@@ -99,24 +98,31 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return nil, nil
 	}
 
+	res := &model.CourseProgress{
+		ID:          progress.ID,
+		State:       progress.State,
+		DateStarted: progress.DateStarted.String(),
+	}
+
 	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
 	if err != nil {
 		log.Error("error getting course steps", err)
 		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
-	steps, err := r.stepProgressHandler.GetCompletedProgressByStepID(ctx, userID, courseStepIDs...)
+	if len(courseStepIDs) == 0 {
+		return res, nil
+	}
+
+	completedSteps, err := r.stepProgressHandler.GetCompletedProgressByStepID(ctx, userID, courseStepIDs...)
 	if err != nil {
 		log.Error("error getting completed steps", err)
 		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
-	return &model.CourseProgress{
-		ID:             progress.ID,
-		State:          progress.State,
-		CompletedSteps: len(steps),
-		DateStarted:    progress.DateStarted.String(),
-	}, nil
+	res.CompletedSteps = len(completedSteps)
+
+	return res, nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
@@ -301,6 +307,10 @@ func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*m
 		return nil, err
 	}
 
+	if cg == nil {
+		return nil, nil
+	}
+
 	c := CourseFromCMS(cg)
 
 	return c, nil
@@ -310,6 +320,10 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	gs, err := r.graphcms.ResolveSession(ctx, where.ID)
 	if err != nil {
 		return nil, err
+	}
+
+	if gs == nil {
+		return nil, nil
 	}
 
 	s := SessionFromCMS(gs)

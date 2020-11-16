@@ -88,6 +88,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 
 	return &model.CourseProgress{
 		ID:          progress.ID,
+		State:       progress.State,
 		DateStarted: progress.DateStarted.String(),
 	}, nil
 }
@@ -337,7 +338,8 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 	}
 
 	res := &model.StepProgress{
-		ID: progress.ID,
+		ID:    progress.ID,
+		State: progress.State,
 	}
 
 	if progress.DateStarted != nil {

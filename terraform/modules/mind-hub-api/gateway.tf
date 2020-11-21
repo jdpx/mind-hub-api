@@ -34,7 +34,7 @@ module "cors" {
 }
 
 module authorizer {
-  source                  = "amancevice/auth0-authorizer/aws"
+  source                  = "jdpx/auth0-authorizer/aws"
   authorizer_audience     = var.auth0_audience
   authorizer_jwks_uri     = var.auth0_jwks_uri
   authorizer_token_issuer = var.auth0_token_issuer

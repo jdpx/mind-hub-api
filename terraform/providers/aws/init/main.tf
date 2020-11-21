@@ -7,7 +7,7 @@ terraform {
 }
 
 provider "aws" {
-  version                 = "~> 2.0"
+  version                 = "~> 3.0"
   region                  = "eu-west-1"
   shared_credentials_file = "~/.aws/credentials"
   profile                 = "mind-terraform"

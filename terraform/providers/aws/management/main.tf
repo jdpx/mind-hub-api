@@ -8,24 +8,24 @@ terraform {
 }
 
 provider "aws" {
-  version                 = "~> 2.0"
+  version                 = "~> 3.0"
   region                  = "eu-west-1"
   shared_credentials_file = "~/.aws/credentials"
   profile                 = "mind-terraform"
 }
 
 provider "github" {
-  version = "2.4.0"
+  version      = "~> 2.4"
   token        = var.github_token
-  individual = false
+  individual   = false
   organization = "jdpx"
 }
 
 module "mind-hub-api-pipeline" {
   source = "../../../modules/pipeline"
 
-  env                 = "management"
-  repository_owner    = "jdpx"
-  repository_name     = "mind-hub-api"
-  github_token        = var.github_token
+  env              = "management"
+  repository_owner = "jdpx"
+  repository_name  = "mind-hub-api"
+  github_token     = var.github_token
 }

@@ -35,6 +35,9 @@ run-api:
 regenerate-types:
 	go run github.com/99designs/gqlgen generate
 
+run/local-dynamo:
+	docker-compose up dynamodb-local
+
 cmd/lambdas/%/main.go:
 	cd $(subst main.go,,$@) \
 	&& $(GO_BUILD) -o lambda ./.\

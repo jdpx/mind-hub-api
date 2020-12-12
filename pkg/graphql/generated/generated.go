@@ -79,9 +79,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Course  func(childComplexity int, where model.CourseQuery) int
-		Courses func(childComplexity int) int
-		Session func(childComplexity int, where model.SessionQuery) int
+		Course             func(childComplexity int, where model.CourseQuery) int
+		Courses            func(childComplexity int) int
+		Session            func(childComplexity int, where model.SessionQuery) int
+		SessionsByCourseID func(childComplexity int, where model.SessionsByCourseIDQuery) int
 	}
 
 	Session struct {
@@ -138,6 +139,7 @@ type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
 	Course(ctx context.Context, where model.CourseQuery) (*model.Course, error)
 	Session(ctx context.Context, where model.SessionQuery) (*model.Session, error)
+	SessionsByCourseID(ctx context.Context, where model.SessionsByCourseIDQuery) ([]*model.Session, error)
 }
 type StepResolver interface {
 	Note(ctx context.Context, obj *model.Step) (*model.StepNote, error)
@@ -361,6 +363,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Session(childComplexity, args["where"].(model.SessionQuery)), true
+
+	case "Query.sessionsByCourseID":
+		if e.complexity.Query.SessionsByCourseID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_sessionsByCourseID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SessionsByCourseID(childComplexity, args["where"].(model.SessionsByCourseIDQuery)), true
 
 	case "Session.course":
 		if e.complexity.Session.Course == nil {
@@ -655,6 +669,10 @@ input SessionQuery {
   id: ID!
 }
 
+input SessionsByCourseIDQuery {
+  id: ID!
+}
+
 input StepQuery {
   id: ID!
 }
@@ -678,6 +696,7 @@ type Query {
 
   course(where: CourseQuery!): Course
   session(where: SessionQuery!): Session
+  sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
 }
 
 input CourseStarted {
@@ -832,6 +851,21 @@ func (ec *executionContext) field_Query_session_args(ctx context.Context, rawArg
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg0, err = ec.unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSessionQuery(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_sessionsByCourseID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SessionsByCourseIDQuery
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg0, err = ec.unmarshalNSessionsByCourseIDQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSessionsByCourseIDQuery(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1750,6 +1784,45 @@ func (ec *executionContext) _Query_session(ctx context.Context, field graphql.Co
 	res := resTmp.(*model.Session)
 	fc.Result = res
 	return ec.marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_sessionsByCourseID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_sessionsByCourseID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SessionsByCourseID(rctx, args["where"].(model.SessionsByCourseIDQuery))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Session)
+	fc.Result = res
+	return ec.marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3754,6 +3827,26 @@ func (ec *executionContext) unmarshalInputSessionQuery(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSessionsByCourseIDQuery(ctx context.Context, obj interface{}) (model.SessionsByCourseIDQuery, error) {
+	var it model.SessionsByCourseIDQuery
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStepCompleted(ctx context.Context, obj interface{}) (model.StepCompleted, error) {
 	var it model.StepCompleted
 	var asMap = obj.(map[string]interface{})
@@ -4176,6 +4269,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_session(ctx, field)
+				return res
+			})
+		case "sessionsByCourseID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_sessionsByCourseID(ctx, field)
 				return res
 			})
 		case "__type":
@@ -4796,6 +4900,11 @@ func (ec *executionContext) unmarshalNSessionQuery2githubᚗcomᚋjdpxᚋmindᚑ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNSessionsByCourseIDQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSessionsByCourseIDQuery(ctx context.Context, v interface{}) (model.SessionsByCourseIDQuery, error) {
+	res, err := ec.unmarshalInputSessionsByCourseIDQuery(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNStep2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx context.Context, sel ast.SelectionSet, v model.Step) graphql.Marshaler {
 	return ec._Step(ctx, sel, &v)
 }
@@ -5132,6 +5241,46 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return graphql.MarshalID(*v)
+}
+
+func (ec *executionContext) marshalOSession2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v []*model.Session) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOSession2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {

@@ -31,5 +31,5 @@ jobs:
           name: "Running TFSec"
           command: |
             go get -u github.com/tfsec/tfsec/cmd/tfsec
-            make run-tfsec
+            make run/tfsec
       - run: go test -v ./...

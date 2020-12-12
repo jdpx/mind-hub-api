@@ -10,44 +10,9 @@ OPTS=
 install:
 	go mod download
 
-.PHONY: test
-test:
-	go test -v ./...
-
 .PHONY: lint
 lint:
 	golangci-lint run
-
-.PHONY: cb-lint
-cb-lint:
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
-	golangci-lint run
-
-.PHONY: run-tfsec
-run-tfsec:
-	tfsec . -e AWS002,AWS017
-
-.PHONY: run-api
-run-api:
-	go run ./cmd/api/.
-
-.PHONY: regenerate-types
-regenerate-types:
-	go run github.com/99designs/gqlgen generate
-
-run/local-dynamo:
-	docker-compose up dynamodb-local
-
-cmd/lambdas/%/main.go:
-	cd $(subst main.go,,$@) \
-	&& $(GO_BUILD) -o lambda ./.\
-	&& zip ../../../dist/$*.zip lambda \
-	&& rm lambda
-
-.PHONY: build-all-lambdas
-build-all-lambdas:
-	mkdir -p dist
-	make $(FUNCTIONS_LAMBDAS)
 
 .PHONY: validate-terraform
 validate-terraform:
@@ -56,6 +21,42 @@ validate-terraform:
 	terraform validate && \
 	terraform $(TERRAFORM_ACTION) $(OPTS)
 
-.PHONY: regenerate-all-mocks
-regenerate-all-mocks:
+cmd/lambdas/%/main.go:
+	cd $(subst main.go,,$@) \
+	&& $(GO_BUILD) -o lambda ./.\
+	&& zip ../../../dist/$*.zip lambda \
+	&& rm lambda
+
+.PHONY: run/tfsec
+run/tfsec:
+	tfsec . -e AWS002,AWS017
+
+.PHONY: run/api
+run/api:
+	go run ./cmd/api/.
+
+.PHONY: run/local-dynamo
+run/local-dynamo:
+	docker-compose up dynamodb-local
+
+.PHONY: run/tests
+run/tests:
+	go test -v ./...
+
+.PHONY: run/lint
+run/lint:
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
+	golangci-lint run
+
+.PHONY: generate/graphql
+generate/graphql:
+	go run github.com/99designs/gqlgen generate
+
+.PHONY: generate/mocks
+generate/mocks:
 	@go generate ./...
+
+.PHONY: build/lambdas
+build/lambdas:
+	mkdir -p dist
+	make $(FUNCTIONS_LAMBDAS)

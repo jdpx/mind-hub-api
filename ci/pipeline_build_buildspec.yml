@@ -10,9 +10,9 @@ phases:
       - make install
   build:
     commands:
-      - make cb-lint
-      - make test
-      - make build-all-lambdas -B
+      - make run/lint
+      - make run/test
+      - make build/lambdas -B
 
 artifacts:
   files:

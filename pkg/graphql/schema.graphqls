@@ -66,6 +66,10 @@ input SessionQuery {
   id: ID!
 }
 
+input SessionsByCourseIDQuery {
+  id: ID!
+}
+
 input StepQuery {
   id: ID!
 }
@@ -89,6 +93,7 @@ type Query {
 
   course(where: CourseQuery!): Course
   session(where: SessionQuery!): Session
+  sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
 }
 
 input CourseStarted {

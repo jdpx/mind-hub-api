@@ -331,6 +331,20 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	return s, nil
 }
 
+func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.SessionsByCourseIDQuery) ([]*model.Session, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("Sessions By Course ID resolver got called", where.ID)
+
+	gss, err := r.graphcms.ResolveCourseSessions(ctx, where.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	ss := SessionsFromCMS(gss)
+
+	return ss, nil
+}
+
 func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNote, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("Step Note resolver got called", obj.ID)

@@ -47,6 +47,10 @@ type SessionQuery struct {
 	ID string `json:"id"`
 }
 
+type SessionsByCourseIDQuery struct {
+	ID string `json:"id"`
+}
+
 type Step struct {
 	ID          string        `json:"id"`
 	Title       string        `json:"title"`

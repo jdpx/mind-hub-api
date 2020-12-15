@@ -1,6 +1,16 @@
 resource "aws_s3_bucket" "mind_hub_api_pipeline_artifact_bucket" {
   bucket = "mind-hub-api-pipeline-artifacts"
   acl    = "private"
+
+  lifecycle_rule {
+    id      = "quarterly_retention"
+    prefix  = "/"
+    enabled = true
+
+    expiration {
+      days = 100
+    }
+  }
 }
 
 data "aws_s3_bucket" "dev_tf_state_bucket" {

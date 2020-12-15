@@ -9,7 +9,7 @@ terraform {
   }
 
   required_providers {
-    aws =  "~> 3.21"
+    aws = "~> 3.21"
   }
 }
 
@@ -34,6 +34,7 @@ module "mind-hub-ui" {
   auth0_audience     = var.auth0_audience
   auth0_jwks_uri     = var.auth0_jwks_uri
   auth0_token_issuer = var.auth0_token_issuer
+  graph_cms_url      = "https://api-eu-central-1.graphcms.com/v2/ckftjhf769ysi01z7ari84qio/master"
 
   providers = {
     aws         = aws

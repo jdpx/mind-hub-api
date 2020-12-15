@@ -70,7 +70,7 @@ resource "aws_codepipeline" "mind_hub_api_pipeline" {
     action {
       category = "Deploy"
       configuration = {
-        "BucketName" = data.aws_s3_bucket.mind_hub_api_artifacts_dev.bucket
+        "BucketName" = aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.bucket
         "Extract"    = "true"
       }
       input_artifacts = [

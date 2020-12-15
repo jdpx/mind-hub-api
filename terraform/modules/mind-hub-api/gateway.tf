@@ -1,18 +1,10 @@
-# This is a _data source_ which allows us to get the internal
-# ID (which AWS calls an "ARN") from AWS
-data "aws_acm_certificate" "api_mind_jdpx_co_uk_cert" {
-  provider = aws.us_east
-  domain   = "api.${var.env}.mind.jdpx.co.uk"
-  statuses = ["ISSUED"]
-}
-
 resource "aws_api_gateway_account" "mind_hub_api" {
   cloudwatch_role_arn = aws_iam_role.mind_hub_api_cloudwatch.arn
 }
 
 resource "aws_api_gateway_domain_name" "mind_hub_api_domain" {
   domain_name     = "api.${var.env}.mind.jdpx.co.uk"
-  certificate_arn = data.aws_acm_certificate.api_mind_jdpx_co_uk_cert.arn
+  certificate_arn = aws_acm_certificate.api_mind_jdpx_co_uk_cert.arn
   security_policy = "TLS_1_2"
 }
 
@@ -44,6 +36,14 @@ resource "aws_api_gateway_rest_api" "mind_hub_api" {
   name = "mind_hub_api_${var.env}"
 }
 
+resource "aws_api_gateway_stage" "mind_hub_api_v1_stage" {
+  stage_name    = var.api_stage_name
+  rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
+  deployment_id = aws_api_gateway_deployment.mind_hub_api_deploy.id
+
+  depends_on = [aws_cloudwatch_log_group.mind_hub_api_api_logs]
+}
+
 resource "aws_api_gateway_base_path_mapping" "base_path_mapping" {
   api_id = aws_api_gateway_rest_api.mind_hub_api.id
 
@@ -72,7 +72,7 @@ resource "aws_api_gateway_method" "proxy_method" {
 
 resource "aws_api_gateway_method_settings" "proxy_method_settings" {
   rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
-  stage_name  = "v1"
+  stage_name  = aws_api_gateway_stage.mind_hub_api_v1_stage.stage_name
   method_path = "*/*"
 
   settings {
@@ -114,7 +114,7 @@ resource "aws_api_gateway_deployment" "mind_hub_api_deploy" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
-  stage_name  = "v1"
+  stage_name  = ""
 
   lifecycle {
     create_before_destroy = true

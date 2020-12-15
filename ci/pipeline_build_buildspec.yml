@@ -11,7 +11,7 @@ phases:
   build:
     commands:
       - make run/lint
-      - make run/test
+      - make run/tests
       - make build/lambdas -B
 
 artifacts:

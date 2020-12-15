@@ -17,3 +17,15 @@ variable "env" {
   type        = string
   description = "Environment"
 }
+
+variable "api_stage_name" {
+  type        = string
+  description = "API Gateway Stage Name"
+  default     = "v1"
+}
+
+
+variable "graph_cms_url" {
+  type        = string
+  description = "GraphCMS API URL"
+}

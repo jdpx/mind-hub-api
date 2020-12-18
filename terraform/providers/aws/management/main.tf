@@ -6,6 +6,7 @@ terraform {
     key            = "terraform.tfstate"
     region         = "eu-west-1"
     dynamodb_table = "mind-hub-ui-state-lock"
+    role_arn       = "arn:aws:iam::500248363656:role/cd"
   }
 
   required_providers {
@@ -16,8 +17,6 @@ terraform {
 
 provider "aws" {
   region                  = "eu-west-1"
-  shared_credentials_file = "~/.aws/credentials"
-  profile                 = "mind-terraform"
 }
 
 provider "github" {

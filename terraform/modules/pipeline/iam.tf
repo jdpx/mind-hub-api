@@ -189,23 +189,8 @@ resource "aws_iam_role_policy" "mind_hub_api_terraform_deploy_role_policy" {
       ],
       "Resource": [
         "${aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.arn}",
-        "${aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.arn}/*",
-        "${data.aws_s3_bucket.mind_hub_api_artifacts_dev.arn}",
-        "${data.aws_s3_bucket.mind_hub_api_artifacts_dev.arn}/*",
-        "${data.aws_s3_bucket.dev_tf_state_bucket.arn}",
-        "${data.aws_s3_bucket.dev_tf_state_bucket.arn}/*"
+        "${aws_s3_bucket.mind_hub_api_pipeline_artifact_bucket.arn}/*"
       ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Describe*",
-        "dynamodb:List*"
-      ],
-      "Resource": "${data.aws_dynamodb_table.tf_lock_state.arn}"
     },
     {
       "Effect": "Allow",

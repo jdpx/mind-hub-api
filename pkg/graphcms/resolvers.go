@@ -21,6 +21,7 @@ type Resolverer interface {
 	ResolveCourseSessions(ctx context.Context, id string) ([]*Session, error)
 	ResolveSession(ctx context.Context, id string) (*Session, error)
 	ResolveCourseStepIDs(ctx context.Context, id string) ([]string, error)
+	ResolveStep(ctx context.Context, id string) (*Step, error)
 }
 
 // NewResolver initialises a new Resolver
@@ -120,4 +121,21 @@ func (r Resolver) ResolveCourseStepIDs(ctx context.Context, id string) ([]string
 	}
 
 	return ids, err
+}
+
+// ResolveStep retreives Steps from GraphCMS based on the Step ID
+func (r Resolver) ResolveStep(ctx context.Context, id string) (*Step, error) {
+	log := logging.NewFromResolver(ctx).WithField(logging.StepIDKey, id)
+	log.Info(fmt.Sprintf("Resolving Graphcms Step %s", id))
+
+	req := NewRequest(getStepByID)
+	req.Var("id", id)
+	res := stepResponse{}
+
+	err := r.client.Run(ctx, req, &res)
+	if err != nil {
+		return nil, fmt.Errorf("error occurred getting GraphCMS Step")
+	}
+
+	return res.Step, err
 }

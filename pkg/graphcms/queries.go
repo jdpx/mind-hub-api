@@ -53,3 +53,15 @@ const getSessionByID = `query Session($id: ID) {
         }
     }
 }`
+
+const getStepByID = `query Step($id: ID) {
+    step(where: { id: $id }) {
+      id
+      title
+      description
+      type
+      videoUrl
+      audioUrl
+      question
+    }
+}`

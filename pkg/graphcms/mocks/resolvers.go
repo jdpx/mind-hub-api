@@ -108,3 +108,18 @@ func (mr *MockResolvererMockRecorder) ResolveCourseStepIDs(ctx, id interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveCourseStepIDs", reflect.TypeOf((*MockResolverer)(nil).ResolveCourseStepIDs), ctx, id)
 }
+
+// ResolveStep mocks base method
+func (m *MockResolverer) ResolveStep(ctx context.Context, id string) (*graphcms.Step, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResolveStep", ctx, id)
+	ret0, _ := ret[0].(*graphcms.Step)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResolveStep indicates an expected call of ResolveStep
+func (mr *MockResolvererMockRecorder) ResolveStep(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveStep", reflect.TypeOf((*MockResolverer)(nil).ResolveStep), ctx, id)
+}

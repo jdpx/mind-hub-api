@@ -8,6 +8,7 @@ type Course {
   description: String!
   sessionCount: Int!
   stepCount: Int!
+  firstSession: String
 
   sessions: [Session]!
 
@@ -93,6 +94,7 @@ type Query {
 
   course(where: CourseQuery!): Course
   session(where: SessionQuery!): Session
+  step(where: StepQuery!): Step
   sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
 }
 

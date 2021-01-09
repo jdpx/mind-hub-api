@@ -331,6 +331,21 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 	return s, nil
 }
 
+func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model.Step, error) {
+	gs, err := r.graphcms.ResolveStep(ctx, where.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if gs == nil {
+		return nil, nil
+	}
+
+	s := StepFromCMS(gs)
+
+	return s, nil
+}
+
 func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.SessionsByCourseIDQuery) ([]*model.Session, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("Sessions By Course ID resolver got called", where.ID)

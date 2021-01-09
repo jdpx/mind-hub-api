@@ -15,3 +15,7 @@ type sessionsResponse struct {
 type sessionResponse struct {
 	Session *Session `json:"session"`
 }
+
+type stepResponse struct {
+	Step *Step `json:"step"`
+}

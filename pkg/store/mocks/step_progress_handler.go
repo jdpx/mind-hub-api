@@ -50,9 +50,9 @@ func (mr *MockStepProgressRepositorMockRecorder) GetStepProgress(ctx, sID, uID i
 }
 
 // GetCompletedProgressByStepID mocks base method
-func (m *MockStepProgressRepositor) GetCompletedProgressByStepID(ctx context.Context, ids ...string) ([]*store.StepProgress, error) {
+func (m *MockStepProgressRepositor) GetCompletedProgressByStepID(ctx context.Context, uID string, ids ...string) ([]*store.StepProgress, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx}
+	varargs := []interface{}{ctx, uID}
 	for _, a := range ids {
 		varargs = append(varargs, a)
 	}
@@ -63,9 +63,9 @@ func (m *MockStepProgressRepositor) GetCompletedProgressByStepID(ctx context.Con
 }
 
 // GetCompletedProgressByStepID indicates an expected call of GetCompletedProgressByStepID
-func (mr *MockStepProgressRepositorMockRecorder) GetCompletedProgressByStepID(ctx interface{}, ids ...interface{}) *gomock.Call {
+func (mr *MockStepProgressRepositorMockRecorder) GetCompletedProgressByStepID(ctx, uID interface{}, ids ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx}, ids...)
+	varargs := append([]interface{}{ctx, uID}, ids...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompletedProgressByStepID", reflect.TypeOf((*MockStepProgressRepositor)(nil).GetCompletedProgressByStepID), varargs...)
 }
 

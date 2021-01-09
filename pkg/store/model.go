@@ -41,3 +41,11 @@ type StepNote struct {
 	UserID string `json:"userID"`
 	Value  string `json:"value"`
 }
+
+// Timemap ...
+type Timemap struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"userID"`
+	Map       string    `json:"map"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+}

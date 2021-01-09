@@ -19,6 +19,7 @@ type Resolver struct {
 	stepProgressHandler   store.StepProgressRepositor
 	courseNoteHandler     store.CourseNoteRepositor
 	stepNoteHandler       store.StepNoteRepositor
+	timemapHandler        store.TimemapRepositor
 }
 
 // NewResolver ...
@@ -64,5 +65,12 @@ func WithStepProgressHandler(s store.StepProgressRepositor) func(*Resolver) {
 func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
 	return func(r *Resolver) {
 		r.stepNoteHandler = s
+	}
+}
+
+// WithTimemapRepositor ...
+func WithTimemapRepositor(s store.TimemapRepositor) func(*Resolver) {
+	return func(r *Resolver) {
+		r.timemapHandler = s
 	}
 }

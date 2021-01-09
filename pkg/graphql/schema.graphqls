@@ -59,6 +59,11 @@ type StepProgress {
   dateCompleted: String!
 }
 
+type Timemap {
+  map: String!
+  updatedAt: String!
+}
+
 input CourseQuery {
   id: ID!
 }
@@ -96,6 +101,7 @@ type Query {
   session(where: SessionQuery!): Session
   step(where: StepQuery!): Step
   sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
+  timemap: Timemap
 }
 
 input CourseStarted {
@@ -122,6 +128,10 @@ input UpdatedStepNote {
   value: String!
 }
 
+input UpdatedTimemap {
+  map: String!
+}
+
 type Mutation {
   courseStarted(input: CourseStarted!): Course!
   updateCourseNote(input: UpdatedCourseNote!): Course!
@@ -129,4 +139,5 @@ type Mutation {
   stepStarted(input: StepStarted!): Step!
   stepCompleted(input: StepCompleted!): Step!
   updateStepNote(input: UpdatedStepNote!): Step!
+  UpdateTimemap(input: UpdatedTimemap!): Timemap!
 }

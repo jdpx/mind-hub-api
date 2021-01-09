@@ -60,6 +60,7 @@ type StepProgress {
 }
 
 type Timemap {
+  id: ID!
   map: String!
   updatedAt: String!
 }
@@ -139,5 +140,5 @@ type Mutation {
   stepStarted(input: StepStarted!): Step!
   stepCompleted(input: StepCompleted!): Step!
   updateStepNote(input: UpdatedStepNote!): Step!
-  UpdateTimemap(input: UpdatedTimemap!): Timemap!
+  updateTimemap(input: UpdatedTimemap!): Timemap!
 }

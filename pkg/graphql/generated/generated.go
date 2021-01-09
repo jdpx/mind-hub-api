@@ -125,6 +125,7 @@ type ComplexityRoot struct {
 	}
 
 	Timemap struct {
+		ID        func(childComplexity int) int
 		Map       func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
@@ -353,12 +354,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateStepNote(childComplexity, args["input"].(model.UpdatedStepNote)), true
 
-	case "Mutation.UpdateTimemap":
+	case "Mutation.updateTimemap":
 		if e.complexity.Mutation.UpdateTimemap == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_UpdateTimemap_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateTimemap_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -588,6 +589,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StepProgress.State(childComplexity), true
 
+	case "Timemap.id":
+		if e.complexity.Timemap.ID == nil {
+			break
+		}
+
+		return e.complexity.Timemap.ID(childComplexity), true
+
 	case "Timemap.map":
 		if e.complexity.Timemap.Map == nil {
 			break
@@ -728,6 +736,7 @@ type StepProgress {
 }
 
 type Timemap {
+  id: ID!
   map: String!
   updatedAt: String!
 }
@@ -807,7 +816,7 @@ type Mutation {
   stepStarted(input: StepStarted!): Step!
   stepCompleted(input: StepCompleted!): Step!
   updateStepNote(input: UpdatedStepNote!): Step!
-  UpdateTimemap(input: UpdatedTimemap!): Timemap!
+  updateTimemap(input: UpdatedTimemap!): Timemap!
 }
 `, BuiltIn: false},
 }
@@ -816,21 +825,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) field_Mutation_UpdateTimemap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UpdatedTimemap
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdatedTimemap2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedTimemap(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
 
 func (ec *executionContext) field_Mutation_courseStarted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -899,6 +893,21 @@ func (ec *executionContext) field_Mutation_updateStepNote_args(ctx context.Conte
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdatedStepNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedStepNote(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTimemap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdatedTimemap
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdatedTimemap2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedTimemap(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1813,7 +1822,7 @@ func (ec *executionContext) _Mutation_updateStepNote(ctx context.Context, field 
 	return ec.marshalNStep2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStep(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_UpdateTimemap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateTimemap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1830,7 +1839,7 @@ func (ec *executionContext) _Mutation_UpdateTimemap(ctx context.Context, field g
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_UpdateTimemap_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateTimemap_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2931,6 +2940,41 @@ func (ec *executionContext) _StepProgress_dateCompleted(ctx context.Context, fie
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Timemap_id(ctx context.Context, field graphql.CollectedField, obj *model.Timemap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Timemap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Timemap_map(ctx context.Context, field graphql.CollectedField, obj *model.Timemap) (ret graphql.Marshaler) {
@@ -4554,8 +4598,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "UpdateTimemap":
-			out.Values[i] = ec._Mutation_UpdateTimemap(ctx, field)
+		case "updateTimemap":
+			out.Values[i] = ec._Mutation_updateTimemap(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4880,6 +4924,11 @@ func (ec *executionContext) _Timemap(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Timemap")
+		case "id":
+			out.Values[i] = ec._Timemap_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "map":
 			out.Values[i] = ec._Timemap_map(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

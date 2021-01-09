@@ -73,3 +73,16 @@ resource "aws_dynamodb_table" "mind_hub_api_step_note" {
     type = "S"
   }
 }
+
+resource "aws_dynamodb_table" "mind_hub_api_timemap" {
+  name              = "timemap"
+  read_capacity     = 5
+  write_capacity    = 5
+  hash_key          = "userID"
+  stream_enabled    = false
+
+  attribute {
+    name = "userID"
+    type = "S"
+  }
+}

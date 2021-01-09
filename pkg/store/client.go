@@ -337,4 +337,26 @@ func setupDbTables(dbSvc *dynamodb.DynamoDB) {
 	if err != nil {
 		log.Println(err)
 	}
+	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("timemap"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("userID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("userID"),
+				KeyType:       aws.String("HASH"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
 }

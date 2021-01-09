@@ -66,6 +66,7 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	courseNoteHandler := store.NewCourseNoteHandler(s)
 	stepProgressHandler := store.NewStepProgressHandler(s)
 	stepNoteHandler := store.NewStepNoteHandler(s)
+	timemapHandler := store.NewTimemapHandler(s)
 
 	resolver := graphql.NewResolver(
 		graphql.WithCMSClient(cmsResolver),
@@ -73,6 +74,7 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		graphql.WithCourseNoteRepositor(courseNoteHandler),
 		graphql.WithStepProgressHandler(stepProgressHandler),
 		graphql.WithStepNoteRepositor(stepNoteHandler),
+		graphql.WithTimemapRepositor(timemapHandler),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

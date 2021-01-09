@@ -92,6 +92,7 @@ type StepStarted struct {
 }
 
 type Timemap struct {
+	ID        string `json:"id"`
 	Map       string `json:"map"`
 	UpdatedAt string `json:"updatedAt"`
 }

@@ -334,7 +334,6 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 		Map:       timemap.Map,
 		UpdatedAt: timemap.UpdatedAt.String(),
 	}, nil
-
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
@@ -408,7 +407,26 @@ func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.Sess
 }
 
 func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
-	panic(fmt.Errorf("not implemented"))
+	log := logging.NewFromResolver(ctx)
+	log.Info("Timemap resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error getting user", err)
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	timemap, err := r.timemapHandler.GetTimemap(ctx, userID)
+	if err != nil {
+		log.Error("error getting Timemap", err)
+		return nil, fmt.Errorf("error occurred getting Timemap %w", err)
+	}
+
+	return &model.Timemap{
+		ID:        timemap.ID,
+		Map:       timemap.Map,
+		UpdatedAt: timemap.UpdatedAt.String(),
+	}, nil
 }
 
 func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNote, error) {

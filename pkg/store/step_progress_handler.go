@@ -105,14 +105,13 @@ func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepP
 		DateStarted: &now,
 	}
 
-	res := StepProgress{}
 	err := c.db.Put(ctx, stepProgressTableName, input)
 	if err != nil {
 		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
 		return nil, err
 	}
 
-	return &res, nil
+	return &input, nil
 }
 
 // Complete ...

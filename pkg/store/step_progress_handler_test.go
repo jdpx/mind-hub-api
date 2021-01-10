@@ -157,7 +157,7 @@ func TestStepProgresshandlerStart(t *testing.T) {
 				assert.NotEqual(t, tt.expectedStepProgress.ID, n.ID)
 				assert.Equal(t, tt.expectedStepProgress.StepID, n.StepID)
 				assert.Equal(t, tt.expectedStepProgress.UserID, n.UserID)
-				assert.Equal(t, tt.expectedStepProgress.State, store.STATUS_STARTED)
+				assert.Equal(t, store.STATUS_STARTED, n.State)
 			}
 		})
 	}
@@ -189,7 +189,8 @@ func TestStepProgresshandlerCompleted(t *testing.T) {
 
 				expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
 
-				client.EXPECT().Update(gomock.Any(), stepProgressTableName, keys, expression, gomock.Any(), gomock.Any()).SetArg(5, stepProgress)
+				completedProgress := builder.NewStepProgressBuilder().WithStepID(sID).WithUserID(uID).Completed().Build()
+				client.EXPECT().Update(gomock.Any(), stepProgressTableName, keys, expression, gomock.Any(), gomock.Any()).SetArg(5, completedProgress)
 			},
 
 			expectedStepProgress: &stepProgress,
@@ -233,7 +234,7 @@ func TestStepProgresshandlerCompleted(t *testing.T) {
 				assert.NotEqual(t, tt.expectedStepProgress.ID, n.ID)
 				assert.Equal(t, tt.expectedStepProgress.StepID, n.StepID)
 				assert.Equal(t, tt.expectedStepProgress.UserID, n.UserID)
-				assert.Equal(t, tt.expectedStepProgress.State, store.STATUS_COMPLETED)
+				assert.Equal(t, store.STATUS_COMPLETED, n.State)
 			}
 		})
 	}

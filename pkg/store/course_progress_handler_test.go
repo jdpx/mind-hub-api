@@ -157,7 +157,7 @@ func TestCourseProgresshandlerStart(t *testing.T) {
 				assert.NotEqual(t, tt.expectedCourseProgress.ID, n.ID)
 				assert.Equal(t, tt.expectedCourseProgress.CourseID, n.CourseID)
 				assert.Equal(t, tt.expectedCourseProgress.UserID, n.UserID)
-				assert.Equal(t, tt.expectedCourseProgress.State, store.STATUS_COMPLETED)
+				assert.Equal(t, store.STATUS_STARTED, n.State)
 			}
 		})
 	}

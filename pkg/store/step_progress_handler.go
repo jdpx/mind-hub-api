@@ -18,10 +18,10 @@ const (
 
 // StepProgressRepositor ...
 type StepProgressRepositor interface {
-	GetStepProgress(ctx context.Context, sID, uID string) (*StepProgress, error)
-	GetCompletedProgressByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error)
-	StartStep(ctx context.Context, sID, uID string) (*StepProgress, error)
-	CompleteStep(ctx context.Context, sID, uID string) (*StepProgress, error)
+	Get(ctx context.Context, sID, uID string) (*StepProgress, error)
+	GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error)
+	Start(ctx context.Context, sID, uID string) (*StepProgress, error)
+	Complete(ctx context.Context, sID, uID string) (*StepProgress, error)
 }
 
 // StepProgressHandler ...
@@ -36,8 +36,8 @@ func NewStepProgressHandler(client Storer) StepProgressHandler {
 	}
 }
 
-// GetStepProgress ...
-func (c StepProgressHandler) GetStepProgress(ctx context.Context, sID, uID string) (*StepProgress, error) {
+// Get ...
+func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	p := map[string]string{
 		"stepID": sID,
 		"userID": uID,
@@ -57,8 +57,8 @@ func (c StepProgressHandler) GetStepProgress(ctx context.Context, sID, uID strin
 	return &res, nil
 }
 
-// GetStepProgress ...
-func (c StepProgressHandler) GetCompletedProgressByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
+// GetCompletedByStepID ...
+func (c StepProgressHandler) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
 	res := []*StepProgress{}
 
 	keys := []map[string]string{}
@@ -92,8 +92,8 @@ func (c StepProgressHandler) GetCompletedProgressByStepID(ctx context.Context, u
 	return fP, nil
 }
 
-// StartStep ...
-func (c StepProgressHandler) StartStep(ctx context.Context, sID, uID string) (*StepProgress, error) {
+// Start ...
+func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	id, _ := uuid.NewV4()
 
 	now := time.Now()
@@ -115,8 +115,8 @@ func (c StepProgressHandler) StartStep(ctx context.Context, sID, uID string) (*S
 	return &res, nil
 }
 
-// StartStep ...
-func (c StepProgressHandler) CompleteStep(ctx context.Context, sID, uID string) (*StepProgress, error) {
+// Complete ...
+func (c StepProgressHandler) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	now := time.Now()
 
 	input := map[string]interface{}{

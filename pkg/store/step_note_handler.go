@@ -13,9 +13,9 @@ const (
 
 // StepNoteRepositor ...
 type StepNoteRepositor interface {
-	GetNote(ctx context.Context, cID, uID string) (*StepNote, error)
-	CreateNote(ctx context.Context, note StepNote) (*StepNote, error)
-	UpdateNote(ctx context.Context, note StepNote) (*StepNote, error)
+	Get(ctx context.Context, cID, uID string) (*StepNote, error)
+	Create(ctx context.Context, note StepNote) (*StepNote, error)
+	Update(ctx context.Context, note StepNote) (*StepNote, error)
 }
 
 // StepNoteHandler ...
@@ -30,8 +30,8 @@ func NewStepNoteHandler(client Storer) StepNoteHandler {
 	}
 }
 
-// GetNote ...
-func (c StepNoteHandler) GetNote(ctx context.Context, cID, uID string) (*StepNote, error) {
+// Get ...
+func (c StepNoteHandler) Get(ctx context.Context, cID, uID string) (*StepNote, error) {
 	p := map[string]string{
 		"stepID": cID,
 		"userID": uID,
@@ -50,8 +50,8 @@ func (c StepNoteHandler) GetNote(ctx context.Context, cID, uID string) (*StepNot
 	return &res, nil
 }
 
-// CreateNote ...
-func (c StepNoteHandler) CreateNote(ctx context.Context, note StepNote) (*StepNote, error) {
+// Create ...
+func (c StepNoteHandler) Create(ctx context.Context, note StepNote) (*StepNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
 
@@ -68,8 +68,8 @@ func (c StepNoteHandler) CreateNote(ctx context.Context, note StepNote) (*StepNo
 	}, nil
 }
 
-// UpdateNote ...
-func (c StepNoteHandler) UpdateNote(ctx context.Context, note StepNote) (*StepNote, error) {
+// Update ...
+func (c StepNoteHandler) Update(ctx context.Context, note StepNote) (*StepNote, error) {
 	p := StepNote{
 		ID:     note.ID,
 		StepID: note.StepID,

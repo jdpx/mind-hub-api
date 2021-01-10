@@ -13,9 +13,9 @@ const (
 
 // CourseNoteRepositor ...
 type CourseNoteRepositor interface {
-	GetNote(ctx context.Context, cID, uID string) (*CourseNote, error)
-	CreateNote(ctx context.Context, note CourseNote) (*CourseNote, error)
-	UpdateNote(ctx context.Context, note CourseNote) (*CourseNote, error)
+	Get(ctx context.Context, cID, uID string) (*CourseNote, error)
+	Create(ctx context.Context, note CourseNote) (*CourseNote, error)
+	Update(ctx context.Context, note CourseNote) (*CourseNote, error)
 }
 
 // CourseNoteHandler ...
@@ -30,8 +30,8 @@ func NewCourseNoteHandler(client Storer) CourseNoteHandler {
 	}
 }
 
-// GetNote ...
-func (c CourseNoteHandler) GetNote(ctx context.Context, cID, uID string) (*CourseNote, error) {
+// Get ...
+func (c CourseNoteHandler) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
 	p := map[string]string{
 		"courseID": cID,
 		"userID":   uID,
@@ -50,8 +50,8 @@ func (c CourseNoteHandler) GetNote(ctx context.Context, cID, uID string) (*Cours
 	return &res, nil
 }
 
-// CreateNote ...
-func (c CourseNoteHandler) CreateNote(ctx context.Context, note CourseNote) (*CourseNote, error) {
+// Create ...
+func (c CourseNoteHandler) Create(ctx context.Context, note CourseNote) (*CourseNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
 
@@ -68,8 +68,8 @@ func (c CourseNoteHandler) CreateNote(ctx context.Context, note CourseNote) (*Co
 	}, nil
 }
 
-// UpdateNote ...
-func (c CourseNoteHandler) UpdateNote(ctx context.Context, note CourseNote) (*CourseNote, error) {
+// Update ...
+func (c CourseNoteHandler) Update(ctx context.Context, note CourseNote) (*CourseNote, error) {
 	p := CourseNote{
 		ID:       note.ID,
 		CourseID: note.CourseID,

@@ -62,7 +62,7 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	note, err := r.courseNoteHandler.GetNote(ctx, obj.ID, userID)
+	note, err := r.courseNoteHandler.Get(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
-	progress, err := r.courseProgressHandler.GetCourseProgress(ctx, obj.ID, userID)
+	progress, err := r.courseProgressHandler.Get(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return res, nil
 	}
 
-	completedSteps, err := r.stepProgressHandler.GetCompletedProgressByStepID(ctx, userID, courseStepIDs...)
+	completedSteps, err := r.stepProgressHandler.GetCompletedByStepID(ctx, userID, courseStepIDs...)
 	if err != nil {
 		log.Error("error getting completed steps", err)
 		return nil, fmt.Errorf("error occurred getting course progress %w", err)
@@ -135,7 +135,7 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.courseProgressHandler.StartCourse(ctx, input.CourseID, userID)
+	_, err = r.courseProgressHandler.Start(ctx, input.CourseID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -164,7 +164,7 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 			Value:    input.Value,
 		}
 
-		note, err = r.courseNoteHandler.CreateNote(ctx, m)
+		note, err = r.courseNoteHandler.Create(ctx, m)
 		if err != nil {
 			log.Error("An error occurred creating Note", err)
 
@@ -178,7 +178,7 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 			Value:    input.Value,
 		}
 
-		note, err = r.courseNoteHandler.UpdateNote(ctx, m)
+		note, err = r.courseNoteHandler.Update(ctx, m)
 		if err != nil {
 			log.Error("An error occurred updating Note", err)
 
@@ -207,7 +207,7 @@ func (r *mutationResolver) StepStarted(ctx context.Context, input model.StepStar
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.stepProgressHandler.StartStep(ctx, input.ID, userID)
+	_, err = r.stepProgressHandler.Start(ctx, input.ID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -228,7 +228,7 @@ func (r *mutationResolver) StepCompleted(ctx context.Context, input model.StepCo
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.stepProgressHandler.CompleteStep(ctx, input.ID, userID)
+	_, err = r.stepProgressHandler.Complete(ctx, input.ID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -257,7 +257,7 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 			Value:  input.Value,
 		}
 
-		note, err = r.stepNoteHandler.CreateNote(ctx, m)
+		note, err = r.stepNoteHandler.Create(ctx, m)
 		if err != nil {
 			log.Error("An error occurred creating Note", err)
 
@@ -271,7 +271,7 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 			Value:  input.Value,
 		}
 
-		note, err = r.stepNoteHandler.UpdateNote(ctx, m)
+		note, err = r.stepNoteHandler.Update(ctx, m)
 		if err != nil {
 			log.Error("An error occurred updating Note", err)
 
@@ -299,7 +299,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	timemap, err := r.timemapHandler.GetTimemap(ctx, userID)
+	timemap, err := r.timemapHandler.Get(ctx, userID)
 
 	if err != nil {
 		log.Error("An error occurred getting Timemap", err)
@@ -313,7 +313,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 			Map:    input.Map,
 		}
 
-		timemap, err = r.timemapHandler.CreateTimemap(ctx, sTm)
+		timemap, err = r.timemapHandler.Create(ctx, sTm)
 		if err != nil {
 			log.Error("An error occurred creating Timemap", err)
 
@@ -322,7 +322,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 	} else {
 		timemap.Map = input.Map
 
-		timemap, err = r.timemapHandler.UpdateTimemap(ctx, timemap)
+		timemap, err = r.timemapHandler.Update(ctx, timemap)
 		if err != nil {
 			log.Error("An error occurred updating Timemap", err)
 
@@ -416,7 +416,7 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	timemap, err := r.timemapHandler.GetTimemap(ctx, userID)
+	timemap, err := r.timemapHandler.Get(ctx, userID)
 	if err != nil {
 		log.Error("error getting Timemap", err)
 		return nil, fmt.Errorf("error occurred getting Timemap %w", err)
@@ -439,7 +439,7 @@ func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNo
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	note, err := r.stepNoteHandler.GetNote(ctx, obj.ID, userID)
+	note, err := r.stepNoteHandler.Get(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -466,7 +466,7 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	progress, err := r.stepProgressHandler.GetStepProgress(ctx, obj.ID, userID)
+	progress, err := r.stepProgressHandler.Get(ctx, obj.ID, userID)
 	if err != nil {
 		return nil, err
 	}

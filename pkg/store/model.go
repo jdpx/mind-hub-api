@@ -47,5 +47,5 @@ type Timemap struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"userID"`
 	Map       string    `json:"map"`
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

@@ -1,3 +1,4 @@
+//go:generate mockgen -source=timemap_handler.go -destination=./mocks/timemap_handler.go -package=storemocks
 package store
 
 import (
@@ -14,9 +15,9 @@ const (
 
 // TimemapRepositor ...
 type TimemapRepositor interface {
-	GetTimemap(ctx context.Context, uID string) (*Timemap, error)
-	CreateTimemap(ctx context.Context, note Timemap) (*Timemap, error)
-	UpdateTimemap(ctx context.Context, note *Timemap) (*Timemap, error)
+	Get(ctx context.Context, uID string) (*Timemap, error)
+	Create(ctx context.Context, tm Timemap) (*Timemap, error)
+	Update(ctx context.Context, tm *Timemap) (*Timemap, error)
 }
 
 // TimemapHandler ...
@@ -31,8 +32,8 @@ func NewTimemapHandler(client Storer) TimemapHandler {
 	}
 }
 
-// GetTimemap ...
-func (c TimemapHandler) GetTimemap(ctx context.Context, uID string) (*Timemap, error) {
+// Get ...
+func (c TimemapHandler) Get(ctx context.Context, uID string) (*Timemap, error) {
 	p := map[string]string{
 		"userID": uID,
 	}
@@ -50,36 +51,36 @@ func (c TimemapHandler) GetTimemap(ctx context.Context, uID string) (*Timemap, e
 	return &res, nil
 }
 
-// CreateTimemap ...
-func (c TimemapHandler) CreateTimemap(ctx context.Context, note Timemap) (*Timemap, error) {
+// Create ...
+func (c TimemapHandler) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
 	id, _ := uuid.NewV4()
-	note.ID = id.String()
+	tm.ID = id.String()
 
-	err := c.db.Put(ctx, timemapTableName, note)
+	err := c.db.Put(ctx, timemapTableName, tm)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Timemap{
-		ID:        note.ID,
-		UserID:    note.UserID,
-		Map:       note.Map,
-		UpdatedAt: note.UpdatedAt,
+		ID:        tm.ID,
+		UserID:    tm.UserID,
+		Map:       tm.Map,
+		UpdatedAt: tm.UpdatedAt,
 	}, nil
 }
 
-// UpdateTimemap ...
-func (c TimemapHandler) UpdateTimemap(ctx context.Context, note *Timemap) (*Timemap, error) {
+// Update ...
+func (c TimemapHandler) Update(ctx context.Context, tm *Timemap) (*Timemap, error) {
 	now := time.Now()
 
 	p := Timemap{
-		ID:        note.ID,
-		Map:       note.Map,
+		ID:        tm.ID,
+		Map:       tm.Map,
 		UpdatedAt: now,
 	}
 
 	keys := map[string]string{
-		"userID": note.UserID,
+		"userID": tm.UserID,
 	}
 
 	exp := "set info.map = :map, updatedAt = :updatedAt"

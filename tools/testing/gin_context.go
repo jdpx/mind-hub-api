@@ -10,14 +10,24 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/request"
 )
 
-// GenerateTestGinContext generates a gin context for use in tests
+const (
+	authorizationHeader = "Authorization"
+)
+
+// GenerateTestGinContextWithToken generates a gin context for use in tests that has an authorisation token
 // This replicates the Gin Middleware which wraps the Requests context into the Resolver context
-func GenerateTestGinContext(ctx context.Context, tokenClaims jwt.MapClaims) context.Context {
+func GenerateTestGinContextWithToken(ctx context.Context, tokenClaims jwt.MapClaims) context.Context {
 	ts := GenerateTestTokenString(tokenClaims)
 
 	req := http.Request{Header: http.Header{}}
-	req.Header.Set(request.AuthorizationHeader, fmt.Sprintf("Bearer %s", ts))
+	req.Header.Set(authorizationHeader, fmt.Sprintf("Bearer %s", ts))
 
+	return GenerateTestGinContextWithRequest(ctx, req)
+}
+
+// GenerateTestGinContextWithRequest generates a gin context for use in tests
+// This replicates the Gin Middleware which wraps the Requests context into the Resolver context
+func GenerateTestGinContextWithRequest(ctx context.Context, req http.Request) context.Context {
 	gctx := gin.Context{
 		Request: &req,
 	}

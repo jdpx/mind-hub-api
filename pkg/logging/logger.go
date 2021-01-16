@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	correlationIDHeader = "X-Correlation-Id"
-
 	// CorrelationIDKey ...
 	CorrelationIDKey = "correlation_id"
+	// OrganisationIDKey ...
+	OrganisationIDKey = "organisation_id"
 	// QueryKey ...
 	QueryKey = "query"
 	// CourseIDKey ...
@@ -53,20 +53,6 @@ func NewFromResolver(ctx context.Context) *logrus.Entry {
 	cID, err := request.ContextCorrelationID(ctx)
 	if err != nil {
 		log.WithContext(ctx)
-	}
-
-	return log.WithContext(ctx).
-		WithField(CorrelationIDKey, cID)
-}
-
-// NewWithContext ...
-func NewWithContext(ctx context.Context) *logrus.Entry {
-	log := New()
-
-	cID := ctx.Value(correlationIDHeader)
-	if cID == "" {
-		id, _ := uuid.NewUUID()
-		cID = id.String()
 	}
 
 	return log.WithContext(ctx).

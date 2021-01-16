@@ -6,21 +6,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jdpx/mind-hub-api/pkg/auth"
+	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/sirupsen/logrus"
 )
 
 // RequestLoggerMiddleware ...
 func RequestLoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cID := c.Request.Header.Get(correlationIDHeader)
+		cID := request.GetCorrelationIDHeader(c.Request.Header)
 
 		if cID == "" {
 			id, _ := uuid.NewUUID()
 			cID = id.String()
 		}
 
+		aH, _ := request.AuthTokenFromGinContext(c)
+		orgID, _ := auth.GetOrganisationScopeClaims(aH)
+
 		log := New().WithFields(logrus.Fields{
-			CorrelationIDKey: cID,
+			CorrelationIDKey:  cID,
+			OrganisationIDKey: orgID,
 		})
 
 		log.Info(fmt.Sprintf("Request %s starting", c.Request.URL.Path))

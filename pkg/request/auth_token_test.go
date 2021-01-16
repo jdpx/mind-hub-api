@@ -25,7 +25,7 @@ func TestGetUserID(t *testing.T) {
 	}{
 		{
 			desc: "given a valid User ID in the context, id returned",
-			ctx: tools.GenerateTestGinContext(ctx, jwt.MapClaims{
+			ctx: tools.GenerateTestGinContextWithToken(ctx, jwt.MapClaims{
 				"sub": testUserID,
 			}),
 
@@ -39,7 +39,7 @@ func TestGetUserID(t *testing.T) {
 		},
 		{
 			desc: "given the user ID in the token claim, isnt a valid Auth0 user id, error returned",
-			ctx: tools.GenerateTestGinContext(ctx, jwt.MapClaims{
+			ctx: tools.GenerateTestGinContextWithToken(ctx, jwt.MapClaims{
 				"sub": "invalid user ID",
 			}),
 
@@ -76,7 +76,7 @@ func TestGetOrganisationID(t *testing.T) {
 	}{
 		{
 			desc: "given a valid Org ID scope in the scope, id returned",
-			ctx: tools.GenerateTestGinContext(ctx, jwt.MapClaims{
+			ctx: tools.GenerateTestGinContextWithToken(ctx, jwt.MapClaims{
 				"scope": testScopes,
 			}),
 
@@ -90,7 +90,7 @@ func TestGetOrganisationID(t *testing.T) {
 		},
 		{
 			desc: "given the org ID in the token scopes, error returned",
-			ctx: tools.GenerateTestGinContext(ctx, jwt.MapClaims{
+			ctx: tools.GenerateTestGinContextWithToken(ctx, jwt.MapClaims{
 				"scope": fake.Words(),
 			}),
 

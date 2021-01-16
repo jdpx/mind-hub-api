@@ -57,6 +57,7 @@ func TestTokenGetUserClaims(t *testing.T) {
 		})
 	}
 }
+
 func TestTokenGetOrganisationID(t *testing.T) {
 	orgID := fake.CharactersN(10)
 	orgIdScope := fmt.Sprintf("read:organisation:%s", orgID)
@@ -70,27 +71,39 @@ func TestTokenGetOrganisationID(t *testing.T) {
 		expectedErr   error
 	}{
 		{
-			desc:   "given a valid scope containing org id, correct id returned",
-			scopes: testScopes,
+			desc: "given a valid scope containing org id, correct id returned",
+			scopes: tTools.GenerateTestTokenString(jwt.MapClaims{
+				"scope": testScopes,
+			}),
 
 			expectedOrgID: orgID,
 		},
 		{
-			desc:   "given no org scope appears in scopes, error returned",
-			scopes: fake.Words(),
+			desc:   "given an invalid token string, error returned",
+			scopes: "testing",
+
+			expectedErr: fmt.Errorf("no user claims in token invalid token"),
+		},
+		{
+			desc: "given no org scope appears in scopes, error returned",
+			scopes: tTools.GenerateTestTokenString(jwt.MapClaims{
+				"scope": fake.Words(),
+			}),
 
 			expectedErr: fmt.Errorf("no organisation scopes present"),
 		},
 		{
-			desc:   "given an invalid org scope, error returned",
-			scopes: fmt.Sprintf("read:organisation:%s:foo", orgID),
+			desc: "given an invalid org scope, error returned",
+			scopes: tTools.GenerateTestTokenString(jwt.MapClaims{
+				"scope": fmt.Sprintf("read:organisation:%s:foo", orgID),
+			}),
 
 			expectedErr: fmt.Errorf("invalid organisation scope"),
 		},
 	}
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
-			id, err := auth.GetOrganisationScope(tt.scopes)
+			id, err := auth.GetTokenOrganisationID(tt.scopes)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())

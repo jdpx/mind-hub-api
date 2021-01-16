@@ -21,8 +21,8 @@ func RequestLoggerMiddleware() gin.HandlerFunc {
 			cID = id.String()
 		}
 
-		aH, _ := request.AuthTokenFromGinContext(c)
-		orgID, _ := auth.GetOrganisationScopeClaims(aH)
+		aH, _ := request.GetGinContextAuthToken(c)
+		orgID, _ := auth.GetTokenOrganisationID(aH)
 
 		log := New().WithFields(logrus.Fields{
 			CorrelationIDKey:  cID,

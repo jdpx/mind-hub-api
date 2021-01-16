@@ -36,33 +36,13 @@ func GetUserClaims(ts string) (*CustomClaims, error) {
 	return claims, nil
 }
 
-func GetOrganisationScopeClaims(ts string) (string, error) {
+func GetTokenOrganisationID(ts string) (string, error) {
 	c, err := GetUserClaims(ts)
 	if err != nil {
 		return "", fmt.Errorf("no user claims in token %w", err)
 	}
 
 	sS := strings.Split(c.Scope, scopeDelimiter)
-
-	for _, scope := range sS {
-		if !strings.HasPrefix(scope, "read:organisation") {
-			continue
-		}
-
-		a := strings.Split(scope, orgScopeDelimiter)
-
-		if len(a) != 3 {
-			return "", fmt.Errorf("invalid organisation scope")
-		}
-
-		return a[2], nil
-	}
-
-	return "", fmt.Errorf("no organisation scopes present")
-}
-
-func GetOrganisationScope(scopes string) (string, error) {
-	sS := strings.Split(scopes, scopeDelimiter)
 
 	for _, scope := range sS {
 		if !strings.HasPrefix(scope, "read:organisation") {

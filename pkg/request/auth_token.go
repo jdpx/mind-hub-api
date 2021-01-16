@@ -16,7 +16,7 @@ const (
 
 // GetUserID ...
 func GetUserID(ctx context.Context) (string, error) {
-	ts, err := AuthTokenFromContext(ctx)
+	ts, err := getAuthTokenFromContext(ctx)
 	if err != nil {
 		return "", fmt.Errorf("no auth token in context %w", err)
 	}
@@ -35,17 +35,12 @@ func GetUserID(ctx context.Context) (string, error) {
 }
 
 func GetOrganisationID(ctx context.Context) (string, error) {
-	ts, err := AuthTokenFromContext(ctx)
+	ts, err := getAuthTokenFromContext(ctx)
 	if err != nil {
 		return "", fmt.Errorf("no auth token in context %w", err)
 	}
 
-	c, err := auth.GetUserClaims(ts)
-	if err != nil {
-		return "", fmt.Errorf("no user claims in token %w", err)
-	}
-
-	orgScope, err := auth.GetOrganisationScope(c.Scope)
+	orgScope, err := auth.GetTokenOrganisationID(ts)
 	if err != nil {
 		return "", fmt.Errorf("no organisation scope claim in token %w", err)
 	}
@@ -53,16 +48,7 @@ func GetOrganisationID(ctx context.Context) (string, error) {
 	return orgScope, nil
 }
 
-func AuthTokenFromContext(ctx context.Context) (string, error) {
-	gc, err := GinContext(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	return AuthTokenFromGinContext(gc)
-}
-
-func AuthTokenFromGinContext(gc *gin.Context) (string, error) {
+func GetGinContextAuthToken(gc *gin.Context) (string, error) {
 	header := GetAuthorizationHeader(gc.Request.Header)
 	if header == "" {
 		return "", fmt.Errorf("no authorization header present in request")
@@ -71,4 +57,13 @@ func AuthTokenFromGinContext(gc *gin.Context) (string, error) {
 	s := strings.Split(header, authDelimiter)
 
 	return s[1], nil
+}
+
+func getAuthTokenFromContext(ctx context.Context) (string, error) {
+	gc, err := GinContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return GetGinContextAuthToken(gc)
 }

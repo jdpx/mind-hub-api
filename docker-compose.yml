@@ -5,3 +5,17 @@ services:
     container_name: dynamodb-local
     ports:
       - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ."
+    volumes:
+      - ./.database:/dynamodb_local_db
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    depends_on: 
+      - dynamodb-local
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://host.docker.internal:8000
+      - AWS_REGION=eu-west-1

@@ -234,7 +234,10 @@ func TestResolverResolveSession(t *testing.T) {
             description
             type
             videoUrl
-            audioUrl
+            audio {
+                id
+                url
+            }
             question
         }
 

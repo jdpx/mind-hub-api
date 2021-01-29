@@ -24,7 +24,12 @@ type Step struct {
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	VideoURL    *string  `json:"videoUrl"`
-	AudioURL    *string  `json:"audioUrl"`
+	Audio       *Audio   `json:"audio"`
 	Question    *string  `json:"question"`
 	Session     *Session `json:"session"`
+}
+
+type Audio struct {
+	ID  string `json:"id"`
+	URL string `json:"url"`
 }

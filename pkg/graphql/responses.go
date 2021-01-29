@@ -70,13 +70,18 @@ func SessionsFromCMS(gcs []*graphcms.Session) []*model.Session {
 
 // StepFromCMS ...
 func StepFromCMS(gc *graphcms.Step) *model.Step {
-	return &model.Step{
+	s := &model.Step{
 		ID:          gc.ID,
 		Title:       gc.Title,
 		Description: gc.Description,
 		Type:        gc.Type,
 		VideoURL:    gc.VideoURL,
-		AudioURL:    gc.AudioURL,
 		Question:    gc.Question,
 	}
+
+	if gc.Audio != nil {
+		s.AudioURL = &gc.Audio.URL
+	}
+
+	return s
 }

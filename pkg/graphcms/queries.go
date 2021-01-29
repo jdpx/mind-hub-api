@@ -42,7 +42,10 @@ const getSessionByID = `query Session($id: ID) {
             description
             type
             videoUrl
-            audioUrl
+            audio {
+                id
+                url
+            }
             question
         }
 
@@ -61,7 +64,10 @@ const getStepByID = `query Step($id: ID) {
       description
       type
       videoUrl
-      audioUrl
+      audio {
+        id
+        url
+      }
       question
     }
 }`

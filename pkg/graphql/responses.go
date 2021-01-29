@@ -3,6 +3,7 @@ package graphql
 import (
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 )
 
 // CourseFromCMS ...
@@ -12,6 +13,16 @@ func CourseFromCMS(gc *graphcms.Course) *model.Course {
 		Title:       gc.Title,
 		Description: gc.Description,
 		Sessions:    []*model.Session{},
+	}
+}
+
+// CourseProgressFromService ...
+func CourseProgressFromService(cp *service.CourseProgress) *model.CourseProgress {
+	return &model.CourseProgress{
+		ID:             cp.ID,
+		State:          cp.State,
+		CompletedSteps: cp.CompletedSteps,
+		DateStarted:    cp.DateStarted.String(),
 	}
 }
 

@@ -1,35 +1,23 @@
-package store
+package service
 
 import (
 	"fmt"
 	"time"
 )
 
-const (
-	STATUS_STARTED   = "STARTED"
-	STATUS_COMPLETED = "COMPLETED"
+var (
+	// ErrNotFound ...
+	ErrNotFound = fmt.Errorf("record not found")
 )
-
-func UserPK(id string) string {
-	return fmt.Sprintf("USER#%s", id)
-}
-
-func ProgressSK(id string) string {
-	return fmt.Sprintf("PROGRESS#%s", id)
-}
-
-type BaseEntity struct {
-	PK string `json:"PK"`
-	SK string `json:"SK"`
-}
 
 // CourseProgress ...
 type CourseProgress struct {
-	BaseEntity
-	CourseID    string    `json:"courseID,omitempty"`
-	UserID      string    `json:"userID,omitempty"`
-	State       string    `json:"progressState,omitempty"`
-	DateStarted time.Time `json:"dateStarted,omitempty"`
+	ID             string    `json:"id"`
+	CourseID       string    `json:"courseID,omitempty"`
+	UserID         string    `json:"userID,omitempty"`
+	State          string    `json:"progressState,omitempty"`
+	CompletedSteps int       `json:"completedSteps"`
+	DateStarted    time.Time `json:"dateStarted,omitempty"`
 }
 
 // CourseNote ...

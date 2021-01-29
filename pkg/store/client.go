@@ -214,7 +214,39 @@ func (c Client) Update(ctx context.Context, tableName string, keys map[string]st
 }
 
 func setupDbTables(dbSvc *dynamodb.DynamoDB) {
+
 	_, err := dbSvc.CreateTable(&dynamodb.CreateTableInput{
+		TableName: aws.String("user"),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("PK"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("SK"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("PK"),
+				KeyType:       aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("SK"),
+				KeyType:       aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
 		TableName: aws.String("course_progress"),
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{

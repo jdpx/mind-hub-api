@@ -11,6 +11,7 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 	"github.com/jdpx/mind-hub-api/pkg/store"
 	graphqlClient "github.com/machinebox/graphql"
 )
@@ -58,15 +59,22 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		Env: config.Env,
 	}
 	s, err := store.NewClient(sConfig)
+	s2, err := store.NewClientV2(sConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	courseProgressHandler := store.NewCourseProgressHandler(s)
+	courseProgressHandler := store.NewCourseProgressHandler(s2)
 	courseNoteHandler := store.NewCourseNoteHandler(s)
-	stepProgressHandler := store.NewStepProgressHandler(s)
+	stepProgressHandler := store.NewStepProgressHandler(s2)
 	stepNoteHandler := store.NewStepNoteHandler(s)
 	timemapHandler := store.NewTimemapHandler(s)
+
+	courseProgressService := service.New(
+		service.WithCMSClient(cmsResolver),
+		service.WithCourseProgressRepository(courseProgressHandler),
+		service.WithStepProgressRepository(stepProgressHandler),
+	)
 
 	resolver := graphql.NewResolver(
 		graphql.WithCMSClient(cmsResolver),
@@ -75,6 +83,7 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		graphql.WithStepProgressHandler(stepProgressHandler),
 		graphql.WithStepNoteRepositor(stepNoteHandler),
 		graphql.WithTimemapRepositor(timemapHandler),
+		graphql.WithCourseProgressResolver(courseProgressService),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

@@ -7,12 +7,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/labstack/gommon/log"
 )
 
 const (
-	courseProgressTableName = "course_progress"
+	courseProgressTableName = "user"
 )
 
 // CourseProgressRepositor ...
@@ -23,11 +22,11 @@ type CourseProgressRepositor interface {
 
 // CourseProgressHandler ...
 type CourseProgressHandler struct {
-	db Storer
+	db StorerV2
 }
 
 // NewCourseProgressHandler ...
-func NewCourseProgressHandler(client Storer) CourseProgressHandler {
+func NewCourseProgressHandler(client StorerV2) CourseProgressHandler {
 	return CourseProgressHandler{
 		db: client,
 	}
@@ -35,13 +34,8 @@ func NewCourseProgressHandler(client Storer) CourseProgressHandler {
 
 // Get ...
 func (c CourseProgressHandler) Get(ctx context.Context, cID, uID string) (*CourseProgress, error) {
-	p := map[string]string{
-		"courseID": cID,
-		"userID":   uID,
-	}
-
 	res := CourseProgress{}
-	err := c.db.Get(ctx, courseProgressTableName, p, &res)
+	err := c.db.Get(ctx, courseProgressTableName, UserPK(uID), ProgressSK(cID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -56,10 +50,12 @@ func (c CourseProgressHandler) Get(ctx context.Context, cID, uID string) (*Cours
 
 // Start ...
 func (c CourseProgressHandler) Start(ctx context.Context, cID, uID string) (*CourseProgress, error) {
-	id, _ := uuid.NewV4()
-
 	input := CourseProgress{
-		ID:          id.String(),
+		BaseEntity: BaseEntity{
+			PK: UserPK(uID),
+			SK: ProgressSK(cID),
+		},
+
 		CourseID:    cID,
 		UserID:      uID,
 		State:       STATUS_STARTED,

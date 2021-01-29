@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
@@ -20,6 +21,8 @@ type Resolver struct {
 	courseNoteHandler     store.CourseNoteRepositor
 	stepNoteHandler       store.StepNoteRepositor
 	timemapHandler        store.TimemapRepositor
+
+	courseProgressService service.CourseProgressRepositor
 }
 
 // NewResolver ...
@@ -72,5 +75,12 @@ func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
 func WithTimemapRepositor(s store.TimemapRepositor) func(*Resolver) {
 	return func(r *Resolver) {
 		r.timemapHandler = s
+	}
+}
+
+// WithCourseProgressResolver ...
+func WithCourseProgressResolver(s service.CourseProgressRepositor) func(*Resolver) {
+	return func(r *Resolver) {
+		r.courseProgressService = s
 	}
 }

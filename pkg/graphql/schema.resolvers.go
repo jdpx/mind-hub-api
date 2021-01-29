@@ -5,12 +5,14 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
@@ -89,40 +91,54 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
-	progress, err := r.courseProgressHandler.Get(ctx, obj.ID, userID)
+	cp, err := r.courseProgressService.Get(ctx, obj.ID, userID)
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
+
+		log.Error("Error occurred getting Course Progress %w", err)
 		return nil, err
 	}
 
-	if progress == nil {
-		return nil, nil
-	}
+	p := CourseProgressFromService(cp)
 
-	res := &model.CourseProgress{
-		ID:          progress.ID,
-		State:       progress.State,
-		DateStarted: progress.DateStarted.String(),
-	}
+	return p, nil
 
-	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
-	if err != nil {
-		log.Error("error getting course steps", err)
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
-	}
+	// progress, err := r.courseProgressHandler.Get(ctx, obj.ID, userID)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	if len(courseStepIDs) == 0 {
-		return res, nil
-	}
+	// if progress == nil {
+	// 	return nil, nil
+	// }
 
-	completedSteps, err := r.stepProgressHandler.GetCompletedByStepID(ctx, userID, courseStepIDs...)
-	if err != nil {
-		log.Error("error getting completed steps", err)
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
-	}
+	// res := &model.CourseProgress{
+	// 	// ID:          progress.ID,
+	// 	State:       progress.State,
+	// 	DateStarted: progress.DateStarted.String(),
+	// }
 
-	res.CompletedSteps = len(completedSteps)
+	// courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
+	// if err != nil {
+	// 	log.Error("error getting course steps", err)
+	// 	return nil, fmt.Errorf("error occurred getting course progress %w", err)
+	// }
 
-	return res, nil
+	// if len(courseStepIDs) == 0 {
+	// 	return res, nil
+	// }
+
+	// completedSteps, err := r.stepProgressHandler.GetCompletedByStepID(ctx, userID, courseStepIDs...)
+	// if err != nil {
+	// 	log.Error("error getting completed steps", err)
+	// 	return nil, fmt.Errorf("error occurred getting course progress %w", err)
+	// }
+
+	// res.CompletedSteps = len(completedSteps)
+
+	// return p, nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
@@ -135,9 +151,10 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.courseProgressHandler.Start(ctx, input.CourseID, userID)
+	_, err = r.courseProgressService.Start(ctx, input.CourseID, userID)
 	if err != nil {
-		log.Error("error putting record in store", err)
+		log.Error("error starting Course", err)
+
 		return nil, err
 	}
 

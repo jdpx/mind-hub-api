@@ -14,7 +14,7 @@ type CourseProgressBuilder struct {
 func NewCourseProgressBuilder() *CourseProgressBuilder {
 	return &CourseProgressBuilder{
 		progress: store.CourseProgress{
-			ID:       fake.CharactersN(10),
+			// ID:       fake.CharactersN(10),
 			CourseID: fake.CharactersN(10),
 			UserID:   fake.CharactersN(10),
 			State:    store.STATUS_STARTED,
@@ -22,11 +22,11 @@ func NewCourseProgressBuilder() *CourseProgressBuilder {
 	}
 }
 
-// WithID ...
-func (c CourseProgressBuilder) WithID(id string) CourseProgressBuilder {
-	c.progress.ID = id
-	return c
-}
+// // WithID ...
+// func (c CourseProgressBuilder) WithID(id string) CourseProgressBuilder {
+// 	c.progress.ID = id
+// 	return c
+// }
 
 // WithUserID ...
 func (c CourseProgressBuilder) WithUserID(id string) CourseProgressBuilder {

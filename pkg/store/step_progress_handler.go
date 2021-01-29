@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/gofrs/uuid"
 	"github.com/labstack/gommon/log"
 )
 
 const (
-	stepProgressTableName = "step_progress"
+	stepProgressTableName = "user"
 )
 
 // StepProgressRepositor ...
@@ -26,11 +27,11 @@ type StepProgressRepositor interface {
 
 // StepProgressHandler ...
 type StepProgressHandler struct {
-	db Storer
+	db StorerV2
 }
 
 // NewStepProgressHandler ...
-func NewStepProgressHandler(client Storer) StepProgressHandler {
+func NewStepProgressHandler(client StorerV2) StepProgressHandler {
 	return StepProgressHandler{
 		db: client,
 	}
@@ -38,13 +39,8 @@ func NewStepProgressHandler(client Storer) StepProgressHandler {
 
 // Get ...
 func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
-	p := map[string]string{
-		"stepID": sID,
-		"userID": uID,
-	}
-
 	res := StepProgress{}
-	err := c.db.Get(ctx, stepProgressTableName, p, &res)
+	err := c.db.Get(ctx, courseProgressTableName, UserPK(uID), ProgressSK(sID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -61,18 +57,20 @@ func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepPro
 func (c StepProgressHandler) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
 	res := []*StepProgress{}
 
-	keys := []map[string]string{}
-
+	builder := expression.NewBuilder()
 	for _, id := range ids {
-		m := map[string]string{
-			"userID": uID,
-			"stepID": id,
-		}
+		keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID)))
+		keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(id)))
 
-		keys = append(keys, m)
+		builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
 	}
 
-	err := c.db.Query(ctx, stepProgressTableName, keys, &res)
+	expr, err := builder.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.db.Query(ctx, stepProgressTableName, expr, &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -118,20 +116,36 @@ func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepP
 func (c StepProgressHandler) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	now := time.Now()
 
-	input := map[string]interface{}{
-		":dateCompleted": now,
-		":progressState": STATUS_COMPLETED,
-	}
+	// input := map[string]interface{}{
+	// 	":dateCompleted": now,
+	// 	":progressState": STATUS_COMPLETED,
+	// }
 
-	keys := map[string]string{
-		"stepID": sID,
-		"userID": uID,
-	}
+	// keys := map[string]string{
+	// 	"stepID": c,
+	// 	"userID": uID,
+	// }
 
-	expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
+	builder := expression.NewBuilder()
+
+	keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID)))
+	keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(sID)))
+
+	builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
+
+	upBuilder := expression.Set(expression.Name("dateCompleted"), expression.IfNotExists(expression.Name("dateCompleted"), expression.Value(now))).
+		Set(expression.Name("progressState"), expression.Value(STATUS_COMPLETED))
+
+	// expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
+	builder.WithUpdate(upBuilder)
+
+	expr, err := builder.Build()
+	if err != nil {
+		return nil, err
+	}
 
 	res := StepProgress{}
-	err := c.db.Update(ctx, stepProgressTableName, keys, expression, input, &res)
+	err = c.db.Update(ctx, stepProgressTableName, UserPK(uID), ProgressSK(sID), expr, &res)
 	if err != nil {
 		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
 		return nil, err

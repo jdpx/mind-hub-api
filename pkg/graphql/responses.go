@@ -1,13 +1,12 @@
 package graphql
 
 import (
-	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/model"
 	"github.com/jdpx/mind-hub-api/pkg/service"
 )
 
 // CourseFromCMS ...
-func CourseFromCMS(gc *graphcms.Course) *model.Course {
+func CourseFromCMS(gc *service.Course) *model.Course {
 	return &model.Course{
 		ID:          gc.ID,
 		Title:       gc.Title,
@@ -26,8 +25,18 @@ func CourseProgressFromService(cp *service.CourseProgress) *model.CourseProgress
 	}
 }
 
+// CourseNoteFromService ...
+func CourseNoteFromService(cn *service.CourseNote) *model.CourseNote {
+	return &model.CourseNote{
+		ID:       cn.ID,
+		CourseID: cn.CourseID,
+		UserID:   cn.UserID,
+		Value:    cn.Value,
+	}
+}
+
 // CoursesFromCMS ...
-func CoursesFromCMS(gcs []*graphcms.Course) []*model.Course {
+func CoursesFromCMS(gcs []*service.Course) []*model.Course {
 	cs := []*model.Course{}
 
 	for _, gc := range gcs {
@@ -38,7 +47,7 @@ func CoursesFromCMS(gcs []*graphcms.Course) []*model.Course {
 }
 
 // SessionFromCMS ...
-func SessionFromCMS(gs *graphcms.Session) *model.Session {
+func SessionFromCMS(gs *service.Session) *model.Session {
 	s := &model.Session{
 		ID:          gs.ID,
 		Title:       gs.Title,
@@ -58,7 +67,7 @@ func SessionFromCMS(gs *graphcms.Session) *model.Session {
 }
 
 // SessionsFromCMS ...
-func SessionsFromCMS(gcs []*graphcms.Session) []*model.Session {
+func SessionsFromCMS(gcs []*service.Session) []*model.Session {
 	cs := []*model.Session{}
 
 	for _, gc := range gcs {
@@ -69,19 +78,14 @@ func SessionsFromCMS(gcs []*graphcms.Session) []*model.Session {
 }
 
 // StepFromCMS ...
-func StepFromCMS(gc *graphcms.Step) *model.Step {
-	s := &model.Step{
+func StepFromCMS(gc *service.Step) *model.Step {
+	return &model.Step{
 		ID:          gc.ID,
 		Title:       gc.Title,
 		Description: gc.Description,
 		Type:        gc.Type,
 		VideoURL:    gc.VideoURL,
+		AudioURL:    gc.AudioURL,
 		Question:    gc.Question,
 	}
-
-	if gc.Audio != nil {
-		s.AudioURL = &gc.Audio.URL
-	}
-
-	return s
 }

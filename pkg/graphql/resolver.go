@@ -1,9 +1,7 @@
 package graphql
 
 import (
-	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/service"
-	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
 // This file will not be regenerated automatically.
@@ -15,14 +13,16 @@ type ResolverOption func(*Resolver)
 
 // Resolver ...
 type Resolver struct {
-	graphcms              graphcms.Resolverer
-	courseProgressHandler store.CourseProgressRepositor
-	stepProgressHandler   store.StepProgressRepositor
-	courseNoteHandler     store.CourseNoteRepositor
-	stepNoteHandler       store.StepNoteRepositor
-	timemapHandler        store.TimemapRepositor
+	// graphcms              graphcms.Resolverer
+	// courseProgressHandler store.CourseProgressRepositor
+	// stepProgressHandler   store.StepProgressRepositor
+	// courseNoteHandler     store.CourseNoteRepositor
+	// stepNoteHandler       store.StepNoteRepositor
+	// timemapHandler        store.TimemapRepositor
 
-	courseProgressService service.CourseProgressRepositor
+	// courseProgressService service.CourseProgressServicer
+
+	service *service.Service
 }
 
 // NewResolver ...
@@ -36,51 +36,58 @@ func NewResolver(opts ...ResolverOption) *Resolver {
 	return r
 }
 
-// WithCMSClient ...
-func WithCMSClient(c graphcms.Resolverer) func(*Resolver) {
+// WithService ...
+func WithService(c *service.Service) func(*Resolver) {
 	return func(r *Resolver) {
-		r.graphcms = c
+		r.service = c
 	}
 }
 
-// WithCourseProgressHandler ...
-func WithCourseProgressHandler(s store.CourseProgressRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.courseProgressHandler = s
-	}
-}
+// // WithCMSClient ...
+// func WithCMSClient(c graphcms.Resolverer) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.graphcms = c
+// 	}
+// }
 
-// WithCourseNoteRepositor ...
-func WithCourseNoteRepositor(s store.CourseNoteRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.courseNoteHandler = s
-	}
-}
+// // WithCourseProgressHandler ...
+// func WithCourseProgressHandler(s store.CourseProgressRepositor) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.courseProgressHandler = s
+// 	}
+// }
 
-// WithStepProgressHandler ...
-func WithStepProgressHandler(s store.StepProgressRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.stepProgressHandler = s
-	}
-}
+// // WithCourseNoteRepositor ...
+// func WithCourseNoteRepositor(s store.CourseNoteRepositor) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.courseNoteHandler = s
+// 	}
+// }
 
-// WithStepNoteRepositor ...
-func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.stepNoteHandler = s
-	}
-}
+// // WithStepProgressHandler ...
+// func WithStepProgressHandler(s store.StepProgressRepositor) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.stepProgressHandler = s
+// 	}
+// }
 
-// WithTimemapRepositor ...
-func WithTimemapRepositor(s store.TimemapRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.timemapHandler = s
-	}
-}
+// // WithStepNoteRepositor ...
+// func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.stepNoteHandler = s
+// 	}
+// }
 
-// WithCourseProgressResolver ...
-func WithCourseProgressResolver(s service.CourseProgressRepositor) func(*Resolver) {
-	return func(r *Resolver) {
-		r.courseProgressService = s
-	}
-}
+// // WithTimemapRepositor ...
+// func WithTimemapRepositor(s store.TimemapRepositor) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.timemapHandler = s
+// 	}
+// }
+
+// // WithCourseProgressResolver ...
+// func WithCourseProgressResolver(s service.CourseProgressServicer) func(*Resolver) {
+// 	return func(r *Resolver) {
+// 		r.courseProgressService = s
+// 	}
+// }

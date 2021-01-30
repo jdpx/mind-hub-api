@@ -15,10 +15,10 @@ type Course struct {
 }
 
 type CourseNote struct {
-	ID       string  `json:"id"`
-	CourseID string  `json:"courseID"`
-	UserID   string  `json:"userID"`
-	Value    *string `json:"value"`
+	ID       string `json:"id"`
+	CourseID string `json:"courseID"`
+	UserID   string `json:"userID"`
+	Value    string `json:"value"`
 }
 
 type CourseProgress struct {
@@ -70,10 +70,10 @@ type StepCompleted struct {
 }
 
 type StepNote struct {
-	ID     string  `json:"id"`
-	StepID string  `json:"stepID"`
-	UserID string  `json:"userID"`
-	Value  *string `json:"value"`
+	ID     string `json:"id"`
+	StepID string `json:"stepID"`
+	UserID string `json:"userID"`
+	Value  string `json:"value"`
 }
 
 type StepProgress struct {

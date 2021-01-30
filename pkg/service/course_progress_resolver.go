@@ -9,9 +9,9 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-type CourseProgressRepositor interface {
+type CourseProgressServicer interface {
 	Get(ctx context.Context, cID, userID string) (*CourseProgress, error)
-	Start(ctx context.Context, cID, userID string) (*CourseProgress, error) {
+	Start(ctx context.Context, cID, userID string) (*CourseProgress, error)
 }
 
 type CourseProgressResolver struct {
@@ -23,15 +23,14 @@ type CourseProgressResolver struct {
 // ResolverOption ...
 type ResolverOption func(*CourseProgressResolver)
 
-// New ...
-func New(opts ...ResolverOption) *CourseProgressResolver {
-	r := &CourseProgressResolver{}
-
-	for _, opt := range opts {
-		opt(r)
+// NewCourseProgressService ...
+func NewCourseProgressService(c graphcms.Resolverer, cpr store.CourseProgressRepositor, spr store.StepProgressRepositor) *CourseProgressResolver {
+	return &CourseProgressResolver{
+		graphcms:              c,
+		courseProgressHandler: cpr,
+		stepProgressHandler:   spr,
 	}
 
-	return r
 }
 
 // WithCMSClient ...
@@ -59,6 +58,7 @@ func WithStepProgressRepository(s store.StepProgressRepositor) func(*CourseProgr
 func (r CourseProgressResolver) Get(ctx context.Context, cID, userID string) (*CourseProgress, error) {
 	sProgress, err := r.courseProgressHandler.Get(ctx, cID, userID)
 	if err != nil {
+		log.Error("error getting course progress", err)
 		return nil, err
 	}
 
@@ -75,7 +75,7 @@ func (r CourseProgressResolver) Get(ctx context.Context, cID, userID string) (*C
 	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, cID)
 	if err != nil {
 		log.Error("error getting course steps", err)
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress2 %w", err)
 	}
 
 	if len(courseStepIDs) == 0 {
@@ -85,7 +85,7 @@ func (r CourseProgressResolver) Get(ctx context.Context, cID, userID string) (*C
 	completedSteps, err := r.stepProgressHandler.GetCompletedByStepID(ctx, userID, courseStepIDs...)
 	if err != nil {
 		log.Error("error getting completed steps", err)
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress3 %w", err)
 	}
 
 	p.CompletedSteps = len(completedSteps)
@@ -100,6 +100,11 @@ func (r CourseProgressResolver) Start(ctx context.Context, cID, userID string) (
 		return nil, err
 	}
 
-	
+	p := CourseProgress{
+		// ID:          progress.ID,
+		State:       sProgress.State,
+		DateStarted: sProgress.DateStarted,
+	}
 
+	return &p, nil
 }

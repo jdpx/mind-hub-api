@@ -59,6 +59,10 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		Env: config.Env,
 	}
 	s, err := store.NewClient(sConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	s2, err := store.NewClientV2(sConfig)
 	if err != nil {
 		log.Fatal(err)
@@ -70,20 +74,35 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	stepNoteHandler := store.NewStepNoteHandler(s)
 	timemapHandler := store.NewTimemapHandler(s)
 
-	courseProgressService := service.New(
-		service.WithCMSClient(cmsResolver),
-		service.WithCourseProgressRepository(courseProgressHandler),
-		service.WithStepProgressRepository(stepProgressHandler),
+	courseProgressService := service.NewCourseProgressService(cmsResolver, courseProgressHandler, stepProgressHandler)
+	courseService := service.NewCourseService(cmsResolver)
+	sessionService := service.NewSessionService(cmsResolver)
+	courseNoteService := service.NewCourseNoteService(courseNoteHandler)
+	stepProgressService := service.NewStepProgressService(stepProgressHandler)
+	stepService := service.NewStepService(cmsResolver)
+	stepNoteService := service.NewStepNoteService(stepNoteHandler)
+	timemapService := service.NewTimemapService(timemapHandler)
+
+	serv := service.New(
+		service.WithCourse(courseService),
+		service.WithCourseProgress(courseProgressService),
+		service.WithCourseNote(courseNoteService),
+		service.WithSession(sessionService),
+		service.WithStep(stepService),
+		service.WithStepNote(stepNoteService),
+		service.WithStepProgress(stepProgressService),
+		service.WithTimemap(timemapService),
 	)
 
 	resolver := graphql.NewResolver(
-		graphql.WithCMSClient(cmsResolver),
-		graphql.WithCourseProgressHandler(courseProgressHandler),
-		graphql.WithCourseNoteRepositor(courseNoteHandler),
-		graphql.WithStepProgressHandler(stepProgressHandler),
-		graphql.WithStepNoteRepositor(stepNoteHandler),
-		graphql.WithTimemapRepositor(timemapHandler),
-		graphql.WithCourseProgressResolver(courseProgressService),
+		// graphql.WithCMSClient(cmsResolver),
+		// graphql.WithCourseProgressHandler(courseProgressHandler),
+		// graphql.WithCourseNoteRepositor(courseNoteHandler),
+		// graphql.WithStepProgressHandler(stepProgressHandler),
+		// graphql.WithStepNoteRepositor(stepNoteHandler),
+		// graphql.WithTimemapRepositor(timemapHandler),
+		// graphql.WithCourseProgressResolver(courseProgressService),
+		graphql.WithService(serv),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

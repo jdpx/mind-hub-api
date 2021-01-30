@@ -13,38 +13,37 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/jdpx/mind-hub-api/pkg/service"
-	"github.com/jdpx/mind-hub-api/pkg/store"
 )
 
 func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (int, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("course sessions count resolver got called", obj.ID)
 
-	gss, err := r.graphcms.ResolveCourseSessions(ctx, obj.ID)
+	count, err := r.service.Session.CountByCourseID(ctx, obj.ID)
 	if err != nil {
 		return 0, err
 	}
 
-	return len(gss), nil
+	return count, nil
 }
 
 func (r *courseResolver) StepCount(ctx context.Context, obj *model.Course) (int, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("course step count resolver got called", obj.ID)
 
-	gss, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
+	count, err := r.service.Step.CountByCourseID(ctx, obj.ID)
 	if err != nil {
 		return 0, err
 	}
 
-	return len(gss), nil
+	return count, nil
 }
 
 func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("course sessions resolver got called", obj.ID)
 
-	gss, err := r.graphcms.ResolveCourseSessions(ctx, obj.ID)
+	gss, err := r.service.Session.GetByCourseID(ctx, obj.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -61,24 +60,21 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
 		log.Error("error getting user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	note, err := r.courseNoteHandler.Get(ctx, obj.ID, userID)
+	note, err := r.service.CourseNote.Get(ctx, obj.ID, userID)
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
+
+		log.Error("Error occurred getting Course Note %w", err)
 		return nil, err
 	}
 
-	if note == nil {
-		return nil, nil
-	}
-
-	return &model.CourseNote{
-		ID:       note.ID,
-		CourseID: note.CourseID,
-		UserID:   note.UserID,
-		Value:    &note.Value,
-	}, nil
+	return CourseNoteFromService(note), nil
 }
 
 func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*model.CourseProgress, error) {
@@ -88,57 +84,20 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
 		log.Error("error getting user", err)
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress1 %w", err)
 	}
 
-	cp, err := r.courseProgressService.Get(ctx, obj.ID, userID)
+	cp, err := r.service.CourseProgress.Get(ctx, obj.ID, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			return nil, nil
 		}
 
-		log.Error("Error occurred getting Course Progress %w", err)
+		log.Error("Error occurred getting Course Progress1 %w", err)
 		return nil, err
 	}
 
-	p := CourseProgressFromService(cp)
-
-	return p, nil
-
-	// progress, err := r.courseProgressHandler.Get(ctx, obj.ID, userID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// if progress == nil {
-	// 	return nil, nil
-	// }
-
-	// res := &model.CourseProgress{
-	// 	// ID:          progress.ID,
-	// 	State:       progress.State,
-	// 	DateStarted: progress.DateStarted.String(),
-	// }
-
-	// courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, obj.ID)
-	// if err != nil {
-	// 	log.Error("error getting course steps", err)
-	// 	return nil, fmt.Errorf("error occurred getting course progress %w", err)
-	// }
-
-	// if len(courseStepIDs) == 0 {
-	// 	return res, nil
-	// }
-
-	// completedSteps, err := r.stepProgressHandler.GetCompletedByStepID(ctx, userID, courseStepIDs...)
-	// if err != nil {
-	// 	log.Error("error getting completed steps", err)
-	// 	return nil, fmt.Errorf("error occurred getting course progress %w", err)
-	// }
-
-	// res.CompletedSteps = len(completedSteps)
-
-	// return p, nil
+	return CourseProgressFromService(cp), nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
@@ -151,7 +110,7 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.courseProgressService.Start(ctx, input.CourseID, userID)
+	_, err = r.service.CourseProgress.Start(ctx, input.CourseID, userID)
 	if err != nil {
 		log.Error("error starting Course", err)
 
@@ -172,45 +131,42 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 		return nil, err
 	}
 
-	var note *store.CourseNote
+	note, err := r.service.CourseNote.Update(ctx, input.CourseID, userID, input.Value)
 
-	if input.ID == nil {
-		m := store.CourseNote{
-			CourseID: input.CourseID,
-			UserID:   userID,
-			Value:    input.Value,
-		}
+	// var note *store.CourseNote
 
-		note, err = r.courseNoteHandler.Create(ctx, m)
-		if err != nil {
-			log.Error("An error occurred creating Note", err)
+	// if input.ID == nil {
+	// 	m := store.CourseNote{
+	// 		CourseID: input.CourseID,
+	// 		UserID:   userID,
+	// 		Value:    input.Value,
+	// 	}
 
-			return nil, err
-		}
-	} else {
-		m := store.CourseNote{
-			ID:       *input.ID,
-			CourseID: input.CourseID,
-			UserID:   userID,
-			Value:    input.Value,
-		}
+	// 	note, err = r.courseNoteHandler.Create(ctx, m)
+	// 	if err != nil {
+	// 		log.Error("An error occurred creating Note", err)
 
-		note, err = r.courseNoteHandler.Update(ctx, m)
-		if err != nil {
-			log.Error("An error occurred updating Note", err)
+	// 		return nil, err
+	// 	}
+	// } else {
+	// 	m := store.CourseNote{
+	// 		ID:       *input.ID,
+	// 		CourseID: input.CourseID,
+	// 		UserID:   userID,
+	// 		Value:    input.Value,
+	// 	}
 
-			return nil, err
-		}
-	}
+	// 	note, err = r.courseNoteHandler.Update(ctx, m)
+	// 	if err != nil {
+	// 		log.Error("An error occurred updating Note", err)
+
+	// 		return nil, err
+	// 	}
+	// }
 
 	return &model.Course{
-		ID: input.CourseID,
-		Note: &model.CourseNote{
-			ID:       note.ID,
-			CourseID: note.CourseID,
-			UserID:   note.UserID,
-			Value:    &note.Value,
-		},
+		ID:   input.CourseID,
+		Note: CourseNoteFromService(note),
 	}, nil
 }
 
@@ -224,7 +180,7 @@ func (r *mutationResolver) StepStarted(ctx context.Context, input model.StepStar
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.stepProgressHandler.Start(ctx, input.ID, userID)
+	_, err = r.service.StepProgress.Start(ctx, input.ID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -245,7 +201,7 @@ func (r *mutationResolver) StepCompleted(ctx context.Context, input model.StepCo
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	_, err = r.stepProgressHandler.Complete(ctx, input.ID, userID)
+	_, err = r.service.StepProgress.Complete(ctx, input.ID, userID)
 	if err != nil {
 		log.Error("error putting record in store", err)
 		return nil, err
@@ -265,36 +221,38 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 		return nil, err
 	}
 
-	var note *store.StepNote
+	note, err := r.service.StepNote.Update(ctx, input.StepID, userID, input.Value)
 
-	if input.ID == nil {
-		m := store.StepNote{
-			StepID: input.StepID,
-			UserID: userID,
-			Value:  input.Value,
-		}
+	// var note *store.StepNote
 
-		note, err = r.stepNoteHandler.Create(ctx, m)
-		if err != nil {
-			log.Error("An error occurred creating Note", err)
+	// if input.ID == nil {
+	// 	m := store.StepNote{
+	// 		StepID: input.StepID,
+	// 		UserID: userID,
+	// 		Value:  input.Value,
+	// 	}
 
-			return nil, err
-		}
-	} else {
-		m := store.StepNote{
-			ID:     *input.ID,
-			StepID: input.StepID,
-			UserID: userID,
-			Value:  input.Value,
-		}
+	// 	note, err = r.stepNoteHandler.Create(ctx, m)
+	// 	if err != nil {
+	// 		log.Error("An error occurred creating Note", err)
 
-		note, err = r.stepNoteHandler.Update(ctx, m)
-		if err != nil {
-			log.Error("An error occurred updating Note", err)
+	// 		return nil, err
+	// 	}
+	// } else {
+	// 	m := store.StepNote{
+	// 		ID:     *input.ID,
+	// 		StepID: input.StepID,
+	// 		UserID: userID,
+	// 		Value:  input.Value,
+	// 	}
 
-			return nil, err
-		}
-	}
+	// 	note, err = r.stepNoteHandler.Update(ctx, m)
+	// 	if err != nil {
+	// 		log.Error("An error occurred updating Note", err)
+
+	// 		return nil, err
+	// 	}
+	// }
 
 	return &model.Step{
 		ID: input.StepID,
@@ -302,7 +260,7 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 			ID:     note.ID,
 			StepID: note.StepID,
 			UserID: note.UserID,
-			Value:  &note.Value,
+			Value:  note.Value,
 		},
 	}, nil
 }
@@ -316,36 +274,35 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	timemap, err := r.timemapHandler.Get(ctx, userID)
-
+	timemap, err := r.service.Timemap.Update(ctx, userID, input.Map)
 	if err != nil {
 		log.Error("An error occurred getting Timemap", err)
 
 		return nil, err
 	}
 
-	if timemap == nil {
-		sTm := store.Timemap{
-			UserID: userID,
-			Map:    input.Map,
-		}
+	// if timemap == nil {
+	// 	sTm := store.Timemap{
+	// 		UserID: userID,
+	// 		Map:    input.Map,
+	// 	}
 
-		timemap, err = r.timemapHandler.Create(ctx, sTm)
-		if err != nil {
-			log.Error("An error occurred creating Timemap", err)
+	// 	timemap, err = r.timemapHandler.Create(ctx, sTm)
+	// 	if err != nil {
+	// 		log.Error("An error occurred creating Timemap", err)
 
-			return nil, err
-		}
-	} else {
-		timemap.Map = input.Map
+	// 		return nil, err
+	// 	}
+	// } else {
+	// 	timemap.Map = input.Map
 
-		timemap, err = r.timemapHandler.Update(ctx, timemap)
-		if err != nil {
-			log.Error("An error occurred updating Timemap", err)
+	// 	timemap, err = r.timemapHandler.Update(ctx, timemap)
+	// 	if err != nil {
+	// 		log.Error("An error occurred updating Timemap", err)
 
-			return nil, err
-		}
-	}
+	// 		return nil, err
+	// 	}
+	// }
 
 	return &model.Timemap{
 		Map:       timemap.Map,
@@ -354,7 +311,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
-	cgs, err := r.graphcms.ResolveCourses(ctx)
+	cgs, err := r.service.Course.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -365,13 +322,13 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 }
 
 func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*model.Course, error) {
-	cg, err := r.graphcms.ResolveCourse(ctx, where.ID)
+	cg, err := r.service.Course.GetByID(ctx, where.ID)
 	if err != nil {
-		return nil, err
-	}
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
 
-	if cg == nil {
-		return nil, nil
+		return nil, err
 	}
 
 	c := CourseFromCMS(cg)
@@ -380,13 +337,13 @@ func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*m
 }
 
 func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (*model.Session, error) {
-	gs, err := r.graphcms.ResolveSession(ctx, where.ID)
+	gs, err := r.service.Session.GetByID(ctx, where.ID)
 	if err != nil {
-		return nil, err
-	}
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
 
-	if gs == nil {
-		return nil, nil
+		return nil, err
 	}
 
 	s := SessionFromCMS(gs)
@@ -395,13 +352,13 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 }
 
 func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model.Step, error) {
-	gs, err := r.graphcms.ResolveStep(ctx, where.ID)
+	gs, err := r.service.Step.GetByID(ctx, where.ID)
 	if err != nil {
-		return nil, err
-	}
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
 
-	if gs == nil {
-		return nil, nil
+		return nil, err
 	}
 
 	s := StepFromCMS(gs)
@@ -413,7 +370,7 @@ func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.Sess
 	log := logging.NewFromResolver(ctx)
 	log.Info("Sessions By Course ID resolver got called", where.ID)
 
-	gss, err := r.graphcms.ResolveCourseSessions(ctx, where.ID)
+	gss, err := r.service.Session.GetByCourseID(ctx, where.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -433,8 +390,12 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	timemap, err := r.timemapHandler.Get(ctx, userID)
+	timemap, err := r.service.Timemap.Get(ctx, userID)
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
+
 		log.Error("error getting Timemap", err)
 		return nil, fmt.Errorf("error occurred getting Timemap %w", err)
 	}
@@ -456,20 +417,20 @@ func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNo
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	note, err := r.stepNoteHandler.Get(ctx, obj.ID, userID)
+	note, err := r.service.StepNote.Get(ctx, obj.ID, userID)
 	if err != nil {
-		return nil, err
-	}
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
 
-	if note == nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &model.StepNote{
 		ID:     note.ID,
 		StepID: note.StepID,
 		UserID: note.UserID,
-		Value:  &note.Value,
+		Value:  note.Value,
 	}, nil
 }
 
@@ -483,13 +444,13 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	progress, err := r.stepProgressHandler.Get(ctx, obj.ID, userID)
+	progress, err := r.service.StepProgress.Get(ctx, obj.ID, userID)
 	if err != nil {
-		return nil, err
-	}
+		if errors.Is(err, service.ErrNotFound) {
+			return nil, nil
+		}
 
-	if progress == nil {
-		return nil, nil
+		return nil, err
 	}
 
 	res := &model.StepProgress{

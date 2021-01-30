@@ -85,14 +85,14 @@ type CourseNote {
   id: ID!
   courseID: ID!
   userID: ID!
-  value: String
+  value: String!
 }
 
 type StepNote {
   id: ID!
   stepID: ID!
   userID: ID!
-  value: String
+  value: String!
 }
 
 type Query {

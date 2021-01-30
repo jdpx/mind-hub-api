@@ -84,11 +84,17 @@ func (c ClientV2) Get(ctx context.Context, tableName string, pk, sk string, i in
 		},
 	}
 
+	fmt.Println("1111", pk, sk)
+
 	results, err := c.db.GetItem(ctx, &input)
 	if err != nil {
 		log.Error("error getting item from store", err)
 
 		return err
+	}
+
+	if results == nil {
+		log.Fatal("1111", err)
 	}
 
 	if results.Item == nil {

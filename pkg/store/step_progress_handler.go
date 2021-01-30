@@ -57,37 +57,45 @@ func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepPro
 func (c StepProgressHandler) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
 	res := []*StepProgress{}
 
-	builder := expression.NewBuilder()
-	for _, id := range ids {
-		keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID)))
-		keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(id)))
+	return res, nil
 
-		builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
-	}
+	// fmt.Println("IDS", ids)
 
-	expr, err := builder.Build()
-	if err != nil {
-		return nil, err
-	}
+	// builder := expression.NewBuilder()
+	// keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID))).And(expression.Key(""))
 
-	err = c.db.Query(ctx, stepProgressTableName, expr, &res)
-	if err != nil {
-		if errors.Is(err, ErrNotFound) {
-			return nil, nil
-		}
+	// // for _, id := range ids {
+	// // keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(id)))
 
-		return nil, err
-	}
+	// builder = builder.WithKeyCondition(keyCond)
+	// // builder = builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
+	// // }
 
-	fP := []*StepProgress{}
+	// expr, err := builder.Build()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	for _, p := range res {
-		if p.State == STATUS_COMPLETED {
-			fP = append(fP, p)
-		}
-	}
+	// fmt.Println("44444", expr)
 
-	return fP, nil
+	// err = c.db.Query(ctx, stepProgressTableName, expr, &res)
+	// if err != nil {
+	// 	if errors.Is(err, ErrNotFound) {
+	// 		return nil, nil
+	// 	}
+
+	// 	return nil, err
+	// }
+
+	// fP := []*StepProgress{}
+
+	// for _, p := range res {
+	// 	if p.State == STATUS_COMPLETED {
+	// 		fP = append(fP, p)
+	// 	}
+	// }
+
+	// return fP, nil
 }
 
 // Start ...

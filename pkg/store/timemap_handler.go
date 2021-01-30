@@ -6,11 +6,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/gofrs/uuid"
 )
 
 const (
-	timemapTableName = "timemap"
+	timemapTableName = "user"
 )
 
 // TimemapRepositor ...
@@ -22,11 +23,11 @@ type TimemapRepositor interface {
 
 // TimemapHandler ...
 type TimemapHandler struct {
-	db Storer
+	db StorerV2
 }
 
 // NewTimemapHandler ...
-func NewTimemapHandler(client Storer) TimemapHandler {
+func NewTimemapHandler(client StorerV2) TimemapHandler {
 	return TimemapHandler{
 		db: client,
 	}
@@ -34,12 +35,8 @@ func NewTimemapHandler(client Storer) TimemapHandler {
 
 // Get ...
 func (c TimemapHandler) Get(ctx context.Context, uID string) (*Timemap, error) {
-	p := map[string]string{
-		"userID": uID,
-	}
-
 	res := Timemap{}
-	err := c.db.Get(ctx, timemapTableName, p, &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), TimemapSK(), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -55,6 +52,11 @@ func (c TimemapHandler) Get(ctx context.Context, uID string) (*Timemap, error) {
 func (c TimemapHandler) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
 	id, _ := uuid.NewV4()
 	tm.ID = id.String()
+
+	tm.BaseEntity = BaseEntity{
+		PK: UserPK(tm.UserID),
+		SK: TimemapSK(),
+	}
 
 	err := c.db.Put(ctx, timemapTableName, tm)
 	if err != nil {
@@ -79,14 +81,21 @@ func (c TimemapHandler) Update(ctx context.Context, tm *Timemap) (*Timemap, erro
 		UpdatedAt: now,
 	}
 
-	keys := map[string]string{
-		"userID": tm.UserID,
+	upBuilder := expression.Set(
+		expression.Name("map"),
+		expression.Value(tm.Map),
+	).Set(
+		expression.Name("updatedAt"),
+		expression.Value(now),
+	)
+
+	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
+	if err != nil {
+		return nil, err
 	}
 
-	exp := "set info.map = :map, updatedAt = :updatedAt"
-
 	res := Timemap{}
-	err := c.db.Update(ctx, timemapTableName, keys, exp, p, &res)
+	err = c.db.Update(ctx, timemapTableName, UserPK(tm.UserID), TimemapSK(), expr, &res)
 	if err != nil {
 		return nil, err
 	}

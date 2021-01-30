@@ -84,17 +84,11 @@ func (c ClientV2) Get(ctx context.Context, tableName string, pk, sk string, i in
 		},
 	}
 
-	fmt.Println("1111", pk, sk)
-
 	results, err := c.db.GetItem(ctx, &input)
 	if err != nil {
 		log.Error("error getting item from store", err)
 
 		return err
-	}
-
-	if results == nil {
-		log.Fatal("1111", err)
 	}
 
 	if results.Item == nil {
@@ -153,8 +147,9 @@ func (c ClientV2) Put(ctx context.Context, tableName string, body interface{}) e
 	})
 
 	if err != nil {
-		log.Error("error putting item to store", err)
-		return err
+		log.Error(fmt.Sprintf("error putting item to %s store", tableName), err)
+
+		return fmt.Errorf("error putting item to %s store %w", tableName, err)
 	}
 
 	return nil
@@ -167,7 +162,7 @@ func (c ClientV2) Update(ctx context.Context, tableName string, pk, sk string, e
 				Value: pk,
 			},
 			"SK": &types.AttributeValueMemberS{
-				Value: pk,
+				Value: sk,
 			},
 		},
 		TableName:                 aws.String(tableName),
@@ -188,7 +183,7 @@ func (c ClientV2) Update(ctx context.Context, tableName string, pk, sk string, e
 		} else {
 			fmt.Println(err)
 		}
-		return nil
+		return fmt.Errorf("error updating item to %s store %w", tableName, err)
 	}
 
 	err = attributevalue.UnmarshalMap(result.Attributes, &i)
@@ -230,150 +225,4 @@ func setupDbV2Tables(dbSvc *dynamodb.Client) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	// _, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-	// 	TableName: aws.String("course_progress"),
-	// 	AttributeDefinitions: []*dynamodb.AttributeDefinition{
-	// 		{
-	// 			AttributeName: aws.String("courseID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 	},
-	// 	KeySchema: []*dynamodb.KeySchemaElement{
-	// 		{
-	// 			AttributeName: aws.String("courseID"),
-	// 			KeyType:       aws.String("HASH"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			KeyType:       aws.String("RANGE"),
-	// 		},
-	// 	},
-	// 	ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-	// 		ReadCapacityUnits:  aws.Int64(10),
-	// 		WriteCapacityUnits: aws.Int64(10),
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
-	// _, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-	// 	TableName: aws.String("course_note"),
-	// 	AttributeDefinitions: []*dynamodb.AttributeDefinition{
-	// 		{
-	// 			AttributeName: aws.String("courseID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 	},
-	// 	KeySchema: []*dynamodb.KeySchemaElement{
-	// 		{
-	// 			AttributeName: aws.String("courseID"),
-	// 			KeyType:       aws.String("HASH"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			KeyType:       aws.String("RANGE"),
-	// 		},
-	// 	},
-	// 	ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-	// 		ReadCapacityUnits:  aws.Int64(10),
-	// 		WriteCapacityUnits: aws.Int64(10),
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
-	// _, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-	// 	TableName: aws.String("step_progress"),
-	// 	AttributeDefinitions: []*dynamodb.AttributeDefinition{
-	// 		{
-	// 			AttributeName: aws.String("stepID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 	},
-	// 	KeySchema: []*dynamodb.KeySchemaElement{
-	// 		{
-	// 			AttributeName: aws.String("stepID"),
-	// 			KeyType:       aws.String("HASH"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			KeyType:       aws.String("RANGE"),
-	// 		},
-	// 	},
-	// 	ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-	// 		ReadCapacityUnits:  aws.Int64(10),
-	// 		WriteCapacityUnits: aws.Int64(10),
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
-	// _, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-	// 	TableName: aws.String("step_note"),
-	// 	AttributeDefinitions: []*dynamodb.AttributeDefinition{
-	// 		{
-	// 			AttributeName: aws.String("stepID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 	},
-	// 	KeySchema: []*dynamodb.KeySchemaElement{
-	// 		{
-	// 			AttributeName: aws.String("stepID"),
-	// 			KeyType:       aws.String("HASH"),
-	// 		},
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			KeyType:       aws.String("RANGE"),
-	// 		},
-	// 	},
-	// 	ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-	// 		ReadCapacityUnits:  aws.Int64(10),
-	// 		WriteCapacityUnits: aws.Int64(10),
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// _, err = dbSvc.CreateTable(&dynamodb.CreateTableInput{
-	// 	TableName: aws.String("timemap"),
-	// 	AttributeDefinitions: []*dynamodb.AttributeDefinition{
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			AttributeType: aws.String("S"),
-	// 		},
-	// 	},
-	// 	KeySchema: []*dynamodb.KeySchemaElement{
-	// 		{
-	// 			AttributeName: aws.String("userID"),
-	// 			KeyType:       aws.String("HASH"),
-	// 		},
-	// 	},
-	// 	ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-	// 		ReadCapacityUnits:  aws.Int64(10),
-	// 		WriteCapacityUnits: aws.Int64(10),
-	// 	},
-	// })
-	// if err != nil {
-	// 	log.Println(err)
-	// }
 }

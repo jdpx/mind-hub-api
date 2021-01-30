@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	courseProgressTableName = "user"
+	userTableName = "user"
 )
 
 // CourseProgressRepositor ...
@@ -35,7 +35,7 @@ func NewCourseProgressHandler(client StorerV2) CourseProgressHandler {
 // Get ...
 func (c CourseProgressHandler) Get(ctx context.Context, cID, uID string) (*CourseProgress, error) {
 	res := CourseProgress{}
-	err := c.db.Get(ctx, courseProgressTableName, UserPK(uID), ProgressSK(cID), &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(cID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -62,7 +62,7 @@ func (c CourseProgressHandler) Start(ctx context.Context, cID, uID string) (*Cou
 		DateStarted: time.Now(),
 	}
 
-	err := c.db.Put(ctx, courseProgressTableName, input)
+	err := c.db.Put(ctx, userTableName, input)
 	if err != nil {
 		log.Error("error getting item from store", err)
 		return nil, err

@@ -18,6 +18,14 @@ func ProgressSK(id string) string {
 	return fmt.Sprintf("PROGRESS#%s", id)
 }
 
+func NoteSK(id string) string {
+	return fmt.Sprintf("NOTE#%s", id)
+}
+
+func TimemapSK() string {
+	return "TIMEMAP"
+}
+
 type BaseEntity struct {
 	PK string `json:"PK"`
 	SK string `json:"SK"`
@@ -34,6 +42,7 @@ type CourseProgress struct {
 
 // CourseNote ...
 type CourseNote struct {
+	BaseEntity
 	ID       string `json:"id"`
 	CourseID string `json:"courseID"`
 	UserID   string `json:"userID"`
@@ -42,6 +51,7 @@ type CourseNote struct {
 
 // StepProgress ...
 type StepProgress struct {
+	BaseEntity
 	ID            string     `json:"id,omitempty"`
 	StepID        string     `json:"stepID,omitempty"`
 	UserID        string     `json:"userID,omitempty"`
@@ -52,6 +62,7 @@ type StepProgress struct {
 
 // StepNote ...
 type StepNote struct {
+	BaseEntity
 	ID     string `json:"id"`
 	StepID string `json:"stepID"`
 	UserID string `json:"userID"`
@@ -60,6 +71,7 @@ type StepNote struct {
 
 // Timemap ...
 type Timemap struct {
+	BaseEntity
 	ID        string    `json:"id"`
 	UserID    string    `json:"userID"`
 	Map       string    `json:"map"`

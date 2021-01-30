@@ -40,7 +40,7 @@ func NewStepProgressHandler(client StorerV2) StepProgressHandler {
 // Get ...
 func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	res := StepProgress{}
-	err := c.db.Get(ctx, courseProgressTableName, UserPK(uID), ProgressSK(sID), &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(sID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -104,6 +104,11 @@ func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepP
 
 	now := time.Now()
 	input := StepProgress{
+		BaseEntity: BaseEntity{
+			PK: UserPK(uID),
+			SK: ProgressSK(sID),
+		},
+
 		ID:          id.String(),
 		StepID:      sID,
 		UserID:      uID,
@@ -123,39 +128,28 @@ func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepP
 // Complete ...
 func (c StepProgressHandler) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	now := time.Now()
-
-	// input := map[string]interface{}{
-	// 	":dateCompleted": now,
-	// 	":progressState": STATUS_COMPLETED,
-	// }
-
-	// keys := map[string]string{
-	// 	"stepID": c,
-	// 	"userID": uID,
-	// }
-
 	builder := expression.NewBuilder()
 
-	keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID)))
-	keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(sID)))
+	upBuilder := expression.Set(
+		expression.Name("DateCompleted"),
+		expression.Value(now),
+	).Set(
+		expression.Name("State"),
+		expression.Value(STATUS_COMPLETED),
+	)
 
-	builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
-
-	upBuilder := expression.Set(expression.Name("dateCompleted"), expression.IfNotExists(expression.Name("dateCompleted"), expression.Value(now))).
-		Set(expression.Name("progressState"), expression.Value(STATUS_COMPLETED))
-
-	// expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
-	builder.WithUpdate(upBuilder)
+	builder = builder.WithUpdate(upBuilder)
 
 	expr, err := builder.Build()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating complete step expression %w", err)
 	}
 
 	res := StepProgress{}
 	err = c.db.Update(ctx, stepProgressTableName, UserPK(uID), ProgressSK(sID), expr, &res)
 	if err != nil {
 		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
+
 		return nil, err
 	}
 

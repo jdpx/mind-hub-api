@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/gofrs/uuid"
 )
 
 const (
-	stepNoteTableName = "step_note"
+	stepNoteTableName = "user"
 )
 
 // StepNoteRepositor ...
@@ -20,11 +21,11 @@ type StepNoteRepositor interface {
 
 // StepNoteHandler ...
 type StepNoteHandler struct {
-	db Storer
+	db StorerV2
 }
 
 // NewStepNoteHandler ...
-func NewStepNoteHandler(client Storer) StepNoteHandler {
+func NewStepNoteHandler(client StorerV2) StepNoteHandler {
 	return StepNoteHandler{
 		db: client,
 	}
@@ -32,13 +33,8 @@ func NewStepNoteHandler(client Storer) StepNoteHandler {
 
 // Get ...
 func (c StepNoteHandler) Get(ctx context.Context, cID, uID string) (*StepNote, error) {
-	p := map[string]string{
-		"stepID": cID,
-		"userID": uID,
-	}
-
 	res := StepNote{}
-	err := c.db.Get(ctx, stepNoteTableName, p, &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), NoteSK(cID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -54,6 +50,11 @@ func (c StepNoteHandler) Get(ctx context.Context, cID, uID string) (*StepNote, e
 func (c StepNoteHandler) Create(ctx context.Context, note StepNote) (*StepNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
+
+	note.BaseEntity = BaseEntity{
+		PK: UserPK(note.UserID),
+		SK: NoteSK(note.StepID),
+	}
 
 	err := c.db.Put(ctx, stepNoteTableName, note)
 	if err != nil {
@@ -77,15 +78,15 @@ func (c StepNoteHandler) Update(ctx context.Context, note StepNote) (*StepNote, 
 		Value:  note.Value,
 	}
 
-	keys := map[string]string{
-		"stepID": note.StepID,
-		"userID": note.UserID,
+	upBuilder := expression.Set(expression.Name("Value"), expression.Value(note.Value))
+
+	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
+	if err != nil {
+		return nil, err
 	}
 
-	exporession := "set info.value = :value"
-
 	res := StepNote{}
-	err := c.db.Update(ctx, stepNoteTableName, keys, exporession, p, &res)
+	err = c.db.Update(ctx, stepNoteTableName, UserPK(note.UserID), NoteSK(note.StepID), expr, &res)
 	if err != nil {
 		return nil, err
 	}

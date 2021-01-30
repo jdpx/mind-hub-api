@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/gofrs/uuid"
 )
 
 const (
-	courseNoteTableName = "course_note"
+	courseNoteTableName = "user"
 )
 
 // CourseNoteRepositor ...
@@ -20,11 +21,11 @@ type CourseNoteRepositor interface {
 
 // CourseNoteHandler ...
 type CourseNoteHandler struct {
-	db Storer
+	db StorerV2
 }
 
 // NewCourseNoteHandler ...
-func NewCourseNoteHandler(client Storer) CourseNoteHandler {
+func NewCourseNoteHandler(client StorerV2) CourseNoteHandler {
 	return CourseNoteHandler{
 		db: client,
 	}
@@ -32,13 +33,8 @@ func NewCourseNoteHandler(client Storer) CourseNoteHandler {
 
 // Get ...
 func (c CourseNoteHandler) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
-	p := map[string]string{
-		"courseID": cID,
-		"userID":   uID,
-	}
-
 	res := CourseNote{}
-	err := c.db.Get(ctx, courseNoteTableName, p, &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), NoteSK(cID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -54,6 +50,11 @@ func (c CourseNoteHandler) Get(ctx context.Context, cID, uID string) (*CourseNot
 func (c CourseNoteHandler) Create(ctx context.Context, note CourseNote) (*CourseNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
+
+	note.BaseEntity = BaseEntity{
+		PK: UserPK(note.UserID),
+		SK: NoteSK(note.CourseID),
+	}
 
 	err := c.db.Put(ctx, courseNoteTableName, note)
 	if err != nil {
@@ -77,15 +78,15 @@ func (c CourseNoteHandler) Update(ctx context.Context, note CourseNote) (*Course
 		Value:    note.Value,
 	}
 
-	keys := map[string]string{
-		"courseID": note.CourseID,
-		"userID":   note.UserID,
+	upBuilder := expression.Set(expression.Name("Value"), expression.Value(note.Value))
+
+	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
+	if err != nil {
+		return nil, err
 	}
 
-	exporession := "set info.value = :value"
-
 	res := CourseNote{}
-	err := c.db.Update(ctx, courseNoteTableName, keys, exporession, p, &res)
+	err = c.db.Update(ctx, courseNoteTableName, UserPK(note.UserID), NoteSK(note.CourseID), expr, &res)
 	if err != nil {
 		return nil, err
 	}

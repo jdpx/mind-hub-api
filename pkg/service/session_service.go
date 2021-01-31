@@ -1,3 +1,5 @@
+//go:generate mockgen -source=session_service.go -destination=./mocks/session_service.go -package=servicemocks
+
 package service
 
 import (

@@ -1,3 +1,5 @@
+//go:generate mockgen -source=step_progress_service.go -destination=./mocks/step_progress_service.go -package=servicemocks
+
 package service
 
 import (

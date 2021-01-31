@@ -6,9 +6,114 @@ package storemocks
 
 import (
 	context "context"
+	expression "github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
+	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
+
+// MockDynamoDBer is a mock of DynamoDBer interface
+type MockDynamoDBer struct {
+	ctrl     *gomock.Controller
+	recorder *MockDynamoDBerMockRecorder
+}
+
+// MockDynamoDBerMockRecorder is the mock recorder for MockDynamoDBer
+type MockDynamoDBerMockRecorder struct {
+	mock *MockDynamoDBer
+}
+
+// NewMockDynamoDBer creates a new mock instance
+func NewMockDynamoDBer(ctrl *gomock.Controller) *MockDynamoDBer {
+	mock := &MockDynamoDBer{ctrl: ctrl}
+	mock.recorder = &MockDynamoDBerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockDynamoDBer) EXPECT() *MockDynamoDBerMockRecorder {
+	return m.recorder
+}
+
+// GetItem mocks base method
+func (m *MockDynamoDBer) GetItem(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetItem", varargs...)
+	ret0, _ := ret[0].(*dynamodb.GetItemOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetItem indicates an expected call of GetItem
+func (mr *MockDynamoDBerMockRecorder) GetItem(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockDynamoDBer)(nil).GetItem), varargs...)
+}
+
+// Query mocks base method
+func (m *MockDynamoDBer) Query(ctx context.Context, params *dynamodb.QueryInput, optFns ...func(*dynamodb.Options)) (*dynamodb.QueryOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(*dynamodb.QueryOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query
+func (mr *MockDynamoDBerMockRecorder) Query(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockDynamoDBer)(nil).Query), varargs...)
+}
+
+// PutItem mocks base method
+func (m *MockDynamoDBer) PutItem(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PutItem", varargs...)
+	ret0, _ := ret[0].(*dynamodb.PutItemOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PutItem indicates an expected call of PutItem
+func (mr *MockDynamoDBerMockRecorder) PutItem(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutItem", reflect.TypeOf((*MockDynamoDBer)(nil).PutItem), varargs...)
+}
+
+// UpdateItem mocks base method
+func (m *MockDynamoDBer) UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateItem", varargs...)
+	ret0, _ := ret[0].(*dynamodb.UpdateItemOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateItem indicates an expected call of UpdateItem
+func (mr *MockDynamoDBerMockRecorder) UpdateItem(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateItem", reflect.TypeOf((*MockDynamoDBer)(nil).UpdateItem), varargs...)
+}
 
 // MockStorer is a mock of Storer interface
 type MockStorer struct {
@@ -34,31 +139,31 @@ func (m *MockStorer) EXPECT() *MockStorerMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockStorer) Get(ctx context.Context, tableName string, searchBody, i interface{}) error {
+func (m *MockStorer) Get(ctx context.Context, tableName, pk, sk string, i interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, tableName, searchBody, i)
+	ret := m.ctrl.Call(m, "Get", ctx, tableName, pk, sk, i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Get indicates an expected call of Get
-func (mr *MockStorerMockRecorder) Get(ctx, tableName, searchBody, i interface{}) *gomock.Call {
+func (mr *MockStorerMockRecorder) Get(ctx, tableName, pk, sk, i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStorer)(nil).Get), ctx, tableName, searchBody, i)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockStorer)(nil).Get), ctx, tableName, pk, sk, i)
 }
 
 // Query mocks base method
-func (m *MockStorer) Query(ctx context.Context, tableName string, searchKeys []map[string]string, i interface{}) error {
+func (m *MockStorer) Query(ctx context.Context, tableName string, ex expression.Expression, i interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Query", ctx, tableName, searchKeys, i)
+	ret := m.ctrl.Call(m, "Query", ctx, tableName, ex, i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Query indicates an expected call of Query
-func (mr *MockStorerMockRecorder) Query(ctx, tableName, searchKeys, i interface{}) *gomock.Call {
+func (mr *MockStorerMockRecorder) Query(ctx, tableName, ex, i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockStorer)(nil).Query), ctx, tableName, searchKeys, i)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockStorer)(nil).Query), ctx, tableName, ex, i)
 }
 
 // Put mocks base method
@@ -76,15 +181,15 @@ func (mr *MockStorerMockRecorder) Put(ctx, tableName, body interface{}) *gomock.
 }
 
 // Update mocks base method
-func (m *MockStorer) Update(ctx context.Context, tableName string, keys map[string]string, expression string, body, i interface{}) error {
+func (m *MockStorer) Update(ctx context.Context, tableName, pk, sk string, ex expression.Expression, i interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, tableName, keys, expression, body, i)
+	ret := m.ctrl.Call(m, "Update", ctx, tableName, pk, sk, ex, i)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update
-func (mr *MockStorerMockRecorder) Update(ctx, tableName, keys, expression, body, i interface{}) *gomock.Call {
+func (mr *MockStorerMockRecorder) Update(ctx, tableName, pk, sk, ex, i interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStorer)(nil).Update), ctx, tableName, keys, expression, body, i)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStorer)(nil).Update), ctx, tableName, pk, sk, ex, i)
 }

@@ -1,4 +1,5 @@
-//go:generate mockgen -source=timemap_handler.go -destination=./mocks/timemap_handler.go -package=storemocks
+//go:generate mockgen -source=timemap_store.go -destination=./mocks/timemap_store.go -package=storemocks
+
 package store
 
 import (

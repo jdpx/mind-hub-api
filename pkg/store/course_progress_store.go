@@ -1,4 +1,4 @@
-//go:generate mockgen -source=course_progress_handler.go -destination=./mocks/course_progress_handler.go -package=storemocks
+//go:generate mockgen -source=course_progress_store.go -destination=./mocks/course_progress_store.go -package=storemocks
 
 package store
 

@@ -28,6 +28,13 @@ const (
 	localDynamoDBURL = "http://localhost:8000"
 )
 
+type DynamoDBer interface {
+	GetItem(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error)
+	Query(ctx context.Context, params *dynamodb.QueryInput, optFns ...func(*dynamodb.Options)) (*dynamodb.QueryOutput, error)
+	PutItem(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error)
+	UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error)
+}
+
 type Storer interface {
 	Get(ctx context.Context, tableName string, pk, sk string, i interface{}) error
 	Query(ctx context.Context, tableName string, ex expression.Expression, i interface{}) error
@@ -35,26 +42,41 @@ type Storer interface {
 	Update(ctx context.Context, tableName string, pk, sk string, ex expression.Expression, i interface{}) error
 }
 
-// Client ...
-type Client struct {
-	db *dynamodb.Client
+type StoreOption func(*Store)
+
+// Store ...
+type Store struct {
+	db DynamoDBer
+}
+
+func NewStore(opts ...StoreOption) *Store {
+	s := &Store{}
+
+	for _, opt := range opts {
+		opt(s)
+	}
+
+	return s
+}
+
+// WithDynamoDB ...
+func WithDynamoDB(c DynamoDBer) func(*Store) {
+	return func(r *Store) {
+		r.db = c
+	}
 }
 
 // NewClient ...
-func NewClient(c Config) *Client {
+func NewClient() *dynamodb.Client {
 	config, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(dbRegion))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dbSvc := dynamodb.NewFromConfig(config)
-
-	return &Client{
-		db: dbSvc,
-	}
+	return dynamodb.NewFromConfig(config)
 }
 
-func NewLocalClient(c Config) *Client {
+func NewLocalClient() *dynamodb.Client {
 	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
 		if service == dynamodb.ServiceID && region == dbRegion {
 			return aws.Endpoint{
@@ -80,13 +102,11 @@ func NewLocalClient(c Config) *Client {
 
 	setupDbV2Tables(dbSvc)
 
-	return &Client{
-		db: dbSvc,
-	}
+	return dbSvc
 }
 
 // Get ...
-func (c Client) Get(ctx context.Context, tableName string, pk, sk string, i interface{}) error {
+func (c Store) Get(ctx context.Context, tableName string, pk, sk string, i interface{}) error {
 	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
 		logging.PKKey: pk,
 		logging.SKKey: sk,
@@ -134,7 +154,7 @@ func (c Client) Get(ctx context.Context, tableName string, pk, sk string, i inte
 }
 
 // Query ...
-func (c Client) Query(ctx context.Context, tableName string, ex expression.Expression, i interface{}) error {
+func (c Store) Query(ctx context.Context, tableName string, ex expression.Expression, i interface{}) error {
 	log := logging.NewFromResolver(ctx)
 
 	queryInput := dynamodb.QueryInput{
@@ -169,7 +189,7 @@ func (c Client) Query(ctx context.Context, tableName string, ex expression.Expre
 }
 
 // Put ...
-func (c Client) Put(ctx context.Context, tableName string, body interface{}) error {
+func (c Store) Put(ctx context.Context, tableName string, body interface{}) error {
 	log := logging.NewFromResolver(ctx)
 
 	av, err := attributevalue.MarshalMap(body)
@@ -197,7 +217,7 @@ func (c Client) Put(ctx context.Context, tableName string, body interface{}) err
 	return nil
 }
 
-func (c Client) Update(ctx context.Context, tableName string, pk, sk string, ex expression.Expression, i interface{}) error {
+func (c Store) Update(ctx context.Context, tableName string, pk, sk string, ex expression.Expression, i interface{}) error {
 	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
 		logging.PKKey: pk,
 		logging.SKKey: sk,

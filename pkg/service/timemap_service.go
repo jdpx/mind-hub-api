@@ -1,3 +1,5 @@
+//go:generate mockgen -source=timemap_service.go -destination=./mocks/timemap_service.go -package=servicemocks
+
 package service
 
 import (

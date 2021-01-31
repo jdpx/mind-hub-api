@@ -1,3 +1,5 @@
+//go:generate mockgen -source=course_note_store.go -destination=./mocks/course_note_store.go -package=storemocks
+
 package store
 
 import (

@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/gin-gonic/gin"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql"
@@ -53,16 +54,16 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	cms := graphcms.NewClient(graphqlClient)
 	cmsResolver := graphcms.NewResolver(cms)
 
-	sConfig := store.Config{
-		Env: config.Env,
+	var dynamoClient *dynamodb.Client
+	if config.Env == "local" {
+		dynamoClient = store.NewLocalClient()
+	} else {
+		dynamoClient = store.NewClient()
 	}
 
-	var s *store.Client
-	if config.Env == "local" {
-		s = store.NewLocalClient(sConfig)
-	} else {
-		s = store.NewClient(sConfig)
-	}
+	s := store.NewStore(
+		store.WithDynamoDB(dynamoClient),
+	)
 
 	courseProgressStore := store.NewCourseProgressStore(s)
 	courseNoteStore := store.NewCourseNoteStore(s)

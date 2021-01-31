@@ -1,3 +1,5 @@
+//go:generate mockgen -source=course_note_service.go -destination=./mocks/course_note_service.go -package=servicemocks
+
 package service
 
 import (

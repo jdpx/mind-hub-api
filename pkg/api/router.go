@@ -59,16 +59,16 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		Env: config.Env,
 	}
 
-	s2, err := store.NewClient(sConfig)
+	s, err := store.NewClient(sConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	courseProgressStore := store.NewCourseProgressStore(s2)
-	courseNoteStore := store.NewCourseNoteStore(s2)
-	stepProgressStore := store.NewStepProgressStore(s2)
-	stepNoteStore := store.NewStepNoteStore(s2)
-	timemapStore := store.NewTimemapStore(s2)
+	courseProgressStore := store.NewCourseProgressStore(s)
+	courseNoteStore := store.NewCourseNoteStore(s)
+	stepProgressStore := store.NewStepProgressStore(s)
+	stepNoteStore := store.NewStepNoteStore(s)
+	timemapStore := store.NewTimemapStore(s)
 
 	courseProgressService := service.NewCourseProgressService(cmsResolver, courseProgressStore, stepProgressStore)
 	courseService := service.NewCourseService(cmsResolver)

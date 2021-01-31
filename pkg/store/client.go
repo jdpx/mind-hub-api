@@ -41,37 +41,48 @@ type Client struct {
 }
 
 // NewClient ...
-func NewClient(c Config) (*Client, error) {
+func NewClient(c Config) *Client {
 	config, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(dbRegion))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if c.Env == "local" {
-		customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
-			if service == dynamodb.ServiceID && region == dbRegion {
-				return aws.Endpoint{
-					PartitionID:       "aws",
-					URL:               localDynamoDBURL,
-					SigningRegion:     dbRegion,
-					HostnameImmutable: true,
-				}, nil
-			}
-			return aws.Endpoint{}, fmt.Errorf("unknown endpoint requested")
-		})
+	dbSvc := dynamodb.NewFromConfig(config)
 
-		config.EndpointResolver = customResolver
+	return &Client{
+		db: dbSvc,
+	}
+}
+
+func NewLocalClient(c Config) *Client {
+	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		if service == dynamodb.ServiceID && region == dbRegion {
+			return aws.Endpoint{
+				PartitionID:       "aws",
+				URL:               localDynamoDBURL,
+				SigningRegion:     dbRegion,
+				HostnameImmutable: true,
+			}, nil
+		}
+		return aws.Endpoint{}, fmt.Errorf("unknown endpoint requested")
+	})
+
+	config, err := config.LoadDefaultConfig(
+		context.Background(),
+		config.WithRegion(dbRegion),
+		config.WithEndpointResolver(customResolver),
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	dbSvc := dynamodb.NewFromConfig(config)
 
-	if c.Env == "local" {
-		setupDbV2Tables(dbSvc)
-	}
+	setupDbV2Tables(dbSvc)
 
 	return &Client{
 		db: dbSvc,
-	}, nil
+	}
 }
 
 // Get ...

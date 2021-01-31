@@ -1,8 +1,8 @@
 package store_test
 
-const (
-	courseProgressTableName = "course_progress"
-)
+// const (
+// 	courseProgressTableName = "course_progress"
+// )
 
 // func TestCourseProgresshandlerGet(t *testing.T) {
 // 	cID := fake.CharactersN(10)

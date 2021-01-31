@@ -1,8 +1,8 @@
 package store_test
 
-const (
-	courseNoteTableName = "course_note"
-)
+// const (
+// 	courseNoteTableName = "course_note"
+// )
 
 // func TestCourseNotehandlerGet(t *testing.T) {
 // 	cID := fake.CharactersN(10)

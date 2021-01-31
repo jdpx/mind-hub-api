@@ -1,8 +1,8 @@
 package store_test
 
-const (
-	stepProgressTableName = "step_progress"
-)
+// const (
+// 	stepProgressTableName = "step_progress"
+// )
 
 // func TestStepProgresshandlerGet(t *testing.T) {
 // 	sID := fake.CharactersN(10)

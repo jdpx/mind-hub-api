@@ -1,8 +1,8 @@
 package store_test
 
-const (
-	timemapTableName = "timemap"
-)
+// const (
+// 	timemapTableName = "timemap"
+// )
 
 // func TestTimemaphandlerGet(t *testing.T) {
 // 	uID := fake.CharactersN(10)

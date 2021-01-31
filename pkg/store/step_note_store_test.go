@@ -1,8 +1,8 @@
 package store_test
 
-const (
-	stepNoteTableName = "step_note"
-)
+// const (
+// 	stepNoteTableName = "step_note"
+// )
 
 // func TestStepNotehandlerGet(t *testing.T) {
 // 	cID := fake.CharactersN(10)

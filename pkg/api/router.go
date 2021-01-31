@@ -1,8 +1,6 @@
 package api
 
 import (
-	"log"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
@@ -59,9 +57,11 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		Env: config.Env,
 	}
 
-	s, err := store.NewClient(sConfig)
-	if err != nil {
-		log.Fatal(err)
+	var s *store.Client
+	if config.Env == "local" {
+		s = store.NewLocalClient(sConfig)
+	} else {
+		s = store.NewClient(sConfig)
 	}
 
 	courseProgressStore := store.NewCourseProgressStore(s)

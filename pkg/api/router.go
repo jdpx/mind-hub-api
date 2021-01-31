@@ -58,30 +58,26 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	sConfig := store.Config{
 		Env: config.Env,
 	}
-	// s, err := store.NewClient(sConfig)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
-	s2, err := store.NewClientV2(sConfig)
+	s2, err := store.NewClient(sConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	courseProgressHandler := store.NewCourseProgressHandler(s2)
-	courseNoteHandler := store.NewCourseNoteHandler(s2)
-	stepProgressHandler := store.NewStepProgressHandler(s2)
-	stepNoteHandler := store.NewStepNoteHandler(s2)
-	timemapHandler := store.NewTimemapHandler(s2)
+	courseProgressStore := store.NewCourseProgressStore(s2)
+	courseNoteStore := store.NewCourseNoteStore(s2)
+	stepProgressStore := store.NewStepProgressStore(s2)
+	stepNoteStore := store.NewStepNoteStore(s2)
+	timemapStore := store.NewTimemapStore(s2)
 
-	courseProgressService := service.NewCourseProgressService(cmsResolver, courseProgressHandler, stepProgressHandler)
+	courseProgressService := service.NewCourseProgressService(cmsResolver, courseProgressStore, stepProgressStore)
 	courseService := service.NewCourseService(cmsResolver)
 	sessionService := service.NewSessionService(cmsResolver)
-	courseNoteService := service.NewCourseNoteService(courseNoteHandler)
-	stepProgressService := service.NewStepProgressService(stepProgressHandler)
+	courseNoteService := service.NewCourseNoteService(courseNoteStore)
+	stepProgressService := service.NewStepProgressService(stepProgressStore)
 	stepService := service.NewStepService(cmsResolver)
-	stepNoteService := service.NewStepNoteService(stepNoteHandler)
-	timemapService := service.NewTimemapService(timemapHandler)
+	stepNoteService := service.NewStepNoteService(stepNoteStore)
+	timemapService := service.NewTimemapService(timemapStore)
 
 	serv := service.New(
 		service.WithCourse(courseService),
@@ -95,13 +91,6 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	)
 
 	resolver := graphql.NewResolver(
-		// graphql.WithCMSClient(cmsResolver),
-		// graphql.WithCourseProgressHandler(courseProgressHandler),
-		// graphql.WithCourseNoteRepositor(courseNoteHandler),
-		// graphql.WithStepProgressHandler(stepProgressHandler),
-		// graphql.WithStepNoteRepositor(stepNoteHandler),
-		// graphql.WithTimemapRepositor(timemapHandler),
-		// graphql.WithCourseProgressResolver(courseProgressService),
 		graphql.WithService(serv),
 	)
 

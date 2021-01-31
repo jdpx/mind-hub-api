@@ -20,20 +20,20 @@ type CourseProgressRepositor interface {
 	Start(ctx context.Context, cID, uID string) (*CourseProgress, error)
 }
 
-// CourseProgressHandler ...
-type CourseProgressHandler struct {
-	db StorerV2
+// CourseProgressStore ...
+type CourseProgressStore struct {
+	db Storer
 }
 
-// NewCourseProgressHandler ...
-func NewCourseProgressHandler(client StorerV2) CourseProgressHandler {
-	return CourseProgressHandler{
+// NewCourseProgressStore ...
+func NewCourseProgressStore(client Storer) CourseProgressStore {
+	return CourseProgressStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c CourseProgressHandler) Get(ctx context.Context, cID, uID string) (*CourseProgress, error) {
+func (c CourseProgressStore) Get(ctx context.Context, cID, uID string) (*CourseProgress, error) {
 	res := CourseProgress{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(cID), &res)
 	if err != nil {
@@ -49,7 +49,7 @@ func (c CourseProgressHandler) Get(ctx context.Context, cID, uID string) (*Cours
 }
 
 // Start ...
-func (c CourseProgressHandler) Start(ctx context.Context, cID, uID string) (*CourseProgress, error) {
+func (c CourseProgressStore) Start(ctx context.Context, cID, uID string) (*CourseProgress, error) {
 	input := CourseProgress{
 		BaseEntity: BaseEntity{
 			PK: UserPK(uID),

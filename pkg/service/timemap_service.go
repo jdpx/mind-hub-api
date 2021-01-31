@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/store"
-	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 )
 
 type TimemapServicer interface {
@@ -12,32 +13,35 @@ type TimemapServicer interface {
 	Update(ctx context.Context, uID, value string) (*Timemap, error)
 }
 
-type TimemapResolver struct {
+type TimemapService struct {
 	store store.TimemapRepositor
 }
 
-// TimemapResolverOption ...
-type TimemapResolverOption func(*TimemapResolver)
-
 // NewTimemapService ...
-func NewTimemapService(cms store.TimemapRepositor) *TimemapResolver {
-	r := &TimemapResolver{
+func NewTimemapService(cms store.TimemapRepositor) *TimemapService {
+	r := &TimemapService{
 		store: cms,
 	}
 
 	return r
 }
 
-func (s TimemapResolver) Get(ctx context.Context, uID string) (*Timemap, error) {
+func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.UserIDKey: uID,
+	})
+
 	timemap, err := s.store.Get(ctx, uID)
 
 	if err != nil {
-		log.Error("An error occurred getting Timemap", err)
+		log.Error("error getting timemap by id from store", err)
 
 		return nil, err
 	}
 
 	if timemap == nil {
+		log.Error("timemap not found in store")
+
 		return nil, ErrNotFound
 	}
 
@@ -49,16 +53,22 @@ func (s TimemapResolver) Get(ctx context.Context, uID string) (*Timemap, error) 
 	}, nil
 }
 
-func (s TimemapResolver) Update(ctx context.Context, uID, value string) (*Timemap, error) {
+func (s TimemapService) Update(ctx context.Context, uID, value string) (*Timemap, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.UserIDKey: uID,
+	})
+
 	timemap, err := s.store.Get(ctx, uID)
 
 	if err != nil {
-		log.Error("An error occurred getting Timemap", err)
+		log.Error("error getting timemap from store", err)
 
 		return nil, err
 	}
 
 	if timemap == nil {
+		log.Info("creating new timemap in store")
+
 		sTm := store.Timemap{
 			UserID: uID,
 			Map:    value,
@@ -66,16 +76,17 @@ func (s TimemapResolver) Update(ctx context.Context, uID, value string) (*Timema
 
 		timemap, err = s.store.Create(ctx, sTm)
 		if err != nil {
-			log.Error("An error occurred creating Timemap", err)
+			log.Error("error creating timemap from store", err)
 
 			return nil, err
 		}
 	} else {
+		log.Info("updating timemap in store")
 		timemap.Map = value
 
 		timemap, err = s.store.Update(ctx, timemap)
 		if err != nil {
-			log.Error("An error occurred updating Timemap", err)
+			log.Error("error updating timemap from store", err)
 
 			return nil, err
 		}

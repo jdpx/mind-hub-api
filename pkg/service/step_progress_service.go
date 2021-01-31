@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/store"
+	"github.com/sirupsen/logrus"
 )
 
 type StepProgressServicer interface {
@@ -13,45 +15,33 @@ type StepProgressServicer interface {
 }
 
 type StepProgressService struct {
-	stepProgressHandler store.StepProgressRepositor
+	store store.StepProgressRepositor
 }
 
 // NewStepProgressService ...
 func NewStepProgressService(s store.StepProgressRepositor) *StepProgressService {
 	return &StepProgressService{
-		stepProgressHandler: s,
+		store: s,
 	}
 }
 
-// // WithCMSClient ...
-// func WithCMSClient(c graphcms.Resolverer) func(*StepProgressResolver) {
-// 	return func(r *StepProgressResolver) {
-// 		r.graphcms = c
-// 	}
-// }
-
-// // WithStepProgressRepository ...
-// func WithStepProgressRepository(s store.StepProgressRepositor) func(*StepProgressResolver) {
-// 	return func(r *StepProgressResolver) {
-// 		r.courseProgressHandler = s
-// 	}
-// }
-
-// // WithStepProgressRepository ...
-// func WithStepProgressRepository(s store.StepProgressRepositor) func(*StepProgressResolver) {
-// 	return func(r *StepProgressResolver) {
-// 		r.stepProgressHandler = s
-// 	}
-// }
-
 // Get ...
-func (r StepProgressService) Get(ctx context.Context, sID, userID string) (*StepProgress, error) {
-	sProgress, err := r.stepProgressHandler.Get(ctx, sID, userID)
+func (r StepProgressService) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.SessionIDKey: sID,
+		logging.UserIDKey:    uID,
+	})
+
+	sProgress, err := r.store.Get(ctx, sID, uID)
 	if err != nil {
+		log.Error("error getting session progress from store", err)
+
 		return nil, err
 	}
 
 	if sProgress == nil {
+		log.Info("session progress not found in store")
+
 		return nil, ErrNotFound
 	}
 
@@ -71,9 +61,16 @@ func (r StepProgressService) Get(ctx context.Context, sID, userID string) (*Step
 }
 
 // Start ...
-func (r StepProgressService) Start(ctx context.Context, sID, userID string) (*StepProgress, error) {
-	sProgress, err := r.stepProgressHandler.Start(ctx, sID, userID)
+func (r StepProgressService) Start(ctx context.Context, sID, uID string) (*StepProgress, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.SessionIDKey: sID,
+		logging.UserIDKey:    uID,
+	})
+
+	sProgress, err := r.store.Start(ctx, sID, uID)
 	if err != nil {
+		log.Error("error starting session progress in store", err)
+
 		return nil, err
 	}
 
@@ -87,9 +84,16 @@ func (r StepProgressService) Start(ctx context.Context, sID, userID string) (*St
 }
 
 // Start ...
-func (r StepProgressService) Complete(ctx context.Context, sID, userID string) (*StepProgress, error) {
-	sProgress, err := r.stepProgressHandler.Complete(ctx, sID, userID)
+func (r StepProgressService) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.SessionIDKey: sID,
+		logging.UserIDKey:    uID,
+	})
+
+	sProgress, err := r.store.Complete(ctx, sID, uID)
 	if err != nil {
+		log.Error("error completing session progress in store", err)
+
 		return nil, err
 	}
 

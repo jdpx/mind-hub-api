@@ -13,15 +13,6 @@ type ResolverOption func(*Resolver)
 
 // Resolver ...
 type Resolver struct {
-	// graphcms              graphcms.Resolverer
-	// courseProgressHandler store.CourseProgressRepositor
-	// stepProgressHandler   store.StepProgressRepositor
-	// courseNoteHandler     store.CourseNoteRepositor
-	// stepNoteHandler       store.StepNoteRepositor
-	// timemapHandler        store.TimemapRepositor
-
-	// courseProgressService service.CourseProgressServicer
-
 	service *service.Service
 }
 
@@ -42,52 +33,3 @@ func WithService(c *service.Service) func(*Resolver) {
 		r.service = c
 	}
 }
-
-// // WithCMSClient ...
-// func WithCMSClient(c graphcms.Resolverer) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.graphcms = c
-// 	}
-// }
-
-// // WithCourseProgressHandler ...
-// func WithCourseProgressHandler(s store.CourseProgressRepositor) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.courseProgressHandler = s
-// 	}
-// }
-
-// // WithCourseNoteRepositor ...
-// func WithCourseNoteRepositor(s store.CourseNoteRepositor) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.courseNoteHandler = s
-// 	}
-// }
-
-// // WithStepProgressHandler ...
-// func WithStepProgressHandler(s store.StepProgressRepositor) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.stepProgressHandler = s
-// 	}
-// }
-
-// // WithStepNoteRepositor ...
-// func WithStepNoteRepositor(s store.StepNoteRepositor) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.stepNoteHandler = s
-// 	}
-// }
-
-// // WithTimemapRepositor ...
-// func WithTimemapRepositor(s store.TimemapRepositor) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.timemapHandler = s
-// 	}
-// }
-
-// // WithCourseProgressResolver ...
-// func WithCourseProgressResolver(s service.CourseProgressServicer) func(*Resolver) {
-// 	return func(r *Resolver) {
-// 		r.courseProgressService = s
-// 	}
-// }

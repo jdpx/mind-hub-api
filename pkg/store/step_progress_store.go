@@ -25,20 +25,20 @@ type StepProgressRepositor interface {
 	Complete(ctx context.Context, sID, uID string) (*StepProgress, error)
 }
 
-// StepProgressHandler ...
-type StepProgressHandler struct {
-	db StorerV2
+// StepProgressStore ...
+type StepProgressStore struct {
+	db Storer
 }
 
-// NewStepProgressHandler ...
-func NewStepProgressHandler(client StorerV2) StepProgressHandler {
-	return StepProgressHandler{
+// NewStepProgressStore ...
+func NewStepProgressStore(client Storer) StepProgressStore {
+	return StepProgressStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
+func (c StepProgressStore) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	res := StepProgress{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(sID), &res)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c StepProgressHandler) Get(ctx context.Context, sID, uID string) (*StepPro
 }
 
 // GetCompletedByStepID ...
-func (c StepProgressHandler) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
+func (c StepProgressStore) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
 	res := []*StepProgress{}
 
 	return res, nil
@@ -99,7 +99,7 @@ func (c StepProgressHandler) GetCompletedByStepID(ctx context.Context, uID strin
 }
 
 // Start ...
-func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepProgress, error) {
+func (c StepProgressStore) Start(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	id, _ := uuid.NewV4()
 
 	now := time.Now()
@@ -126,7 +126,7 @@ func (c StepProgressHandler) Start(ctx context.Context, sID, uID string) (*StepP
 }
 
 // Complete ...
-func (c StepProgressHandler) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
+func (c StepProgressStore) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
 	now := time.Now()
 	builder := expression.NewBuilder()
 

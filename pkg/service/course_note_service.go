@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/store"
-	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 )
 
 type CourseNoteServicer interface {
@@ -12,29 +13,35 @@ type CourseNoteServicer interface {
 	Update(ctx context.Context, cID, uID, value string) (*CourseNote, error)
 }
 
-type CourseNoteResolver struct {
+type CourseNoteService struct {
 	store store.CourseNoteRepositor
 }
 
-// CourseNoteResolverOption ...
-type CourseNoteResolverOption func(*CourseNoteResolver)
-
 // NewCourseNoteService ...
-func NewCourseNoteService(rep store.CourseNoteRepositor) *CourseNoteResolver {
-	r := &CourseNoteResolver{
+func NewCourseNoteService(rep store.CourseNoteRepositor) *CourseNoteService {
+	r := &CourseNoteService{
 		store: rep,
 	}
 
 	return r
 }
 
-func (s CourseNoteResolver) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
+func (s CourseNoteService) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.CourseIDKey: cID,
+		logging.UserIDKey:   uID,
+	})
+
 	cn, err := s.store.Get(ctx, cID, uID)
 	if err != nil {
+		log.Error("error occurred getting course note from store", err)
+
 		return nil, err
 	}
 
 	if cn == nil {
+		log.Info("course note not found in store")
+
 		return nil, ErrNotFound
 	}
 
@@ -46,7 +53,12 @@ func (s CourseNoteResolver) Get(ctx context.Context, cID, uID string) (*CourseNo
 	}, nil
 }
 
-func (s CourseNoteResolver) Update(ctx context.Context, cID, uID, value string) (*CourseNote, error) {
+func (s CourseNoteService) Update(ctx context.Context, cID, uID, value string) (*CourseNote, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.CourseIDKey: cID,
+		logging.UserIDKey:   uID,
+	})
+
 	m := store.CourseNote{
 		// ID:       *input.ID,
 		CourseID: cID,
@@ -56,7 +68,7 @@ func (s CourseNoteResolver) Update(ctx context.Context, cID, uID, value string) 
 
 	cn, err := s.store.Update(ctx, m)
 	if err != nil {
-		log.Error("An error occurred updating Note", err)
+		log.Error("An error occurred updating course note", err)
 
 		return nil, err
 	}

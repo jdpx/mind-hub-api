@@ -21,20 +21,20 @@ type TimemapRepositor interface {
 	Update(ctx context.Context, tm *Timemap) (*Timemap, error)
 }
 
-// TimemapHandler ...
-type TimemapHandler struct {
-	db StorerV2
+// TimemapStore ...
+type TimemapStore struct {
+	db Storer
 }
 
-// NewTimemapHandler ...
-func NewTimemapHandler(client StorerV2) TimemapHandler {
-	return TimemapHandler{
+// NewTimemapStore ...
+func NewTimemapStore(client Storer) TimemapStore {
+	return TimemapStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c TimemapHandler) Get(ctx context.Context, uID string) (*Timemap, error) {
+func (c TimemapStore) Get(ctx context.Context, uID string) (*Timemap, error) {
 	res := Timemap{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), TimemapSK(), &res)
 	if err != nil {
@@ -49,7 +49,7 @@ func (c TimemapHandler) Get(ctx context.Context, uID string) (*Timemap, error) {
 }
 
 // Create ...
-func (c TimemapHandler) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
+func (c TimemapStore) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
 	id, _ := uuid.NewV4()
 	tm.ID = id.String()
 
@@ -72,7 +72,7 @@ func (c TimemapHandler) Create(ctx context.Context, tm Timemap) (*Timemap, error
 }
 
 // Update ...
-func (c TimemapHandler) Update(ctx context.Context, tm *Timemap) (*Timemap, error) {
+func (c TimemapStore) Update(ctx context.Context, tm *Timemap) (*Timemap, error) {
 	now := time.Now()
 
 	p := Timemap{

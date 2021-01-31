@@ -19,20 +19,20 @@ type CourseNoteRepositor interface {
 	Update(ctx context.Context, note CourseNote) (*CourseNote, error)
 }
 
-// CourseNoteHandler ...
-type CourseNoteHandler struct {
-	db StorerV2
+// CourseNoteStore ...
+type CourseNoteStore struct {
+	db Storer
 }
 
-// NewCourseNoteHandler ...
-func NewCourseNoteHandler(client StorerV2) CourseNoteHandler {
-	return CourseNoteHandler{
+// NewCourseNoteStore ...
+func NewCourseNoteStore(client Storer) CourseNoteStore {
+	return CourseNoteStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c CourseNoteHandler) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
+func (c CourseNoteStore) Get(ctx context.Context, cID, uID string) (*CourseNote, error) {
 	res := CourseNote{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), NoteSK(cID), &res)
 	if err != nil {
@@ -47,7 +47,7 @@ func (c CourseNoteHandler) Get(ctx context.Context, cID, uID string) (*CourseNot
 }
 
 // Create ...
-func (c CourseNoteHandler) Create(ctx context.Context, note CourseNote) (*CourseNote, error) {
+func (c CourseNoteStore) Create(ctx context.Context, note CourseNote) (*CourseNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
 
@@ -70,7 +70,7 @@ func (c CourseNoteHandler) Create(ctx context.Context, note CourseNote) (*Course
 }
 
 // Update ...
-func (c CourseNoteHandler) Update(ctx context.Context, note CourseNote) (*CourseNote, error) {
+func (c CourseNoteStore) Update(ctx context.Context, note CourseNote) (*CourseNote, error) {
 	p := CourseNote{
 		ID:       note.ID,
 		CourseID: note.CourseID,

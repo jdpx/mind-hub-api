@@ -21,6 +21,8 @@ func (r *courseResolver) SessionCount(ctx context.Context, obj *model.Course) (i
 
 	count, err := r.service.Session.CountByCourseID(ctx, obj.ID)
 	if err != nil {
+		log.Error("error occurred getting session count", err)
+
 		return 0, err
 	}
 
@@ -33,6 +35,8 @@ func (r *courseResolver) StepCount(ctx context.Context, obj *model.Course) (int,
 
 	count, err := r.service.Step.CountByCourseID(ctx, obj.ID)
 	if err != nil {
+		log.Error("error occurred getting step count", err)
+
 		return 0, err
 	}
 
@@ -45,6 +49,8 @@ func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*mo
 
 	gss, err := r.service.Session.GetByCourseID(ctx, obj.ID)
 	if err != nil {
+		log.Error("error occurred getting sessions by course ID", err)
+
 		return nil, err
 	}
 
@@ -59,7 +65,7 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
 
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
@@ -67,6 +73,8 @@ func (r *courseResolver) Note(ctx context.Context, obj *model.Course) (*model.Co
 	note, err := r.service.CourseNote.Get(ctx, obj.ID, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Info("course note not found")
+
 			return nil, nil
 		}
 
@@ -83,13 +91,16 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting course progress1 %w", err)
 	}
 
 	cp, err := r.service.CourseProgress.Get(ctx, obj.ID, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Info("course progress not found")
+
 			return nil, nil
 		}
 
@@ -106,7 +117,8 @@ func (r *mutationResolver) CourseStarted(ctx context.Context, input model.Course
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
@@ -128,11 +140,15 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
+		log.Error("error occurred getting request user", err)
+
 		return nil, err
 	}
 
 	note, err := r.service.CourseNote.Update(ctx, input.CourseID, userID, input.Value)
-
+	if err != nil {
+		return nil, err
+	}
 	// var note *store.CourseNote
 
 	// if input.ID == nil {
@@ -176,7 +192,8 @@ func (r *mutationResolver) StepStarted(ctx context.Context, input model.StepStar
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
@@ -197,7 +214,8 @@ func (r *mutationResolver) StepCompleted(ctx context.Context, input model.StepCo
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
@@ -218,11 +236,15 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
+		log.Error("error occurred getting request user", err)
+
 		return nil, err
 	}
 
 	note, err := r.service.StepNote.Update(ctx, input.StepID, userID, input.Value)
-
+	if err != nil {
+		return nil, err
+	}
 	// var note *store.StepNote
 
 	// if input.ID == nil {
@@ -271,6 +293,8 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
+		log.Error("error occurred getting request user", err)
+
 		return nil, err
 	}
 
@@ -311,8 +335,13 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 }
 
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("courses resolver called")
+
 	cgs, err := r.service.Course.GetAll(ctx)
 	if err != nil {
+		log.Error("error occurred getting all courses", err)
+
 		return nil, err
 	}
 
@@ -322,11 +351,18 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 }
 
 func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*model.Course, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("course by id resolver called", where.ID)
+
 	cg, err := r.service.Course.GetByID(ctx, where.ID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Error("course not found")
+
 			return nil, nil
 		}
+
+		log.Error("error occurred getting course by id", err)
 
 		return nil, err
 	}
@@ -337,11 +373,18 @@ func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*m
 }
 
 func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (*model.Session, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("session by id resolver called", where.ID)
+
 	gs, err := r.service.Session.GetByID(ctx, where.ID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Error("session not found")
+
 			return nil, nil
 		}
+
+		log.Error("error occurred getting session by id", err)
 
 		return nil, err
 	}
@@ -352,11 +395,18 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 }
 
 func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model.Step, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("step by id resolver called", where.ID)
+
 	gs, err := r.service.Step.GetByID(ctx, where.ID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Error("step not found")
+
 			return nil, nil
 		}
+
+		log.Error("error occurred getting step by id", err)
 
 		return nil, err
 	}
@@ -372,6 +422,8 @@ func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.Sess
 
 	gss, err := r.service.Session.GetByCourseID(ctx, where.ID)
 	if err != nil {
+		log.Error("error occurred getting sessions by course id", err)
+
 		return nil, err
 	}
 
@@ -386,17 +438,21 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
 	timemap, err := r.service.Timemap.Get(ctx, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Error("timemap not found")
+
 			return nil, nil
 		}
 
 		log.Error("error getting Timemap", err)
+
 		return nil, fmt.Errorf("error occurred getting Timemap %w", err)
 	}
 
@@ -413,15 +469,19 @@ func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNo
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
 	note, err := r.service.StepNote.Get(ctx, obj.ID, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Info("step note not found")
+
 			return nil, nil
 		}
+		log.Error("error getting step note", err)
 
 		return nil, err
 	}
@@ -440,15 +500,19 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 
 	userID, err := request.GetUserID(ctx)
 	if err != nil {
-		log.Error("error getting user", err)
+		log.Error("error occurred getting request user", err)
+
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
 	progress, err := r.service.StepProgress.Get(ctx, obj.ID, userID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
+			log.Info("step progress not found")
+
 			return nil, nil
 		}
+		log.Error("error getting step progress", err)
 
 		return nil, err
 	}

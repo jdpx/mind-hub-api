@@ -19,20 +19,20 @@ type StepNoteRepositor interface {
 	Update(ctx context.Context, note StepNote) (*StepNote, error)
 }
 
-// StepNoteHandler ...
-type StepNoteHandler struct {
-	db StorerV2
+// StepNoteStore ...
+type StepNoteStore struct {
+	db Storer
 }
 
-// NewStepNoteHandler ...
-func NewStepNoteHandler(client StorerV2) StepNoteHandler {
-	return StepNoteHandler{
+// NewStepNoteStore ...
+func NewStepNoteStore(client Storer) StepNoteStore {
+	return StepNoteStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c StepNoteHandler) Get(ctx context.Context, cID, uID string) (*StepNote, error) {
+func (c StepNoteStore) Get(ctx context.Context, cID, uID string) (*StepNote, error) {
 	res := StepNote{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), NoteSK(cID), &res)
 	if err != nil {
@@ -47,7 +47,7 @@ func (c StepNoteHandler) Get(ctx context.Context, cID, uID string) (*StepNote, e
 }
 
 // Create ...
-func (c StepNoteHandler) Create(ctx context.Context, note StepNote) (*StepNote, error) {
+func (c StepNoteStore) Create(ctx context.Context, note StepNote) (*StepNote, error) {
 	id, _ := uuid.NewV4()
 	note.ID = id.String()
 
@@ -70,7 +70,7 @@ func (c StepNoteHandler) Create(ctx context.Context, note StepNote) (*StepNote, 
 }
 
 // Update ...
-func (c StepNoteHandler) Update(ctx context.Context, note StepNote) (*StepNote, error) {
+func (c StepNoteStore) Update(ctx context.Context, note StepNote) (*StepNote, error) {
 	p := StepNote{
 		ID:     note.ID,
 		StepID: note.StepID,

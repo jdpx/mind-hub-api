@@ -126,15 +126,21 @@ func (c Store) Get(ctx context.Context, tableName string, pk, sk string, i inter
 
 	results, err := c.db.GetItem(ctx, &input)
 	if err != nil {
-		if errors.Is(err, &types.ProvisionedThroughputExceededException{}) {
+		if apiErr := new(types.ProvisionedThroughputExceededException); errors.As(err, &apiErr) {
 			log.Error("error dynamodb throughput exceeded", err)
-		} else if errors.Is(err, &types.InternalServerError{}) {
+		} else if apiErr := new(types.InternalServerError); errors.As(err, &apiErr) {
 			log.Error("internal server error from dynamodb", err)
 		} else {
 			log.Error("error getting item from dynamodb", err)
 		}
 
-		return err
+		return fmt.Errorf("error returned from dynamodb %w", err)
+	}
+
+	if results == nil {
+		log.Error("nil results returned")
+
+		return fmt.Errorf("nil results returned")
 	}
 
 	if results.Item == nil {
@@ -167,15 +173,21 @@ func (c Store) Query(ctx context.Context, tableName string, ex expression.Expres
 
 	result, err := c.db.Query(ctx, &queryInput)
 	if err != nil {
-		if errors.Is(err, &types.ProvisionedThroughputExceededException{}) {
+		if apiErr := new(types.ProvisionedThroughputExceededException); errors.As(err, &apiErr) {
 			log.Error("error dynamodb throughput exceeded", err)
-		} else if errors.Is(err, &types.InternalServerError{}) {
+		} else if apiErr := new(types.InternalServerError); errors.As(err, &apiErr) {
 			log.Error("internal server error from dynamodb", err)
 		} else {
-			log.Error("error querying dynamodb", err)
+			log.Error("error getting item from dynamodb", err)
 		}
 
-		return err
+		return fmt.Errorf("error returned from dynamodb %w", err)
+	}
+
+	if result == nil {
+		log.Error("nil results returned")
+
+		return fmt.Errorf("nil results returned")
 	}
 
 	err = attributevalue.UnmarshalListOfMaps(result.Items, &i)
@@ -203,15 +215,15 @@ func (c Store) Put(ctx context.Context, tableName string, body interface{}) erro
 	})
 
 	if err != nil {
-		if errors.Is(err, &types.ProvisionedThroughputExceededException{}) {
+		if apiErr := new(types.ProvisionedThroughputExceededException); errors.As(err, &apiErr) {
 			log.Error("error dynamodb throughput exceeded", err)
-		} else if errors.Is(err, &types.InternalServerError{}) {
+		} else if apiErr := new(types.InternalServerError); errors.As(err, &apiErr) {
 			log.Error("internal server error from dynamodb", err)
 		} else {
-			log.Error("error putting item to dynamodb", err)
+			log.Error("error getting item from dynamodb", err)
 		}
 
-		return err
+		return fmt.Errorf("error returned from dynamodb %w", err)
 	}
 
 	return nil
@@ -223,7 +235,7 @@ func (c Store) Update(ctx context.Context, tableName string, pk, sk string, ex e
 		logging.SKKey: sk,
 	})
 
-	input := &dynamodb.UpdateItemInput{
+	input := dynamodb.UpdateItemInput{
 		Key: map[string]types.AttributeValue{
 			"PK": &types.AttributeValueMemberS{
 				Value: pk,
@@ -239,19 +251,23 @@ func (c Store) Update(ctx context.Context, tableName string, pk, sk string, ex e
 		UpdateExpression:          ex.Update(),
 	}
 
-	result, err := c.db.UpdateItem(ctx, input)
+	result, err := c.db.UpdateItem(ctx, &input)
 	if err != nil {
-		if errors.Is(err, &types.ProvisionedThroughputExceededException{}) {
+		if apiErr := new(types.ProvisionedThroughputExceededException); errors.As(err, &apiErr) {
 			log.Error("error dynamodb throughput exceeded", err)
-		} else if errors.Is(err, &types.ResourceNotFoundException{}) {
-			log.Error("item not found in dynamodb", err)
-		} else if errors.Is(err, &types.InternalServerError{}) {
+		} else if apiErr := new(types.InternalServerError); errors.As(err, &apiErr) {
 			log.Error("internal server error from dynamodb", err)
 		} else {
-			log.Error("error occurred updating record in dynamodb", err)
+			log.Error("error getting item from dynamodb", err)
 		}
 
-		return fmt.Errorf("error updating item to %s store %w", tableName, err)
+		return fmt.Errorf("error returned from dynamodb %w", err)
+	}
+
+	if result == nil {
+		log.Error("nil results returned")
+
+		return fmt.Errorf("nil results returned")
 	}
 
 	err = attributevalue.UnmarshalMap(result.Attributes, &i)

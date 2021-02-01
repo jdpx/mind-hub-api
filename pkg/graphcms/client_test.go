@@ -42,8 +42,9 @@ func TestClientRun(t *testing.T) {
 	for _, tt := range testCases {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			clientMock := graphcmsmocks.NewMockRequester(ctrl)
+			defer ctrl.Finish()
 
+			clientMock := graphcmsmocks.NewMockRequester(ctrl)
 			if tt.clientExpectations != nil {
 				tt.clientExpectations(clientMock)
 			}

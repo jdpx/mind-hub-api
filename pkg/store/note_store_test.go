@@ -1,211 +1,291 @@
 package store_test
 
-// const (
-// 	courseNoteTableName = "course_note"
-// )
+import (
+	"context"
+	"fmt"
+	"testing"
+	"time"
 
-// func TestCourseNotehandlerGet(t *testing.T) {
-// 	cID := fake.CharactersN(10)
-// 	uID := fake.CharactersN(10)
-// 	courseNote := builder.NewCourseNoteBuilder().WithCourseID(cID).WithUserID(uID).Build()
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
+	"github.com/golang/mock/gomock"
+	"github.com/icrowley/fake"
+	"github.com/jdpx/mind-hub-api/pkg/store"
+	"github.com/jdpx/mind-hub-api/pkg/store/builder"
+	storemocks "github.com/jdpx/mind-hub-api/pkg/store/mocks"
+	"github.com/stretchr/testify/assert"
+)
 
-// 	testCases := []struct {
-// 		desc               string
-// 		userID             string
-// 		courseID           string
-// 		clientExpectations func(client *storemocks.MockStorer)
+const (
+	userTableName = "user"
+)
 
-// 		expectedCourseNote *store.CourseNote
-// 		expectedErr        error
-// 	}{
-// 		{
-// 			desc:     "given a courseNote is returned from store, note is returned",
-// 			userID:   uID,
-// 			courseID: cID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"courseID": cID,
-// 					"userID":   uID,
-// 				}
+func TestNoteStoreGet(t *testing.T) {
+	cID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
+	note := builder.NewNoteBuilder().
+		WithEntityID(cID).
+		WithUserID(uID).
+		Build()
 
-// 				client.EXPECT().Get(gomock.Any(), courseNoteTableName, params, gomock.Any()).SetArg(3, courseNote)
-// 			},
+	testCases := []struct {
+		desc               string
+		userID             string
+		courseID           string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 			expectedCourseNote: &courseNote,
-// 		},
-// 		{
-// 			desc:     "given a NotFound error is returned from the store, nil map is returned",
-// 			userID:   uID,
-// 			courseID: cID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"courseID": cID,
-// 					"userID":   uID,
-// 				}
+		expectedCourseNote *store.Note
+		expectedErr        error
+	}{
+		{
+			desc:     "given a note is returned from store, note is returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("NOTE#%s", cID),
+					gomock.Any(),
+				).SetArg(4, note)
+			},
 
-// 				client.EXPECT().Get(gomock.Any(), courseNoteTableName, params, gomock.Any()).Return(store.ErrNotFound)
-// 			},
+			expectedCourseNote: &note,
+		},
+		{
+			desc:     "given a NotFound error is returned from the store, nil map is returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("NOTE#%s", cID),
+					gomock.Any(),
+				).Return(store.ErrNotFound)
+			},
 
-// 			expectedCourseNote: nil,
-// 		},
-// 		{
-// 			desc:     "given a generic error is returned from the store, error returned",
-// 			userID:   uID,
-// 			courseID: cID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"courseID": cID,
-// 					"userID":   uID,
-// 				}
+			expectedCourseNote: nil,
+		},
+		{
+			desc:     "given a generic error is returned from the store, error returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("NOTE#%s", cID),
+					gomock.Any(),
+				).Return(fmt.Errorf("error occurred"))
+			},
 
-// 				client.EXPECT().Get(gomock.Any(), courseNoteTableName, params, gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+			resolver := store.NewNoteStore(clientMock)
+			ctx := context.Background()
 
-// 			resolver := store.NewCourseNoteHandler(clientMock)
-// 			ctx := context.Background()
+			n, err := resolver.Get(ctx, tt.courseID, tt.userID)
 
-// 			n, err := resolver.Get(ctx, tt.courseID, tt.userID)
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedCourseNote, n)
+			}
+		})
+	}
+}
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.Equal(t, tt.expectedCourseNote, n)
-// 			}
-// 		})
-// 	}
-// }
+func TestNoteStoreCreate(t *testing.T) {
+	now := time.Now()
+	nID := fake.CharactersN(10)
+	note := builder.NewNoteBuilder().WithID("").Build()
 
-// func TestCourseNotehandlerCreate(t *testing.T) {
-// 	courseNote := builder.NewCourseNoteBuilder().WithID("").Build()
+	createNote := builder.NewNoteBuilder().
+		WithPK(fmt.Sprintf("USER#%s", note.UserID)).
+		WithSK(fmt.Sprintf("NOTE#%s", note.EntityID)).
+		WithEntityID(note.EntityID).
+		WithUserID(note.UserID).
+		WithValue(note.Value).
+		WithID(nID).
+		WithDateCreated(now).
+		WithDateUpdated(now).
+		Build()
 
-// 	testCases := []struct {
-// 		desc               string
-// 		clientExpectations func(client *storemocks.MockStorer)
+	expectedNote := builder.NewNoteBuilder().
+		WithEntityID(note.EntityID).
+		WithUserID(note.UserID).
+		WithValue(note.Value).
+		WithID(nID).
+		WithDateCreated(now).
+		WithDateUpdated(now).
+		Build()
 
-// 		expectedCourseNote *store.CourseNote
-// 		expectedErr        error
-// 	}{
-// 		{
-// 			desc: "given a note is returned from store, note is returned",
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				client.EXPECT().Put(gomock.Any(), courseNoteTableName, gomock.Any()).Return(nil)
-// 			},
+	testCases := []struct {
+		desc               string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 			expectedCourseNote: &courseNote,
-// 		},
-// 		{
-// 			desc: "given a generic error is returned from the store, error returned",
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				client.EXPECT().Put(gomock.Any(), courseNoteTableName, gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+		expectedNote store.Note
+		expectedErr  error
+	}{
+		{
+			desc: "given create is successful, note is returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), userTableName, createNote).Return(nil)
+			},
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+			expectedNote: expectedNote,
+		},
+		{
+			desc: "given a generic error is returned from the store, error returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), userTableName, gomock.Any()).Return(fmt.Errorf("error occurred"))
+			},
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
 
-// 			resolver := store.NewCourseNoteHandler(clientMock)
-// 			ctx := context.Background()
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
 
-// 			n, err := resolver.Create(ctx, courseNote)
+			gen := func() string {
+				return nID
+			}
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.NotEqual(t, tt.expectedCourseNote.ID, n.ID)
-// 				assert.Equal(t, tt.expectedCourseNote.CourseID, n.CourseID)
-// 				assert.Equal(t, tt.expectedCourseNote.UserID, n.UserID)
-// 				assert.Equal(t, tt.expectedCourseNote.Value, n.Value)
-// 			}
-// 		})
-// 	}
-// }
+			timer := func() time.Time {
+				return now
+			}
 
-// func TestCourseNotehandlerUpdate(t *testing.T) {
-// 	courseNote := builder.NewCourseNoteBuilder().Build()
+			resolver := store.NewNoteStore(clientMock, store.WithIDGenerator(gen), store.WithTimer(timer))
+			ctx := context.Background()
 
-// 	testCases := []struct {
-// 		desc               string
-// 		clientExpectations func(client *storemocks.MockStorer)
+			n, err := resolver.Create(ctx, note)
 
-// 		expectedCourseNote *store.CourseNote
-// 		expectedErr        error
-// 	}{
-// 		{
-// 			desc: "given a note is returned from store, note is returned",
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				keys := map[string]string{
-// 					"courseID": courseNote.CourseID,
-// 					"userID":   courseNote.UserID,
-// 				}
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, &tt.expectedNote, n)
+			}
+		})
+	}
+}
 
-// 				exp := "set info.value = :value"
+func TestNoteStoreUpdate(t *testing.T) {
+	now := time.Now()
+	cID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
+	note := builder.NewNoteBuilder().
+		WithEntityID(cID).
+		WithUserID(uID).
+		Build()
 
-// 				client.EXPECT().Update(gomock.Any(), courseNoteTableName, keys, exp, gomock.Any(), gomock.Any()).SetArg(5, courseNote)
-// 			},
+	expectedNote := builder.NewNoteBuilder().
+		WithEntityID(note.EntityID).
+		WithUserID(note.UserID).
+		WithValue(note.Value).
+		WithID(note.ID).
+		WithDateCreated(now).
+		WithDateUpdated(now).
+		Build()
 
-// 			expectedCourseNote: &courseNote,
-// 		},
-// 		{
-// 			desc: "given a generic error is returned from the store, error returned",
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				keys := map[string]string{
-// 					"courseID": courseNote.CourseID,
-// 					"userID":   courseNote.UserID,
-// 				}
+	testCases := []struct {
+		desc               string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 				exp := "set info.value = :value"
+		expectedNote *store.Note
+		expectedErr  error
+	}{
+		{
+			desc: "given a note is returned from store, note is returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				upBuilder := expression.
+					Set(expression.Name("Value"), expression.Value(note.Value)).
+					Set(expression.Name("DateUpdated"), expression.Value(now))
 
-// 				client.EXPECT().Update(gomock.Any(), courseNoteTableName, keys, exp, gomock.Any(), gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+				client.EXPECT().Update(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("NOTE#%s", cID),
+					expr,
+					gomock.Any(),
+				).SetArg(5, expectedNote)
+			},
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+			expectedNote: &expectedNote,
+		},
+		{
+			desc: "given a generic error is returned from the store, error returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				upBuilder := expression.
+					Set(expression.Name("Value"), expression.Value(note.Value)).
+					Set(expression.Name("DateUpdated"), expression.Value(now))
 
-// 			resolver := store.NewCourseNoteHandler(clientMock)
-// 			ctx := context.Background()
+				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
-// 			n, err := resolver.Update(ctx, courseNote)
+				client.EXPECT().Update(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("NOTE#%s", cID),
+					expr,
+					gomock.Any(),
+				).Return(fmt.Errorf("error occurred"))
+			},
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.Equal(t, tt.expectedCourseNote.ID, n.ID)
-// 				assert.Equal(t, tt.expectedCourseNote.CourseID, n.CourseID)
-// 				assert.Equal(t, tt.expectedCourseNote.UserID, n.UserID)
-// 				assert.Equal(t, tt.expectedCourseNote.Value, n.Value)
-// 			}
-// 		})
-// 	}
-// }
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
+
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
+
+			timer := func() time.Time {
+				return now
+			}
+
+			resolver := store.NewNoteStore(clientMock, store.WithTimer(timer))
+			ctx := context.Background()
+
+			n, err := resolver.Update(ctx, note)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedNote, n)
+				// assert.Equal(t, tt.expectedNote.EntityID, n.EntityID)
+				// assert.Equal(t, tt.expectedNote.UserID, n.UserID)
+				// assert.Equal(t, tt.expectedNote.Value, n.Value)
+				// assert.Equal(t, tt.expectedNote.DateUpdated, now)
+			}
+		})
+	}
+}

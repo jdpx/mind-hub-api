@@ -66,8 +66,8 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	)
 
 	noteStore := store.NewNoteStore(s)
-	progressStore := store.NewProgressStore(s)
-	timemapStore := store.NewTimemapStore(s)
+	progressStore := store.NewProgressStore(s, store.GenerateID)
+	timemapStore := store.NewTimemapStore(s, store.GenerateID)
 
 	courseProgressService := service.NewCourseProgressService(cmsResolver, progressStore)
 	courseService := service.NewCourseService(cmsResolver)

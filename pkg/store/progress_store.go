@@ -1,4 +1,4 @@
-//go:generate mockgen -source=step_progress_store.go -destination=./mocks/step_progress_store.go -package=storemocks
+//go:generate mockgen -source=progress_store.go -destination=./mocks/progress_store.go -package=storemocks
 
 package store
 
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/gofrs/uuid"
 	"github.com/labstack/gommon/log"
 )
 
@@ -23,13 +22,15 @@ type ProgressRepositor interface {
 
 // ProgressStore ...
 type ProgressStore struct {
-	db Storer
+	db          Storer
+	idGenerator IDGenerator
 }
 
-// NewProgressStore ...
-func NewProgressStore(client Storer) ProgressStore {
+// NewNoteStore ...
+func NewProgressStore(client Storer, gen IDGenerator) ProgressStore {
 	return ProgressStore{
-		db: client,
+		db:          client,
+		idGenerator: gen,
 	}
 }
 
@@ -96,20 +97,19 @@ func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ..
 
 // Start ...
 func (c ProgressStore) Start(ctx context.Context, sID, uID string) (*Progress, error) {
-	id, _ := uuid.NewV4()
+	id := c.idGenerator()
 
-	now := time.Now()
 	input := Progress{
 		BaseEntity: BaseEntity{
 			PK: UserPK(uID),
 			SK: ProgressSK(sID),
 		},
 
-		ID:          id.String(),
+		ID:          id,
 		EntityID:    sID,
 		UserID:      uID,
 		State:       STATUS_STARTED,
-		DateStarted: now,
+		DateStarted: time.Now(),
 	}
 
 	err := c.db.Put(ctx, userTableName, input)

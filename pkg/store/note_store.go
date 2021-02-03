@@ -1,13 +1,13 @@
-//go:generate mockgen -source=course_note_store.go -destination=./mocks/course_note_store.go -package=storemocks
+//go:generate mockgen -source=note_store.go -destination=./mocks/note_store.go -package=storemocks
 
 package store
 
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/gofrs/uuid"
 )
 
 const (
@@ -23,13 +23,40 @@ type NoteRepositor interface {
 
 // NoteStore ...
 type NoteStore struct {
-	db Storer
+	db          Storer
+	idGenerator IDGenerator
+	timer       Timer
 }
 
+// ServiceOption ...
+type ServiceOption func(*NoteStore)
+
 // NewNoteStore ...
-func NewNoteStore(client Storer) NoteStore {
-	return NoteStore{
-		db: client,
+func NewNoteStore(client Storer, opts ...ServiceOption) NoteStore {
+	s := NoteStore{
+		db:          client,
+		idGenerator: GenerateID,
+		timer:       time.Now,
+	}
+
+	for _, opt := range opts {
+		opt(&s)
+	}
+
+	return s
+}
+
+// WithIDGenerator ...
+func WithIDGenerator(c IDGenerator) func(*NoteStore) {
+	return func(r *NoteStore) {
+		r.idGenerator = c
+	}
+}
+
+// WithTimer ...
+func WithTimer(c Timer) func(*NoteStore) {
+	return func(r *NoteStore) {
+		r.timer = c
 	}
 }
 
@@ -50,8 +77,10 @@ func (c NoteStore) Get(ctx context.Context, id, uID string) (*Note, error) {
 
 // Create ...
 func (c NoteStore) Create(ctx context.Context, note Note) (*Note, error) {
-	id, _ := uuid.NewV4()
-	note.ID = id.String()
+	id := c.idGenerator()
+	note.ID = id
+	note.DateCreated = c.timer()
+	note.DateUpdated = c.timer()
 
 	note.BaseEntity = BaseEntity{
 		PK: UserPK(note.UserID),
@@ -64,23 +93,20 @@ func (c NoteStore) Create(ctx context.Context, note Note) (*Note, error) {
 	}
 
 	return &Note{
-		ID:       note.ID,
-		EntityID: note.EntityID,
-		UserID:   note.UserID,
-		Value:    note.Value,
+		ID:          note.ID,
+		EntityID:    note.EntityID,
+		UserID:      note.UserID,
+		Value:       note.Value,
+		DateCreated: note.DateCreated,
+		DateUpdated: note.DateUpdated,
 	}, nil
 }
 
 // Update ...
 func (c NoteStore) Update(ctx context.Context, note Note) (*Note, error) {
-	p := Note{
-		ID:       note.ID,
-		EntityID: note.EntityID,
-		UserID:   note.UserID,
-		Value:    note.Value,
-	}
-
-	upBuilder := expression.Set(expression.Name("Value"), expression.Value(note.Value))
+	upBuilder := expression.
+		Set(expression.Name("Value"), expression.Value(note.Value)).
+		Set(expression.Name("DateUpdated"), expression.Value(c.timer()))
 
 	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
 	if err != nil {
@@ -91,6 +117,15 @@ func (c NoteStore) Update(ctx context.Context, note Note) (*Note, error) {
 	err = c.db.Update(ctx, userTableName, UserPK(note.UserID), NoteSK(note.EntityID), expr, &res)
 	if err != nil {
 		return nil, err
+	}
+
+	p := Note{
+		ID:          res.ID,
+		EntityID:    res.EntityID,
+		UserID:      res.UserID,
+		Value:       res.Value,
+		DateCreated: res.DateCreated,
+		DateUpdated: res.DateUpdated,
 	}
 
 	return &p, nil

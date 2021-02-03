@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/gofrs/uuid"
 )
 
 const (
@@ -24,13 +23,15 @@ type TimemapRepositor interface {
 
 // TimemapStore ...
 type TimemapStore struct {
-	db Storer
+	db          Storer
+	idGenerator IDGenerator
 }
 
 // NewTimemapStore ...
-func NewTimemapStore(client Storer) TimemapStore {
+func NewTimemapStore(client Storer, gen IDGenerator) TimemapStore {
 	return TimemapStore{
-		db: client,
+		db:          client,
+		idGenerator: gen,
 	}
 }
 
@@ -51,8 +52,8 @@ func (c TimemapStore) Get(ctx context.Context, uID string) (*Timemap, error) {
 
 // Create ...
 func (c TimemapStore) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
-	id, _ := uuid.NewV4()
-	tm.ID = id.String()
+	id := c.idGenerator()
+	tm.ID = id
 
 	tm.BaseEntity = BaseEntity{
 		PK: UserPK(tm.UserID),

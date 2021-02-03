@@ -43,10 +43,12 @@ type CourseProgress struct {
 // Note ...
 type Note struct {
 	BaseEntity
-	ID       string `json:"id"`
-	EntityID string `json:"entityID"`
-	UserID   string `json:"userID"`
-	Value    string `json:"value"`
+	ID          string    `json:"id"`
+	EntityID    string    `json:"entityID"`
+	UserID      string    `json:"userID"`
+	Value       string    `json:"value"`
+	DateCreated time.Time `json:"dateCreated"`
+	DateUpdated time.Time `json:"dateUpdated"`
 }
 
 // Progress ...

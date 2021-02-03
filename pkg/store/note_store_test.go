@@ -33,8 +33,8 @@ func TestNoteStoreGet(t *testing.T) {
 		courseID           string
 		clientExpectations func(client *storemocks.MockStorer)
 
-		expectedCourseNote *store.Note
-		expectedErr        error
+		expectedNote *store.Note
+		expectedErr  error
 	}{
 		{
 			desc:     "given a note is returned from store, note is returned",
@@ -50,7 +50,7 @@ func TestNoteStoreGet(t *testing.T) {
 				).SetArg(4, note)
 			},
 
-			expectedCourseNote: &note,
+			expectedNote: &note,
 		},
 		{
 			desc:     "given a NotFound error is returned from the store, nil map is returned",
@@ -66,7 +66,7 @@ func TestNoteStoreGet(t *testing.T) {
 				).Return(store.ErrNotFound)
 			},
 
-			expectedCourseNote: nil,
+			expectedNote: nil,
 		},
 		{
 			desc:     "given a generic error is returned from the store, error returned",
@@ -103,7 +103,7 @@ func TestNoteStoreGet(t *testing.T) {
 				assert.EqualError(t, err, tt.expectedErr.Error())
 			} else {
 				assert.Nil(t, err)
-				assert.Equal(t, tt.expectedCourseNote, n)
+				assert.Equal(t, tt.expectedNote, n)
 			}
 		})
 	}
@@ -175,7 +175,7 @@ func TestNoteStoreCreate(t *testing.T) {
 				return now
 			}
 
-			resolver := store.NewNoteStore(clientMock, store.WithIDGenerator(gen), store.WithTimer(timer))
+			resolver := store.NewNoteStore(clientMock, store.WithNoteIDGenerator(gen), store.WithNoteTimer(timer))
 			ctx := context.Background()
 
 			n, err := resolver.Create(ctx, note)
@@ -219,8 +219,8 @@ func TestNoteStoreUpdate(t *testing.T) {
 			desc: "given a note is returned from store, note is returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
-					Set(expression.Name("Value"), expression.Value(note.Value)).
-					Set(expression.Name("DateUpdated"), expression.Value(now))
+					Set(expression.Name("value"), expression.Value(note.Value)).
+					Set(expression.Name("dateUpdated"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
@@ -240,8 +240,8 @@ func TestNoteStoreUpdate(t *testing.T) {
 			desc: "given a generic error is returned from the store, error returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
-					Set(expression.Name("Value"), expression.Value(note.Value)).
-					Set(expression.Name("DateUpdated"), expression.Value(now))
+					Set(expression.Name("value"), expression.Value(note.Value)).
+					Set(expression.Name("dateUpdated"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
@@ -271,7 +271,7 @@ func TestNoteStoreUpdate(t *testing.T) {
 				return now
 			}
 
-			resolver := store.NewNoteStore(clientMock, store.WithTimer(timer))
+			resolver := store.NewNoteStore(clientMock, store.WithNoteTimer(timer))
 			ctx := context.Background()
 
 			n, err := resolver.Update(ctx, note)
@@ -281,10 +281,6 @@ func TestNoteStoreUpdate(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.expectedNote, n)
-				// assert.Equal(t, tt.expectedNote.EntityID, n.EntityID)
-				// assert.Equal(t, tt.expectedNote.UserID, n.UserID)
-				// assert.Equal(t, tt.expectedNote.Value, n.Value)
-				// assert.Equal(t, tt.expectedNote.DateUpdated, now)
 			}
 		})
 	}

@@ -10,10 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 )
 
-const (
-	timemapTableName = "user"
-)
-
 // TimemapRepositor ...
 type TimemapRepositor interface {
 	Get(ctx context.Context, uID string) (*Timemap, error)
@@ -21,17 +17,42 @@ type TimemapRepositor interface {
 	Update(ctx context.Context, tm *Timemap) (*Timemap, error)
 }
 
+// TimemapStoreOption ...
+type TimemapStoreOption func(*TimemapStore)
+
 // TimemapStore ...
 type TimemapStore struct {
 	db          Storer
 	idGenerator IDGenerator
+	timer       Timer
 }
 
 // NewTimemapStore ...
-func NewTimemapStore(client Storer, gen IDGenerator) TimemapStore {
-	return TimemapStore{
+func NewTimemapStore(client Storer, opts ...TimemapStoreOption) TimemapStore {
+	s := TimemapStore{
 		db:          client,
-		idGenerator: gen,
+		idGenerator: GenerateID,
+		timer:       time.Now,
+	}
+
+	for _, opt := range opts {
+		opt(&s)
+	}
+
+	return s
+}
+
+// WithTimemapIDGenerator ...
+func WithTimemapIDGenerator(c IDGenerator) func(*TimemapStore) {
+	return func(r *TimemapStore) {
+		r.idGenerator = c
+	}
+}
+
+// WithTimemapTimer ...
+func WithTimemapTimer(c Timer) func(*TimemapStore) {
+	return func(r *TimemapStore) {
+		r.timer = c
 	}
 }
 
@@ -52,43 +73,35 @@ func (c TimemapStore) Get(ctx context.Context, uID string) (*Timemap, error) {
 
 // Create ...
 func (c TimemapStore) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
-	id := c.idGenerator()
-	tm.ID = id
+	tm.ID = c.idGenerator()
+	tm.DateUpdated = c.timer()
 
 	tm.BaseEntity = BaseEntity{
 		PK: UserPK(tm.UserID),
 		SK: TimemapSK(),
 	}
 
-	err := c.db.Put(ctx, timemapTableName, tm)
+	err := c.db.Put(ctx, userTableName, tm)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Timemap{
-		ID:        tm.ID,
-		UserID:    tm.UserID,
-		Map:       tm.Map,
-		UpdatedAt: tm.UpdatedAt,
+		ID:          tm.ID,
+		UserID:      tm.UserID,
+		Map:         tm.Map,
+		DateUpdated: tm.DateUpdated,
 	}, nil
 }
 
 // Update ...
 func (c TimemapStore) Update(ctx context.Context, tm *Timemap) (*Timemap, error) {
-	now := time.Now()
-
-	p := Timemap{
-		ID:        tm.ID,
-		Map:       tm.Map,
-		UpdatedAt: now,
-	}
-
 	upBuilder := expression.Set(
 		expression.Name("map"),
 		expression.Value(tm.Map),
 	).Set(
-		expression.Name("updatedAt"),
-		expression.Value(now),
+		expression.Name("dateUpdated"),
+		expression.Value(c.timer()),
 	)
 
 	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
@@ -97,10 +110,15 @@ func (c TimemapStore) Update(ctx context.Context, tm *Timemap) (*Timemap, error)
 	}
 
 	res := Timemap{}
-	err = c.db.Update(ctx, timemapTableName, UserPK(tm.UserID), TimemapSK(), expr, &res)
+	err = c.db.Update(ctx, userTableName, UserPK(tm.UserID), TimemapSK(), expr, &res)
 	if err != nil {
 		return nil, err
 	}
 
-	return &p, nil
+	return &Timemap{
+		ID:          res.ID,
+		UserID:      res.UserID,
+		Map:         res.Map,
+		DateUpdated: res.DateUpdated,
+	}, nil
 }

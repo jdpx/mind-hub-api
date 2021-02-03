@@ -28,11 +28,11 @@ type NoteStore struct {
 	timer       Timer
 }
 
-// ServiceOption ...
-type ServiceOption func(*NoteStore)
+// NoteStoreOption ...
+type NoteStoreOption func(*NoteStore)
 
 // NewNoteStore ...
-func NewNoteStore(client Storer, opts ...ServiceOption) NoteStore {
+func NewNoteStore(client Storer, opts ...NoteStoreOption) NoteStore {
 	s := NoteStore{
 		db:          client,
 		idGenerator: GenerateID,
@@ -46,18 +46,26 @@ func NewNoteStore(client Storer, opts ...ServiceOption) NoteStore {
 	return s
 }
 
-// WithIDGenerator ...
-func WithIDGenerator(c IDGenerator) func(*NoteStore) {
+// WithNoteIDGenerator ...
+func WithNoteIDGenerator(c IDGenerator) func(*NoteStore) {
 	return func(r *NoteStore) {
 		r.idGenerator = c
 	}
 }
 
-// WithTimer ...
-func WithTimer(c Timer) func(*NoteStore) {
+// WithNoteTimer ...
+func WithNoteTimer(c Timer) func(*NoteStore) {
 	return func(r *NoteStore) {
 		r.timer = c
 	}
+}
+
+func (c NoteStore) SetIDGenerator(g IDGenerator) {
+	c.idGenerator = g
+}
+
+func (c NoteStore) SetTimer(t Timer) {
+	c.timer = t
 }
 
 // Get ...
@@ -105,8 +113,8 @@ func (c NoteStore) Create(ctx context.Context, note Note) (*Note, error) {
 // Update ...
 func (c NoteStore) Update(ctx context.Context, note Note) (*Note, error) {
 	upBuilder := expression.
-		Set(expression.Name("Value"), expression.Value(note.Value)).
-		Set(expression.Name("DateUpdated"), expression.Value(c.timer()))
+		Set(expression.Name("value"), expression.Value(note.Value)).
+		Set(expression.Name("dateUpdated"), expression.Value(c.timer()))
 
 	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
 	if err != nil {

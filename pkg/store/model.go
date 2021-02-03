@@ -74,8 +74,8 @@ type StepNote struct {
 // Timemap ...
 type Timemap struct {
 	BaseEntity
-	ID        string    `json:"id"`
-	UserID    string    `json:"userID"`
-	Map       string    `json:"map"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID          string    `json:"id"`
+	UserID      string    `json:"userID"`
+	Map         string    `json:"map"`
+	DateUpdated time.Time `json:"dateUpdated"`
 }

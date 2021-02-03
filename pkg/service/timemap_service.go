@@ -51,7 +51,7 @@ func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
 		ID:        timemap.ID,
 		UserID:    timemap.UserID,
 		Map:       timemap.Map,
-		UpdatedAt: timemap.UpdatedAt,
+		UpdatedAt: timemap.DateUpdated,
 	}, nil
 }
 
@@ -98,6 +98,6 @@ func (s TimemapService) Update(ctx context.Context, uID, value string) (*Timemap
 		ID:        timemap.ID,
 		UserID:    timemap.UserID,
 		Map:       timemap.Map,
-		UpdatedAt: timemap.UpdatedAt,
+		UpdatedAt: timemap.DateUpdated,
 	}, nil
 }

@@ -14,30 +14,55 @@ import (
 
 // ProgressRepositor ...
 type ProgressRepositor interface {
-	Get(ctx context.Context, sID, uID string) (*Progress, error)
+	Get(ctx context.Context, eID, uID string) (*Progress, error)
 	GetCompletedByIDs(ctx context.Context, uID string, ids ...string) ([]*Progress, error)
-	Start(ctx context.Context, sID, uID string) (*Progress, error)
-	Complete(ctx context.Context, sID, uID string) (*Progress, error)
+	Start(ctx context.Context, eID, uID string) (*Progress, error)
+	Complete(ctx context.Context, eID, uID string) (*Progress, error)
 }
+
+// ProgressStoreOption ...
+type ProgressStoreOption func(*ProgressStore)
 
 // ProgressStore ...
 type ProgressStore struct {
 	db          Storer
 	idGenerator IDGenerator
+	timer       Timer
 }
 
 // NewNoteStore ...
-func NewProgressStore(client Storer, gen IDGenerator) ProgressStore {
-	return ProgressStore{
+func NewProgressStore(client Storer, opts ...ProgressStoreOption) ProgressStore {
+	s := ProgressStore{
 		db:          client,
-		idGenerator: gen,
+		idGenerator: GenerateID,
+		timer:       time.Now,
+	}
+
+	for _, opt := range opts {
+		opt(&s)
+	}
+
+	return s
+}
+
+// WithProgressIDGenerator ...
+func WithProgressIDGenerator(c IDGenerator) func(*ProgressStore) {
+	return func(r *ProgressStore) {
+		r.idGenerator = c
+	}
+}
+
+// WithProgressTimer ...
+func WithProgressTimer(c Timer) func(*ProgressStore) {
+	return func(r *ProgressStore) {
+		r.timer = c
 	}
 }
 
 // Get ...
-func (c ProgressStore) Get(ctx context.Context, sID, uID string) (*Progress, error) {
+func (c ProgressStore) Get(ctx context.Context, eID, uID string) (*Progress, error) {
 	res := Progress{}
-	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(sID), &res)
+	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(eID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil, nil
@@ -96,41 +121,46 @@ func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ..
 }
 
 // Start ...
-func (c ProgressStore) Start(ctx context.Context, sID, uID string) (*Progress, error) {
+func (c ProgressStore) Start(ctx context.Context, eID, uID string) (*Progress, error) {
 	id := c.idGenerator()
 
 	input := Progress{
 		BaseEntity: BaseEntity{
 			PK: UserPK(uID),
-			SK: ProgressSK(sID),
+			SK: ProgressSK(eID),
 		},
 
 		ID:          id,
-		EntityID:    sID,
+		EntityID:    eID,
 		UserID:      uID,
 		State:       STATUS_STARTED,
-		DateStarted: time.Now(),
+		DateStarted: c.timer(),
 	}
 
 	err := c.db.Put(ctx, userTableName, input)
 	if err != nil {
-		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
+		log.Error(fmt.Sprintf("error completing Step %s in store", eID), err)
 		return nil, err
 	}
 
-	return &input, nil
+	return &Progress{
+		ID:          id,
+		EntityID:    eID,
+		UserID:      uID,
+		State:       STATUS_STARTED,
+		DateStarted: c.timer(),
+	}, nil
 }
 
 // Complete ...
-func (c ProgressStore) Complete(ctx context.Context, sID, uID string) (*Progress, error) {
-	now := time.Now()
+func (c ProgressStore) Complete(ctx context.Context, eID, uID string) (*Progress, error) {
 	builder := expression.NewBuilder()
 
 	upBuilder := expression.Set(
-		expression.Name("DateCompleted"),
-		expression.Value(now),
+		expression.Name("dateCompleted"),
+		expression.Value(c.timer()),
 	).Set(
-		expression.Name("State"),
+		expression.Name("state"),
 		expression.Value(STATUS_COMPLETED),
 	)
 
@@ -142,12 +172,18 @@ func (c ProgressStore) Complete(ctx context.Context, sID, uID string) (*Progress
 	}
 
 	res := Progress{}
-	err = c.db.Update(ctx, userTableName, UserPK(uID), ProgressSK(sID), expr, &res)
+	err = c.db.Update(ctx, userTableName, UserPK(uID), ProgressSK(eID), expr, &res)
 	if err != nil {
-		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
+		log.Error(fmt.Sprintf("error completing Step %s in store", eID), err)
 
 		return nil, err
 	}
 
-	return &res, nil
+	return &Progress{
+		ID:          res.ID,
+		EntityID:    res.EntityID,
+		UserID:      res.UserID,
+		State:       res.State,
+		DateStarted: res.DateStarted,
+	}, nil
 }

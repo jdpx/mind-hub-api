@@ -1,228 +1,280 @@
 package store_test
 
+import (
+	"context"
+	"fmt"
+	"testing"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
+	"github.com/golang/mock/gomock"
+	"github.com/icrowley/fake"
+	"github.com/jdpx/mind-hub-api/pkg/store"
+	"github.com/jdpx/mind-hub-api/pkg/store/builder"
+	storemocks "github.com/jdpx/mind-hub-api/pkg/store/mocks"
+	"github.com/stretchr/testify/assert"
+)
+
 // const (
 // 	stepProgressTableName = "step_progress"
 // )
 
-// func TestStepProgresshandlerGet(t *testing.T) {
-// 	sID := fake.CharactersN(10)
-// 	uID := fake.CharactersN(10)
-// 	stepProgress := builder.NewStepProgressBuilder().WithStepID(sID).WithUserID(uID).Build()
+func TestProgressStoreGet(t *testing.T) {
+	cID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
+	progress := builder.NewProgressBuilder().
+		WithEntityID(cID).
+		WithUserID(uID).
+		Build()
 
-// 	testCases := []struct {
-// 		desc               string
-// 		userID             string
-// 		stepID             string
-// 		clientExpectations func(client *storemocks.MockStorer)
+	testCases := []struct {
+		desc               string
+		userID             string
+		courseID           string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 		expectedStepProgress *store.StepProgress
-// 		expectedErr          error
-// 	}{
-// 		{
-// 			desc:   "given a stepProgress is returned from store, progress is returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"stepID": sID,
-// 					"userID": uID,
-// 				}
+		expectedProgress *store.Progress
+		expectedErr      error
+	}{
+		{
+			desc:     "given a progress is returned from store, progress is returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("PROGRESS#%s", cID),
+					gomock.Any(),
+				).SetArg(4, progress)
+			},
 
-// 				client.EXPECT().Get(gomock.Any(), stepProgressTableName, params, gomock.Any()).SetArg(3, stepProgress)
-// 			},
+			expectedProgress: &progress,
+		},
+		{
+			desc:     "given a NotFound error is returned from the store, nil map is returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("PROGRESS#%s", cID),
+					gomock.Any(),
+				).Return(store.ErrNotFound)
+			},
 
-// 			expectedStepProgress: &stepProgress,
-// 		},
-// 		{
-// 			desc:   "given a NotFound error is returned from the store, nil map is returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"stepID": sID,
-// 					"userID": uID,
-// 				}
+			expectedProgress: nil,
+		},
+		{
+			desc:     "given a generic error is returned from the store, error returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Get(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("PROGRESS#%s", cID),
+					gomock.Any(),
+				).Return(fmt.Errorf("error occurred"))
+			},
 
-// 				client.EXPECT().Get(gomock.Any(), stepProgressTableName, params, gomock.Any()).Return(store.ErrNotFound)
-// 			},
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
 
-// 			expectedStepProgress: nil,
-// 		},
-// 		{
-// 			desc:   "given a generic error is returned from the store, error returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				params := map[string]string{
-// 					"stepID": sID,
-// 					"userID": uID,
-// 				}
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
 
-// 				client.EXPECT().Get(gomock.Any(), stepProgressTableName, params, gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+			resolver := store.NewProgressStore(clientMock)
+			ctx := context.Background()
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+			n, err := resolver.Get(ctx, tt.courseID, tt.userID)
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedProgress, n)
+			}
+		})
+	}
+}
 
-// 			resolver := store.NewStepProgressHandler(clientMock)
-// 			ctx := context.Background()
+func TestProgressStoreCreate(t *testing.T) {
+	now := time.Now()
+	id := fake.CharactersN(10)
+	eID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
 
-// 			n, err := resolver.Get(ctx, tt.stepID, tt.userID)
+	progress := builder.NewProgressBuilder().
+		WithPK(fmt.Sprintf("USER#%s", uID)).
+		WithSK(fmt.Sprintf("PROGRESS#%s", eID)).
+		WithID(id).
+		WithEntityID(eID).
+		WithUserID(uID).
+		WithDateStarted(now).
+		Build()
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.Equal(t, tt.expectedStepProgress, n)
-// 			}
-// 		})
-// 	}
-// }
+	expectedProgress := builder.NewProgressBuilder().
+		WithID(id).
+		WithEntityID(eID).
+		WithUserID(uID).
+		WithDateStarted(now).
+		Build()
 
-// func TestStepProgresshandlerStart(t *testing.T) {
-// 	sID := fake.CharactersN(10)
-// 	uID := fake.CharactersN(10)
-// 	stepProgress := builder.NewStepProgressBuilder().WithStepID(sID).WithUserID(uID).Build()
+	testCases := []struct {
+		desc               string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 	testCases := []struct {
-// 		desc               string
-// 		userID             string
-// 		stepID             string
-// 		clientExpectations func(client *storemocks.MockStorer)
+		expectedProgress store.Progress
+		expectedErr      error
+	}{
+		{
+			desc: "given create is successful, progress is returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), userTableName, progress).Return(nil)
+			},
 
-// 		expectedStepProgress *store.StepProgress
-// 		expectedErr          error
-// 	}{
-// 		{
-// 			desc:   "given a progress is returned from store, started progress is returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				client.EXPECT().Put(gomock.Any(), stepProgressTableName, gomock.Any()).Return(nil)
-// 			},
+			expectedProgress: expectedProgress,
+		},
+		{
+			desc: "given a generic error is returned from the store, error returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().Put(gomock.Any(), userTableName, gomock.Any()).Return(fmt.Errorf("error occurred"))
+			},
 
-// 			expectedStepProgress: &stepProgress,
-// 		},
-// 		{
-// 			desc:   "given a generic error is returned from the store, error returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				client.EXPECT().Put(gomock.Any(), stepProgressTableName, gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+			gen := func() string {
+				return id
+			}
 
-// 			resolver := store.NewStepProgressHandler(clientMock)
-// 			ctx := context.Background()
+			timer := func() time.Time {
+				return now
+			}
 
-// 			n, err := resolver.Start(ctx, tt.stepID, tt.userID)
+			resolver := store.NewProgressStore(clientMock, store.WithProgressIDGenerator(gen), store.WithProgressTimer(timer))
+			ctx := context.Background()
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.NotEqual(t, tt.expectedStepProgress.ID, n.ID)
-// 				assert.Equal(t, tt.expectedStepProgress.StepID, n.StepID)
-// 				assert.Equal(t, tt.expectedStepProgress.UserID, n.UserID)
-// 				assert.Equal(t, store.STATUS_STARTED, n.State)
-// 			}
-// 		})
-// 	}
-// }
+			n, err := resolver.Start(ctx, eID, uID)
 
-// func TestStepProgresshandlerCompleted(t *testing.T) {
-// 	sID := fake.CharactersN(10)
-// 	uID := fake.CharactersN(10)
-// 	stepProgress := builder.NewStepProgressBuilder().WithStepID(sID).WithUserID(uID).Build()
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, &tt.expectedProgress, n)
+			}
+		})
+	}
+}
 
-// 	testCases := []struct {
-// 		desc               string
-// 		userID             string
-// 		stepID             string
-// 		clientExpectations func(client *storemocks.MockStorer)
+func TestProgressStoreUpdate(t *testing.T) {
+	now := time.Now()
+	id := fake.CharactersN(10)
+	eID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
 
-// 		expectedStepProgress *store.StepProgress
-// 		expectedErr          error
-// 	}{
-// 		{
-// 			desc:   "given a progress is returned from store, started progress is returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				keys := map[string]string{
-// 					"stepID": stepProgress.StepID,
-// 					"userID": stepProgress.UserID,
-// 				}
+	expectedProgress := builder.NewProgressBuilder().
+		WithID(id).
+		WithEntityID(eID).
+		WithUserID(uID).
+		WithDateStarted(now).
+		Completed().
+		Build()
 
-// 				expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
+	testCases := []struct {
+		desc               string
+		clientExpectations func(client *storemocks.MockStorer)
 
-// 				completedProgress := builder.NewStepProgressBuilder().WithStepID(sID).WithUserID(uID).Completed().Build()
-// 				client.EXPECT().Update(gomock.Any(), stepProgressTableName, keys, expression, gomock.Any(), gomock.Any()).SetArg(5, completedProgress)
-// 			},
+		expectedProgress *store.Progress
+		expectedErr      error
+	}{
+		{
+			desc: "given a progress is returned from store, progress is returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				upBuilder := expression.
+					Set(expression.Name("dateCompleted"), expression.Value(now)).
+					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED))
 
-// 			expectedStepProgress: &stepProgress,
-// 		},
-// 		{
-// 			desc:   "given a generic error is returned from the store, error returned",
-// 			userID: uID,
-// 			stepID: sID,
-// 			clientExpectations: func(client *storemocks.MockStorer) {
-// 				keys := map[string]string{
-// 					"stepID": stepProgress.StepID,
-// 					"userID": stepProgress.UserID,
-// 				}
+				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
-// 				expression := "SET dateCompleted = :dateCompleted, progressState = :progressState"
+				client.EXPECT().Update(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("PROGRESS#%s", eID),
+					expr,
+					gomock.Any(),
+				).SetArg(5, expectedProgress)
+			},
 
-// 				client.EXPECT().Update(gomock.Any(), stepProgressTableName, keys, expression, gomock.Any(), gomock.Any()).Return(fmt.Errorf("error occurred"))
-// 			},
+			expectedProgress: &expectedProgress,
+		},
+		{
+			desc: "given a generic error is returned from the store, error returned",
+			clientExpectations: func(client *storemocks.MockStorer) {
+				upBuilder := expression.
+					Set(expression.Name("dateCompleted"), expression.Value(now)).
+					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED))
 
-// 			expectedErr: fmt.Errorf("error occurred"),
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.desc, func(t *testing.T) {
-// 			ctrl := gomock.NewController(t)
-// 			clientMock := storemocks.NewMockStorer(ctrl)
+				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
-// 			if tt.clientExpectations != nil {
-// 				tt.clientExpectations(clientMock)
-// 			}
+				client.EXPECT().Update(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					fmt.Sprintf("PROGRESS#%s", eID),
+					expr,
+					gomock.Any(),
+				).Return(fmt.Errorf("error occurred"))
+			},
 
-// 			resolver := store.NewStepProgressHandler(clientMock)
-// 			ctx := context.Background()
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
 
-// 			n, err := resolver.Complete(ctx, tt.stepID, tt.userID)
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
 
-// 			if tt.expectedErr != nil {
-// 				assert.EqualError(t, err, tt.expectedErr.Error())
-// 			} else {
-// 				assert.Nil(t, err)
-// 				assert.NotEqual(t, tt.expectedStepProgress.ID, n.ID)
-// 				assert.Equal(t, tt.expectedStepProgress.StepID, n.StepID)
-// 				assert.Equal(t, tt.expectedStepProgress.UserID, n.UserID)
-// 				assert.Equal(t, store.STATUS_COMPLETED, n.State)
-// 			}
-// 		})
-// 	}
-// }
+			timer := func() time.Time {
+				return now
+			}
+
+			resolver := store.NewProgressStore(clientMock, store.WithProgressTimer(timer))
+			ctx := context.Background()
+
+			n, err := resolver.Complete(ctx, eID, uID)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedProgress, n)
+			}
+		})
+	}
+}

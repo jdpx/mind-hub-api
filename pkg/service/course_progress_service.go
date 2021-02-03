@@ -18,17 +18,15 @@ type CourseProgressServicer interface {
 }
 
 type CourseProgressService struct {
-	graphcms            graphcms.Resolverer
-	courseProgressStore store.CourseProgressRepositor
-	stepProgressStore   store.StepProgressRepositor
+	graphcms      graphcms.Resolverer
+	progressStore store.ProgressRepositor
 }
 
 // NewCourseProgressService ...
-func NewCourseProgressService(c graphcms.Resolverer, cpr store.CourseProgressRepositor, spr store.StepProgressRepositor) *CourseProgressService {
+func NewCourseProgressService(c graphcms.Resolverer, spr store.ProgressRepositor) *CourseProgressService {
 	return &CourseProgressService{
-		graphcms:            c,
-		courseProgressStore: cpr,
-		stepProgressStore:   spr,
+		graphcms:      c,
+		progressStore: spr,
 	}
 }
 
@@ -39,7 +37,7 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 		logging.UserIDKey:   uID,
 	})
 
-	cProgress, err := r.courseProgressStore.Get(ctx, cID, uID)
+	cProgress, err := r.progressStore.Get(ctx, cID, uID)
 	if err != nil {
 		log.Error("error getting course progress from store", err)
 
@@ -53,7 +51,7 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 	}
 
 	p := CourseProgress{
-		// ID:          progress.ID,
+		ID:          cProgress.ID,
 		State:       cProgress.State,
 		DateStarted: cProgress.DateStarted,
 	}
@@ -69,7 +67,7 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 		return &p, nil
 	}
 
-	completedSteps, err := r.stepProgressStore.GetCompletedByStepID(ctx, uID, courseStepIDs...)
+	completedSteps, err := r.progressStore.GetCompletedByIDs(ctx, uID, courseStepIDs...)
 	if err != nil {
 		log.Error("error getting completed steps for course progress from store", err)
 		return nil, fmt.Errorf("error occurred getting course progress3 %w", err)
@@ -87,7 +85,7 @@ func (r CourseProgressService) Start(ctx context.Context, cID, uID string) (*Cou
 		logging.UserIDKey:   uID,
 	})
 
-	sProgress, err := r.courseProgressStore.Start(ctx, cID, uID)
+	sProgress, err := r.progressStore.Start(ctx, cID, uID)
 	if err != nil {
 		log.Error("error starting course progress from store", err)
 
@@ -95,7 +93,7 @@ func (r CourseProgressService) Start(ctx context.Context, cID, uID string) (*Cou
 	}
 
 	p := CourseProgress{
-		// ID:          progress.ID,
+		ID:          sProgress.ID,
 		State:       sProgress.State,
 		DateStarted: sProgress.DateStarted,
 	}

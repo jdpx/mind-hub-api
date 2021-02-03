@@ -518,13 +518,11 @@ func (r *stepResolver) Progress(ctx context.Context, obj *model.Step) (*model.St
 	}
 
 	res := &model.StepProgress{
-		ID:    progress.ID,
-		State: progress.State,
+		ID:          progress.ID,
+		State:       progress.State,
+		DateStarted: progress.DateStarted.String(),
 	}
 
-	if progress.DateStarted != nil {
-		res.DateStarted = progress.DateStarted.String()
-	}
 	if progress.DateCompleted != nil {
 		res.DateCompleted = progress.DateCompleted.String()
 	}

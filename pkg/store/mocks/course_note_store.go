@@ -35,10 +35,10 @@ func (m *MockCourseNoteRepositor) EXPECT() *MockCourseNoteRepositorMockRecorder 
 }
 
 // Get mocks base method
-func (m *MockCourseNoteRepositor) Get(ctx context.Context, cID, uID string) (*store.CourseNote, error) {
+func (m *MockCourseNoteRepositor) Get(ctx context.Context, cID, uID string) (*store.Note, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, cID, uID)
-	ret0, _ := ret[0].(*store.CourseNote)
+	ret0, _ := ret[0].(*store.Note)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockCourseNoteRepositorMockRecorder) Get(ctx, cID, uID interface{}) *g
 }
 
 // Create mocks base method
-func (m *MockCourseNoteRepositor) Create(ctx context.Context, note store.CourseNote) (*store.CourseNote, error) {
+func (m *MockCourseNoteRepositor) Create(ctx context.Context, note store.Note) (*store.Note, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, note)
-	ret0, _ := ret[0].(*store.CourseNote)
+	ret0, _ := ret[0].(*store.Note)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +65,10 @@ func (mr *MockCourseNoteRepositorMockRecorder) Create(ctx, note interface{}) *go
 }
 
 // Update mocks base method
-func (m *MockCourseNoteRepositor) Update(ctx context.Context, note store.CourseNote) (*store.CourseNote, error) {
+func (m *MockCourseNoteRepositor) Update(ctx context.Context, note store.Note) (*store.Note, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, note)
-	ret0, _ := ret[0].(*store.CourseNote)
+	ret0, _ := ret[0].(*store.Note)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

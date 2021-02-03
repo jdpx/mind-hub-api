@@ -7,17 +7,17 @@ import (
 
 // StepProgressBuilder ...
 type StepProgressBuilder struct {
-	progress store.StepProgress
+	progress store.Progress
 }
 
 // NewStepProgressBuilder ...
 func NewStepProgressBuilder() *StepProgressBuilder {
 	return &StepProgressBuilder{
-		progress: store.StepProgress{
-			ID:     fake.CharactersN(10),
-			StepID: fake.CharactersN(10),
-			UserID: fake.CharactersN(10),
-			State:  store.STATUS_STARTED,
+		progress: store.Progress{
+			ID:       fake.CharactersN(10),
+			EntityID: fake.CharactersN(10),
+			UserID:   fake.CharactersN(10),
+			State:    store.STATUS_STARTED,
 		},
 	}
 }
@@ -36,7 +36,7 @@ func (c StepProgressBuilder) WithUserID(id string) StepProgressBuilder {
 
 // WithStepID ...
 func (c StepProgressBuilder) WithStepID(id string) StepProgressBuilder {
-	c.progress.StepID = id
+	c.progress.EntityID = id
 	return c
 }
 
@@ -47,6 +47,6 @@ func (c StepProgressBuilder) Completed() StepProgressBuilder {
 }
 
 // Build ...
-func (c StepProgressBuilder) Build() store.StepProgress {
+func (c StepProgressBuilder) Build() store.Progress {
 	return c.progress
 }

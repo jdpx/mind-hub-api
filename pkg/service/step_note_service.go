@@ -16,11 +16,11 @@ type StepNoteServicer interface {
 }
 
 type StepNoteService struct {
-	store store.StepNoteRepositor
+	store store.NoteRepositor
 }
 
 // NewStepNoteService ...
-func NewStepNoteService(rep store.StepNoteRepositor) *StepNoteService {
+func NewStepNoteService(rep store.NoteRepositor) *StepNoteService {
 	r := &StepNoteService{
 		store: rep,
 	}
@@ -49,7 +49,7 @@ func (s StepNoteService) Get(ctx context.Context, sID, uID string) (*StepNote, e
 
 	return &StepNote{
 		ID:     cn.ID,
-		StepID: cn.StepID,
+		StepID: cn.EntityID,
 		UserID: cn.UserID,
 		Value:  cn.Value,
 	}, nil
@@ -61,16 +61,16 @@ func (s StepNoteService) Update(ctx context.Context, sID, uID, value string) (*S
 		logging.UserIDKey:    uID,
 	})
 
-	m := store.StepNote{
+	m := store.Note{
 		// ID:       *input.ID,
-		StepID: sID,
-		UserID: uID,
-		Value:  value,
+		EntityID: sID,
+		UserID:   uID,
+		Value:    value,
 	}
 
 	cn, err := s.store.Update(ctx, m)
 	if err != nil {
-		log.Error("error occurred updating session note in store", err)
+		log.Error("error occurred updating step note in store", err)
 
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s StepNoteService) Update(ctx context.Context, sID, uID, value string) (*S
 
 	return &StepNote{
 		ID:     cn.ID,
-		StepID: cn.StepID,
+		StepID: cn.EntityID,
 		UserID: cn.UserID,
 		Value:  cn.Value,
 	}, nil

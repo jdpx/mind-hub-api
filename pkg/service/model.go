@@ -69,7 +69,7 @@ type StepProgress struct {
 	StepID        string     `json:"stepID,omitempty"`
 	UserID        string     `json:"userID,omitempty"`
 	State         string     `json:"progressState,omitempty"`
-	DateStarted   *time.Time `json:"dateStarted,omitempty"`
+	DateStarted   time.Time  `json:"dateStarted,omitempty"`
 	DateCompleted *time.Time `json:"dateCompleted,omitempty"`
 }
 

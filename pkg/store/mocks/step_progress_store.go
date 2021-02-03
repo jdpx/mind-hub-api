@@ -35,10 +35,10 @@ func (m *MockStepProgressRepositor) EXPECT() *MockStepProgressRepositorMockRecor
 }
 
 // Get mocks base method
-func (m *MockStepProgressRepositor) Get(ctx context.Context, sID, uID string) (*store.StepProgress, error) {
+func (m *MockStepProgressRepositor) Get(ctx context.Context, sID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, sID, uID)
-	ret0, _ := ret[0].(*store.StepProgress)
+	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,14 +50,14 @@ func (mr *MockStepProgressRepositorMockRecorder) Get(ctx, sID, uID interface{}) 
 }
 
 // GetCompletedByStepID mocks base method
-func (m *MockStepProgressRepositor) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*store.StepProgress, error) {
+func (m *MockStepProgressRepositor) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*store.Progress, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, uID}
 	for _, a := range ids {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetCompletedByStepID", varargs...)
-	ret0, _ := ret[0].([]*store.StepProgress)
+	ret0, _ := ret[0].([]*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -70,10 +70,10 @@ func (mr *MockStepProgressRepositorMockRecorder) GetCompletedByStepID(ctx, uID i
 }
 
 // Start mocks base method
-func (m *MockStepProgressRepositor) Start(ctx context.Context, sID, uID string) (*store.StepProgress, error) {
+func (m *MockStepProgressRepositor) Start(ctx context.Context, sID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Start", ctx, sID, uID)
-	ret0, _ := ret[0].(*store.StepProgress)
+	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -85,10 +85,10 @@ func (mr *MockStepProgressRepositorMockRecorder) Start(ctx, sID, uID interface{}
 }
 
 // Complete mocks base method
-func (m *MockStepProgressRepositor) Complete(ctx context.Context, sID, uID string) (*store.StepProgress, error) {
+func (m *MockStepProgressRepositor) Complete(ctx context.Context, sID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Complete", ctx, sID, uID)
-	ret0, _ := ret[0].(*store.StepProgress)
+	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

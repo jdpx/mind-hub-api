@@ -17,11 +17,11 @@ type StepProgressServicer interface {
 }
 
 type StepProgressService struct {
-	store store.StepProgressRepositor
+	store store.ProgressRepositor
 }
 
 // NewStepProgressService ...
-func NewStepProgressService(s store.StepProgressRepositor) *StepProgressService {
+func NewStepProgressService(s store.ProgressRepositor) *StepProgressService {
 	return &StepProgressService{
 		store: s,
 	}
@@ -48,13 +48,11 @@ func (r StepProgressService) Get(ctx context.Context, sID, uID string) (*StepPro
 	}
 
 	p := StepProgress{
-		// ID:          progress.ID,
-		State: sProgress.State,
+		ID:          sProgress.ID,
+		State:       sProgress.State,
+		DateStarted: sProgress.DateStarted,
 	}
 
-	if sProgress.DateStarted != nil {
-		p.DateStarted = sProgress.DateStarted
-	}
 	if sProgress.DateCompleted != nil {
 		p.DateCompleted = sProgress.DateCompleted
 	}
@@ -77,7 +75,7 @@ func (r StepProgressService) Start(ctx context.Context, sID, uID string) (*StepP
 	}
 
 	p := StepProgress{
-		// ID:          progress.ID,
+		ID:          sProgress.ID,
 		State:       sProgress.State,
 		DateStarted: sProgress.DateStarted,
 	}
@@ -100,7 +98,7 @@ func (r StepProgressService) Complete(ctx context.Context, sID, uID string) (*St
 	}
 
 	p := StepProgress{
-		// ID:          progress.ID,
+		ID:          sProgress.ID,
 		State:       sProgress.State,
 		DateStarted: sProgress.DateStarted,
 	}

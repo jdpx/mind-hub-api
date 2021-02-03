@@ -65,19 +65,17 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 		store.WithDynamoDB(dynamoClient),
 	)
 
-	courseProgressStore := store.NewCourseProgressStore(s)
-	courseNoteStore := store.NewCourseNoteStore(s)
-	stepProgressStore := store.NewStepProgressStore(s)
-	stepNoteStore := store.NewStepNoteStore(s)
+	noteStore := store.NewNoteStore(s)
+	progressStore := store.NewProgressStore(s)
 	timemapStore := store.NewTimemapStore(s)
 
-	courseProgressService := service.NewCourseProgressService(cmsResolver, courseProgressStore, stepProgressStore)
+	courseProgressService := service.NewCourseProgressService(cmsResolver, progressStore)
 	courseService := service.NewCourseService(cmsResolver)
 	sessionService := service.NewSessionService(cmsResolver)
-	courseNoteService := service.NewCourseNoteService(courseNoteStore)
-	stepProgressService := service.NewStepProgressService(stepProgressStore)
+	courseNoteService := service.NewCourseNoteService(noteStore)
+	stepProgressService := service.NewStepProgressService(progressStore)
 	stepService := service.NewStepService(cmsResolver)
-	stepNoteService := service.NewStepNoteService(stepNoteStore)
+	stepNoteService := service.NewStepNoteService(noteStore)
 	timemapService := service.NewTimemapService(timemapStore)
 
 	serv := service.New(

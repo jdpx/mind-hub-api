@@ -40,23 +40,23 @@ type CourseProgress struct {
 	DateStarted time.Time `json:"dateStarted,omitempty"`
 }
 
-// CourseNote ...
-type CourseNote struct {
+// Note ...
+type Note struct {
 	BaseEntity
 	ID       string `json:"id"`
-	CourseID string `json:"courseID"`
+	EntityID string `json:"entityID"`
 	UserID   string `json:"userID"`
 	Value    string `json:"value"`
 }
 
-// StepProgress ...
-type StepProgress struct {
+// Progress ...
+type Progress struct {
 	BaseEntity
 	ID            string     `json:"id,omitempty"`
-	StepID        string     `json:"stepID,omitempty"`
+	EntityID      string     `json:"entityID,omitempty"`
 	UserID        string     `json:"userID,omitempty"`
 	State         string     `json:"progressState,omitempty"`
-	DateStarted   *time.Time `json:"dateStarted,omitempty"`
+	DateStarted   time.Time  `json:"dateStarted,omitempty"`
 	DateCompleted *time.Time `json:"dateCompleted,omitempty"`
 }
 

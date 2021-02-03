@@ -13,33 +13,29 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-const (
-	stepProgressTableName = "user"
-)
-
-// StepProgressRepositor ...
-type StepProgressRepositor interface {
-	Get(ctx context.Context, sID, uID string) (*StepProgress, error)
-	GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error)
-	Start(ctx context.Context, sID, uID string) (*StepProgress, error)
-	Complete(ctx context.Context, sID, uID string) (*StepProgress, error)
+// ProgressRepositor ...
+type ProgressRepositor interface {
+	Get(ctx context.Context, sID, uID string) (*Progress, error)
+	GetCompletedByIDs(ctx context.Context, uID string, ids ...string) ([]*Progress, error)
+	Start(ctx context.Context, sID, uID string) (*Progress, error)
+	Complete(ctx context.Context, sID, uID string) (*Progress, error)
 }
 
-// StepProgressStore ...
-type StepProgressStore struct {
+// ProgressStore ...
+type ProgressStore struct {
 	db Storer
 }
 
-// NewStepProgressStore ...
-func NewStepProgressStore(client Storer) StepProgressStore {
-	return StepProgressStore{
+// NewProgressStore ...
+func NewProgressStore(client Storer) ProgressStore {
+	return ProgressStore{
 		db: client,
 	}
 }
 
 // Get ...
-func (c StepProgressStore) Get(ctx context.Context, sID, uID string) (*StepProgress, error) {
-	res := StepProgress{}
+func (c ProgressStore) Get(ctx context.Context, sID, uID string) (*Progress, error) {
+	res := Progress{}
 	err := c.db.Get(ctx, userTableName, UserPK(uID), ProgressSK(sID), &res)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
@@ -53,9 +49,9 @@ func (c StepProgressStore) Get(ctx context.Context, sID, uID string) (*StepProgr
 	return &res, nil
 }
 
-// GetCompletedByStepID ...
-func (c StepProgressStore) GetCompletedByStepID(ctx context.Context, uID string, ids ...string) ([]*StepProgress, error) {
-	res := []*StepProgress{}
+// GetCompletedByIDs ...
+func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ...string) ([]*Progress, error) {
+	res := []*Progress{}
 
 	return res, nil
 
@@ -99,24 +95,24 @@ func (c StepProgressStore) GetCompletedByStepID(ctx context.Context, uID string,
 }
 
 // Start ...
-func (c StepProgressStore) Start(ctx context.Context, sID, uID string) (*StepProgress, error) {
+func (c ProgressStore) Start(ctx context.Context, sID, uID string) (*Progress, error) {
 	id, _ := uuid.NewV4()
 
 	now := time.Now()
-	input := StepProgress{
+	input := Progress{
 		BaseEntity: BaseEntity{
 			PK: UserPK(uID),
 			SK: ProgressSK(sID),
 		},
 
 		ID:          id.String(),
-		StepID:      sID,
+		EntityID:    sID,
 		UserID:      uID,
 		State:       STATUS_STARTED,
-		DateStarted: &now,
+		DateStarted: now,
 	}
 
-	err := c.db.Put(ctx, stepProgressTableName, input)
+	err := c.db.Put(ctx, userTableName, input)
 	if err != nil {
 		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
 		return nil, err
@@ -126,7 +122,7 @@ func (c StepProgressStore) Start(ctx context.Context, sID, uID string) (*StepPro
 }
 
 // Complete ...
-func (c StepProgressStore) Complete(ctx context.Context, sID, uID string) (*StepProgress, error) {
+func (c ProgressStore) Complete(ctx context.Context, sID, uID string) (*Progress, error) {
 	now := time.Now()
 	builder := expression.NewBuilder()
 
@@ -145,8 +141,8 @@ func (c StepProgressStore) Complete(ctx context.Context, sID, uID string) (*Step
 		return nil, fmt.Errorf("error creating complete step expression %w", err)
 	}
 
-	res := StepProgress{}
-	err = c.db.Update(ctx, stepProgressTableName, UserPK(uID), ProgressSK(sID), expr, &res)
+	res := Progress{}
+	err = c.db.Update(ctx, userTableName, UserPK(uID), ProgressSK(sID), expr, &res)
 	if err != nil {
 		log.Error(fmt.Sprintf("error completing Step %s in store", sID), err)
 

@@ -7,15 +7,15 @@ import (
 
 // CourseNoteBuilder ...
 type CourseNoteBuilder struct {
-	note store.CourseNote
+	note store.Note
 }
 
 // NewCourseNoteBuilder ...
 func NewCourseNoteBuilder() *CourseNoteBuilder {
 	return &CourseNoteBuilder{
-		note: store.CourseNote{
+		note: store.Note{
 			ID:       fake.CharactersN(10),
-			CourseID: fake.CharactersN(10),
+			EntityID: fake.CharactersN(10),
 			UserID:   fake.CharactersN(10),
 			Value:    fake.Sentences(),
 		},
@@ -34,9 +34,9 @@ func (c CourseNoteBuilder) WithUserID(id string) CourseNoteBuilder {
 	return c
 }
 
-// WithCourseID ...
-func (c CourseNoteBuilder) WithCourseID(id string) CourseNoteBuilder {
-	c.note.CourseID = id
+// WithEntityID ...
+func (c CourseNoteBuilder) WithEntityID(id string) CourseNoteBuilder {
+	c.note.EntityID = id
 	return c
 }
 
@@ -47,6 +47,6 @@ func (c CourseNoteBuilder) WithValue(t string) CourseNoteBuilder {
 }
 
 // Build ...
-func (c CourseNoteBuilder) Build() store.CourseNote {
+func (c CourseNoteBuilder) Build() store.Note {
 	return c.note
 }

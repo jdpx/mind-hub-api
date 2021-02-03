@@ -16,11 +16,11 @@ type CourseNoteServicer interface {
 }
 
 type CourseNoteService struct {
-	store store.CourseNoteRepositor
+	store store.NoteRepositor
 }
 
 // NewCourseNoteService ...
-func NewCourseNoteService(rep store.CourseNoteRepositor) *CourseNoteService {
+func NewCourseNoteService(rep store.NoteRepositor) *CourseNoteService {
 	r := &CourseNoteService{
 		store: rep,
 	}
@@ -49,7 +49,7 @@ func (s CourseNoteService) Get(ctx context.Context, cID, uID string) (*CourseNot
 
 	return &CourseNote{
 		ID:       cn.ID,
-		CourseID: cn.CourseID,
+		CourseID: cn.EntityID,
 		UserID:   cn.UserID,
 		Value:    cn.Value,
 	}, nil
@@ -61,9 +61,8 @@ func (s CourseNoteService) Update(ctx context.Context, cID, uID, value string) (
 		logging.UserIDKey:   uID,
 	})
 
-	m := store.CourseNote{
-		// ID:       *input.ID,
-		CourseID: cID,
+	m := store.Note{
+		EntityID: cID,
 		UserID:   uID,
 		Value:    value,
 	}
@@ -86,7 +85,7 @@ func (s CourseNoteService) Update(ctx context.Context, cID, uID, value string) (
 
 	return &CourseNote{
 		ID:       cn.ID,
-		CourseID: cn.CourseID,
+		CourseID: cn.EntityID,
 		UserID:   cn.UserID,
 		Value:    cn.Value,
 	}, nil

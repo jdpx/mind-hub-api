@@ -101,11 +101,7 @@ resource "aws_iam_role_policy" "mind_hub_api_graphql_api_role_policy" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "${aws_dynamodb_table.mind_hub_api_course_progress.arn}",
-        "${aws_dynamodb_table.mind_hub_api_course_note.arn}",
-        "${aws_dynamodb_table.mind_hub_api_step_progress.arn}",
-        "${aws_dynamodb_table.mind_hub_api_step_note.arn}",
-        "${aws_dynamodb_table.mind_hub_api_timemap.arn}"
+        "${aws_dynamodb_table.mind_hub_api_user_table.arn}"
       ]
     }
   ],

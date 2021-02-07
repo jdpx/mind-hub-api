@@ -36,10 +36,10 @@ linters:
   enable:
     - errcheck
     - govet
-#    - unused
+    - unused
     - gocyclo
     - golint
-#    - varcheck
+    - varcheck
     - structcheck
     - maligned
     - ineffassign

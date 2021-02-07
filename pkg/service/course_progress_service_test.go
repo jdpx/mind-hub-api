@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/icrowley/fake"
-	gBuilder "github.com/jdpx/mind-hub-api/pkg/graphcms/builders"
+	gBuilder "github.com/jdpx/mind-hub-api/pkg/graphcms/builder"
 	graphcmsmocks "github.com/jdpx/mind-hub-api/pkg/graphcms/mocks"
 	"github.com/jdpx/mind-hub-api/pkg/service"
 	"github.com/jdpx/mind-hub-api/pkg/store"

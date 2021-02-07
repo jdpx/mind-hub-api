@@ -149,36 +149,6 @@ func (r *mutationResolver) UpdateCourseNote(ctx context.Context, input model.Upd
 	if err != nil {
 		return nil, err
 	}
-	// var note *store.CourseNote
-
-	// if input.ID == nil {
-	// 	m := store.CourseNote{
-	// 		CourseID: input.CourseID,
-	// 		UserID:   userID,
-	// 		Value:    input.Value,
-	// 	}
-
-	// 	note, err = r.courseNoteHandler.Create(ctx, m)
-	// 	if err != nil {
-	// 		log.Error("An error occurred creating Note", err)
-
-	// 		return nil, err
-	// 	}
-	// } else {
-	// 	m := store.CourseNote{
-	// 		ID:       *input.ID,
-	// 		CourseID: input.CourseID,
-	// 		UserID:   userID,
-	// 		Value:    input.Value,
-	// 	}
-
-	// 	note, err = r.courseNoteHandler.Update(ctx, m)
-	// 	if err != nil {
-	// 		log.Error("An error occurred updating Note", err)
-
-	// 		return nil, err
-	// 	}
-	// }
 
 	return &model.Course{
 		ID:   input.CourseID,
@@ -245,36 +215,6 @@ func (r *mutationResolver) UpdateStepNote(ctx context.Context, input model.Updat
 	if err != nil {
 		return nil, err
 	}
-	// var note *store.StepNote
-
-	// if input.ID == nil {
-	// 	m := store.StepNote{
-	// 		StepID: input.StepID,
-	// 		UserID: userID,
-	// 		Value:  input.Value,
-	// 	}
-
-	// 	note, err = r.stepNoteHandler.Create(ctx, m)
-	// 	if err != nil {
-	// 		log.Error("An error occurred creating Note", err)
-
-	// 		return nil, err
-	// 	}
-	// } else {
-	// 	m := store.StepNote{
-	// 		ID:     *input.ID,
-	// 		StepID: input.StepID,
-	// 		UserID: userID,
-	// 		Value:  input.Value,
-	// 	}
-
-	// 	note, err = r.stepNoteHandler.Update(ctx, m)
-	// 	if err != nil {
-	// 		log.Error("An error occurred updating Note", err)
-
-	// 		return nil, err
-	// 	}
-	// }
 
 	return &model.Step{
 		ID: input.StepID,
@@ -304,29 +244,6 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 
 		return nil, err
 	}
-
-	// if timemap == nil {
-	// 	sTm := store.Timemap{
-	// 		UserID: userID,
-	// 		Map:    input.Map,
-	// 	}
-
-	// 	timemap, err = r.timemapHandler.Create(ctx, sTm)
-	// 	if err != nil {
-	// 		log.Error("An error occurred creating Timemap", err)
-
-	// 		return nil, err
-	// 	}
-	// } else {
-	// 	timemap.Map = input.Map
-
-	// 	timemap, err = r.timemapHandler.Update(ctx, timemap)
-	// 	if err != nil {
-	// 		log.Error("An error occurred updating Timemap", err)
-
-	// 		return nil, err
-	// 	}
-	// }
 
 	return &model.Timemap{
 		Map:       timemap.Map,

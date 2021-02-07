@@ -74,15 +74,6 @@ func (s CourseNoteService) Update(ctx context.Context, cID, uID, value string) (
 		return nil, err
 	}
 
-	// cn, err := s.store.Get(ctx, cID, uID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// if cn == nil {
-	// 	return nil, ErrNotFound
-	// }
-
 	return &CourseNote{
 		ID:       cn.ID,
 		CourseID: cn.EntityID,

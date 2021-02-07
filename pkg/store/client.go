@@ -4,6 +4,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -132,6 +133,9 @@ func (c Store) Query(ctx context.Context, tableName string, ex expression.Expres
 		ExpressionAttributeValues: ex.Values(),
 		TableName:                 aws.String(tableName),
 	}
+
+	b, _ := json.Marshal(queryInput)
+	fmt.Println("4444", string(b))
 
 	result, err := c.db.Query(ctx, &queryInput)
 	if err != nil {

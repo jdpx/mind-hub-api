@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/icrowley/fake"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
-	builder "github.com/jdpx/mind-hub-api/pkg/graphcms/builders"
+	"github.com/jdpx/mind-hub-api/pkg/graphcms/builder"
 	graphcmsmocks "github.com/jdpx/mind-hub-api/pkg/graphcms/mocks"
 	"github.com/stretchr/testify/assert"
 )

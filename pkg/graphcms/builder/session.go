@@ -33,6 +33,18 @@ func (c SessionBuilder) WithTitle(title string) SessionBuilder {
 	return c
 }
 
+// WithCourse ...
+func (c SessionBuilder) WithCourse(course *graphcms.Course) SessionBuilder {
+	c.session.Course = course
+	return c
+}
+
+// WithSteps ...
+func (c SessionBuilder) WithSteps(steps ...*graphcms.Step) SessionBuilder {
+	c.session.Steps = steps
+	return c
+}
+
 // Build ...
 func (c SessionBuilder) Build() graphcms.Session {
 	return c.session

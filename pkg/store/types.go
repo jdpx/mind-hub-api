@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -9,22 +8,6 @@ const (
 	STATUS_STARTED   = "STARTED"
 	STATUS_COMPLETED = "COMPLETED"
 )
-
-func UserPK(id string) string {
-	return fmt.Sprintf("USER#%s", id)
-}
-
-func ProgressSK(id string) string {
-	return fmt.Sprintf("PROGRESS#%s", id)
-}
-
-func NoteSK(id string) string {
-	return fmt.Sprintf("NOTE#%s", id)
-}
-
-func TimemapSK() string {
-	return "TIMEMAP"
-}
 
 type BaseEntity struct {
 	PK string `dynamodbav:"PK"`

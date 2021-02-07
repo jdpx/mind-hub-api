@@ -35,18 +35,18 @@ func (m *MockProgressRepositor) EXPECT() *MockProgressRepositorMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockProgressRepositor) Get(ctx context.Context, sID, uID string) (*store.Progress, error) {
+func (m *MockProgressRepositor) Get(ctx context.Context, eID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, sID, uID)
+	ret := m.ctrl.Call(m, "Get", ctx, eID, uID)
 	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get
-func (mr *MockProgressRepositorMockRecorder) Get(ctx, sID, uID interface{}) *gomock.Call {
+func (mr *MockProgressRepositorMockRecorder) Get(ctx, eID, uID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockProgressRepositor)(nil).Get), ctx, sID, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockProgressRepositor)(nil).Get), ctx, eID, uID)
 }
 
 // GetCompletedByIDs mocks base method
@@ -70,31 +70,31 @@ func (mr *MockProgressRepositorMockRecorder) GetCompletedByIDs(ctx, uID interfac
 }
 
 // Start mocks base method
-func (m *MockProgressRepositor) Start(ctx context.Context, sID, uID string) (*store.Progress, error) {
+func (m *MockProgressRepositor) Start(ctx context.Context, eID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Start", ctx, sID, uID)
+	ret := m.ctrl.Call(m, "Start", ctx, eID, uID)
 	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Start indicates an expected call of Start
-func (mr *MockProgressRepositorMockRecorder) Start(ctx, sID, uID interface{}) *gomock.Call {
+func (mr *MockProgressRepositorMockRecorder) Start(ctx, eID, uID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockProgressRepositor)(nil).Start), ctx, sID, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockProgressRepositor)(nil).Start), ctx, eID, uID)
 }
 
 // Complete mocks base method
-func (m *MockProgressRepositor) Complete(ctx context.Context, sID, uID string) (*store.Progress, error) {
+func (m *MockProgressRepositor) Complete(ctx context.Context, eID, uID string) (*store.Progress, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Complete", ctx, sID, uID)
+	ret := m.ctrl.Call(m, "Complete", ctx, eID, uID)
 	ret0, _ := ret[0].(*store.Progress)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Complete indicates an expected call of Complete
-func (mr *MockProgressRepositorMockRecorder) Complete(ctx, sID, uID interface{}) *gomock.Call {
+func (mr *MockProgressRepositorMockRecorder) Complete(ctx, eID, uID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Complete", reflect.TypeOf((*MockProgressRepositor)(nil).Complete), ctx, sID, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Complete", reflect.TypeOf((*MockProgressRepositor)(nil).Complete), ctx, eID, uID)
 }

@@ -20,7 +20,7 @@ type testStruct struct {
 	Foo string `json:"foo"`
 }
 
-func TestClientGet(t *testing.T) {
+func TestStoreGet(t *testing.T) {
 	tableName := fake.CharactersN(5)
 	pk := fake.CharactersN(10)
 	sk := fake.CharactersN(10)
@@ -197,7 +197,145 @@ func TestClientGet(t *testing.T) {
 	}
 }
 
-func TestClientQuery(t *testing.T) {
+func TestStoreBatchGet(t *testing.T) {
+	tableName := fake.CharactersN(5)
+	pk := fake.CharactersN(10)
+	skOne := fake.CharactersN(10)
+	skTwo := fake.CharactersN(10)
+
+	valueOne := fake.CharactersN(10)
+	valueTwo := fake.CharactersN(10)
+
+	dynInput := dynamodb.BatchGetItemInput{
+		RequestItems: map[string]types.KeysAndAttributes{
+			tableName: {
+				Keys: []map[string]types.AttributeValue{
+					{
+						"PK": &types.AttributeValueMemberS{
+							Value: pk,
+						},
+						"SK": &types.AttributeValueMemberS{
+							Value: skOne,
+						},
+					},
+					{
+						"PK": &types.AttributeValueMemberS{
+							Value: pk,
+						},
+						"SK": &types.AttributeValueMemberS{
+							Value: skTwo,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	testCases := []struct {
+		desc               string
+		clientExpectations func(client *storemocks.MockDynamoDBer)
+
+		expectedStruct []testStruct
+		expectedErr    error
+	}{
+		{
+			desc: "given record is found in store, output struct set",
+			clientExpectations: func(client *storemocks.MockDynamoDBer) {
+
+				result := dynamodb.BatchGetItemOutput{
+					Responses: map[string][]map[string]types.AttributeValue{
+						tableName: {
+							map[string]types.AttributeValue{
+								"foo": &types.AttributeValueMemberS{
+									Value: valueOne,
+								},
+							},
+							map[string]types.AttributeValue{
+								"foo": &types.AttributeValueMemberS{
+									Value: valueTwo,
+								},
+							},
+						},
+					},
+				}
+
+				client.EXPECT().BatchGetItem(gomock.Any(), &dynInput).Return(&result, nil)
+			},
+
+			expectedStruct: []testStruct{
+				{
+					Foo: valueOne,
+				},
+				{
+					Foo: valueTwo,
+				},
+			},
+		},
+		{
+			desc: "given nil result is returned, err returned",
+			clientExpectations: func(client *storemocks.MockDynamoDBer) {
+				client.EXPECT().BatchGetItem(gomock.Any(), &dynInput).Return(nil, nil)
+			},
+
+			expectedErr: fmt.Errorf("nil results returned"),
+		},
+		{
+			desc: "given a ThroughputExeeded error is returned, err returned",
+			clientExpectations: func(client *storemocks.MockDynamoDBer) {
+				client.EXPECT().BatchGetItem(gomock.Any(), &dynInput).Return(nil, &types.ProvisionedThroughputExceededException{
+					Message: aws.String("something went wrong"),
+				})
+			},
+
+			expectedErr: fmt.Errorf("error returned from dynamodb ProvisionedThroughputExceededException: something went wrong"),
+		},
+		{
+			desc: "given a InternalServerError error is returned, err returned",
+			clientExpectations: func(client *storemocks.MockDynamoDBer) {
+				client.EXPECT().BatchGetItem(gomock.Any(), &dynInput).Return(nil, &types.InternalServerError{
+					Message: aws.String("something went wrong"),
+				})
+			},
+
+			expectedErr: fmt.Errorf("error returned from dynamodb InternalServerError: something went wrong"),
+		},
+		{
+			desc: "given an error is returned, err returned",
+			clientExpectations: func(client *storemocks.MockDynamoDBer) {
+				client.EXPECT().BatchGetItem(gomock.Any(), &dynInput).Return(nil, fmt.Errorf("something went wrong"))
+			},
+
+			expectedErr: fmt.Errorf("error returned from dynamodb something went wrong"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			storeMock := storemocks.NewMockDynamoDBer(ctrl)
+
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(storeMock)
+			}
+
+			store := store.NewStore(store.WithDynamoDB(storeMock))
+			ctx := context.Background()
+			m := []testStruct{}
+
+			err := store.BatchGet(ctx, tableName, pk, []string{skOne, skTwo}, &m)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedStruct, m)
+			}
+		})
+	}
+}
+
+func TestStoreQuery(t *testing.T) {
 	tableName := fake.CharactersN(5)
 	value := fake.CharactersN(10)
 
@@ -358,7 +496,7 @@ func TestClientQuery(t *testing.T) {
 	}
 }
 
-func TestClientPut(t *testing.T) {
+func TestStorePut(t *testing.T) {
 	tableName := fake.CharactersN(5)
 	value := fake.CharactersN(10)
 
@@ -443,7 +581,7 @@ func TestClientPut(t *testing.T) {
 	}
 }
 
-func TestClientUpdate(t *testing.T) {
+func TestStoreUpdate(t *testing.T) {
 	tableName := fake.CharactersN(5)
 	pk := fake.CharactersN(10)
 	sk := fake.CharactersN(10)

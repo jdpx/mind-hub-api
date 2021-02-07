@@ -79,45 +79,29 @@ func (c ProgressStore) Get(ctx context.Context, eID, uID string) (*Progress, err
 func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ...string) ([]*Progress, error) {
 	res := []*Progress{}
 
-	return res, nil
+	var progressKeys []string
+	for _, id := range ids {
+		progressKeys = append(progressKeys, ProgressSK(id))
+	}
 
-	// fmt.Println("IDS", ids)
+	err := c.db.BatchGet(ctx, userTableName, UserPK(uID), progressKeys, &res)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil, nil
+		}
 
-	// builder := expression.NewBuilder()
-	// keyCond := expression.Key("PK").Equal(expression.Value(UserPK(uID))).And(expression.Key(""))
+		return nil, err
+	}
 
-	// // for _, id := range ids {
-	// // keyCond2 := expression.Key("SK").Equal(expression.Value(ProgressSK(id)))
+	fP := []*Progress{}
 
-	// builder = builder.WithKeyCondition(keyCond)
-	// // builder = builder.WithKeyCondition(keyCond).WithKeyCondition(keyCond2)
-	// // }
+	for _, p := range res {
+		if p.State == STATUS_COMPLETED {
+			fP = append(fP, p)
+		}
+	}
 
-	// expr, err := builder.Build()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// fmt.Println("44444", expr)
-
-	// err = c.db.Query(ctx, stepProgressTableName, expr, &res)
-	// if err != nil {
-	// 	if errors.Is(err, ErrNotFound) {
-	// 		return nil, nil
-	// 	}
-
-	// 	return nil, err
-	// }
-
-	// fP := []*progressProgress{}
-
-	// for _, p := range res {
-	// 	if p.State == STATUS_COMPLETED {
-	// 		fP = append(fP, p)
-	// 	}
-	// }
-
-	// return fP, nil
+	return fP, nil
 }
 
 // Start ...

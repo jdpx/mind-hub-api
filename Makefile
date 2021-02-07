@@ -14,18 +14,23 @@ install:
 lint:
 	golangci-lint run
 
-.PHONY: validate-terraform
-validate-terraform:
-	cd terraform/providers/aws/$(APP_ENV) && \
-	terraform init && \
-	terraform validate && \
-	terraform $(TERRAFORM_ACTION) $(OPTS)
+.PHONY: build/lambdas
+build/lambdas:
+	mkdir -p dist
+	make $(FUNCTIONS_LAMBDAS)
 
 cmd/lambdas/%/main.go:
 	cd $(subst main.go,,$@) \
 	&& $(GO_BUILD) -o lambda ./.\
 	&& zip ../../../dist/$*.zip lambda \
 	&& rm lambda
+
+.PHONY: validate-terraform
+validate-terraform:
+	cd terraform/providers/aws/$(APP_ENV) && \
+	terraform init && \
+	terraform validate && \
+	terraform $(TERRAFORM_ACTION) $(OPTS)
 
 .PHONY: run/tfsec
 run/tfsec:
@@ -37,11 +42,11 @@ run/api:
 
 .PHONY: run/local-dynamo
 run/local-dynamo:
-	docker-compose up dynamodb-local
+	docker-compose up
 
 .PHONY: run/tests
 run/tests:
-	go test -v ./...
+	go test ./...
 
 .PHONY: run/lint
 run/lint:
@@ -56,7 +61,3 @@ generate/graphql:
 generate/mocks:
 	@go generate ./...
 
-.PHONY: build/lambdas
-build/lambdas:
-	mkdir -p dist
-	make $(FUNCTIONS_LAMBDAS)

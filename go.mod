@@ -6,6 +6,11 @@ require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/aws/aws-lambda-go v1.18.0
 	github.com/aws/aws-sdk-go v1.35.19
+	github.com/aws/aws-sdk-go-v2 v1.0.0
+	github.com/aws/aws-sdk-go-v2/config v1.0.0
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.0.0
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.0.0
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.0.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.8.1
 	github.com/corpix/uarand v0.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -26,6 +31,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.14.1 // indirect
 	github.com/onsi/gomega v1.10.2 // indirect
+	github.com/segmentio/ksuid v1.0.3
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser/v2 v2.1.0

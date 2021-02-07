@@ -14,6 +14,8 @@
 
 ## Development
 
+- Set GraphCMS URL in your `.zshrc` or `.bashrc`
+  - `GRAPH_CMS_URL=https://api-eu-central-1.graphcms.com/v2/{GraphCMSAPIKey}`
 - Start local DynamoDB
   - `make run/local-dynamo`
 - Run local API

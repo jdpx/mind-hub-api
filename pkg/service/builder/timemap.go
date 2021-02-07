@@ -4,22 +4,21 @@ import (
 	"time"
 
 	"github.com/icrowley/fake"
-	"github.com/jdpx/mind-hub-api/pkg/store"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 )
 
 // TimemapBuilder ...
 type TimemapBuilder struct {
-	timemap store.Timemap
+	timemap service.Timemap
 }
 
 // NewTimemapBuilder ...
 func NewTimemapBuilder() *TimemapBuilder {
 	return &TimemapBuilder{
-		timemap: store.Timemap{
-			BaseEntity: store.BaseEntity{},
-			ID:         fake.CharactersN(10),
-			UserID:     fake.CharactersN(10),
-			Map:        fake.CharactersN(10),
+		timemap: service.Timemap{
+			ID:     fake.CharactersN(10),
+			UserID: fake.CharactersN(10),
+			Map:    fake.CharactersN(10),
 		},
 	}
 }
@@ -27,18 +26,6 @@ func NewTimemapBuilder() *TimemapBuilder {
 // WithID ...
 func (c TimemapBuilder) WithID(id string) TimemapBuilder {
 	c.timemap.ID = id
-	return c
-}
-
-// WithPK ...
-func (c TimemapBuilder) WithPK(pk string) TimemapBuilder {
-	c.timemap.BaseEntity.PK = pk
-	return c
-}
-
-// WithSK ...
-func (c TimemapBuilder) WithSK(sk string) TimemapBuilder {
-	c.timemap.BaseEntity.SK = sk
 	return c
 }
 
@@ -60,13 +47,7 @@ func (c TimemapBuilder) WithDateUpdated(t time.Time) TimemapBuilder {
 	return c
 }
 
-// WithDateCreated ...
-func (c TimemapBuilder) WithDateCreated(t time.Time) TimemapBuilder {
-	c.timemap.DateCreated = t
-	return c
-}
-
 // Build ...
-func (c TimemapBuilder) Build() store.Timemap {
+func (c TimemapBuilder) Build() service.Timemap {
 	return c.timemap
 }

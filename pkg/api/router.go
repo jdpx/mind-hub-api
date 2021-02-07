@@ -1,16 +1,16 @@
 package api
 
 import (
-	"log"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/gin-gonic/gin"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
 	"github.com/jdpx/mind-hub-api/pkg/graphql"
 	"github.com/jdpx/mind-hub-api/pkg/graphql/generated"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/jdpx/mind-hub-api/pkg/request"
+	"github.com/jdpx/mind-hub-api/pkg/service"
 	"github.com/jdpx/mind-hub-api/pkg/store"
 	graphqlClient "github.com/machinebox/graphql"
 )
@@ -54,27 +54,43 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	cms := graphcms.NewClient(graphqlClient)
 	cmsResolver := graphcms.NewResolver(cms)
 
-	sConfig := store.Config{
-		Env: config.Env,
-	}
-	s, err := store.NewClient(sConfig)
-	if err != nil {
-		log.Fatal(err)
+	var dynamoClient *dynamodb.Client
+	if config.Env == "local" {
+		dynamoClient = store.NewLocalClient()
+	} else {
+		dynamoClient = store.NewClient()
 	}
 
-	courseProgressHandler := store.NewCourseProgressHandler(s)
-	courseNoteHandler := store.NewCourseNoteHandler(s)
-	stepProgressHandler := store.NewStepProgressHandler(s)
-	stepNoteHandler := store.NewStepNoteHandler(s)
-	timemapHandler := store.NewTimemapHandler(s)
+	s := store.NewStore(
+		store.WithDynamoDB(dynamoClient),
+	)
+
+	noteStore := store.NewNoteStore(s)
+	progressStore := store.NewProgressStore(s)
+	timemapStore := store.NewTimemapStore(s)
+
+	courseProgressService := service.NewCourseProgressService(cmsResolver, progressStore)
+	courseService := service.NewCourseService(cmsResolver)
+	sessionService := service.NewSessionService(cmsResolver)
+	courseNoteService := service.NewCourseNoteService(noteStore)
+	stepProgressService := service.NewStepProgressService(progressStore)
+	stepService := service.NewStepService(cmsResolver)
+	stepNoteService := service.NewStepNoteService(noteStore)
+	timemapService := service.NewTimemapService(timemapStore)
+
+	serv := service.New(
+		service.WithCourse(courseService),
+		service.WithCourseProgress(courseProgressService),
+		service.WithCourseNote(courseNoteService),
+		service.WithSession(sessionService),
+		service.WithStep(stepService),
+		service.WithStepNote(stepNoteService),
+		service.WithStepProgress(stepProgressService),
+		service.WithTimemap(timemapService),
+	)
 
 	resolver := graphql.NewResolver(
-		graphql.WithCMSClient(cmsResolver),
-		graphql.WithCourseProgressHandler(courseProgressHandler),
-		graphql.WithCourseNoteRepositor(courseNoteHandler),
-		graphql.WithStepProgressHandler(stepProgressHandler),
-		graphql.WithStepNoteRepositor(stepNoteHandler),
-		graphql.WithTimemapRepositor(timemapHandler),
+		graphql.WithService(serv),
 	)
 
 	// NewExecutableSchema and Config are in the generated.go file

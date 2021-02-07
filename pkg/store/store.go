@@ -23,14 +23,14 @@ type Storer interface {
 	Update(ctx context.Context, tableName string, pk, sk string, ex expression.Expression, i interface{}) error
 }
 
-type StoreOption func(*Store)
+type Option func(*Store)
 
 // Store ...
 type Store struct {
 	db DynamoDBer
 }
 
-func NewStore(opts ...StoreOption) *Store {
+func NewStore(opts ...Option) *Store {
 	s := &Store{}
 
 	for _, opt := range opts {

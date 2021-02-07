@@ -211,7 +211,7 @@ func TestProgressStoreUpdate(t *testing.T) {
 					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
 					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
 					Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
-					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED)).
+					Set(expression.Name("state"), expression.Value(store.StatusCompleted)).
 					Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(now))).
 					Set(expression.Name("dateCompleted"), expression.Value(now))
 
@@ -236,7 +236,7 @@ func TestProgressStoreUpdate(t *testing.T) {
 					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
 					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
 					Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
-					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED)).
+					Set(expression.Name("state"), expression.Value(store.StatusCompleted)).
 					Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(now))).
 					Set(expression.Name("dateCompleted"), expression.Value(now))
 

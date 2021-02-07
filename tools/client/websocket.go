@@ -117,9 +117,9 @@ func (p *Client) WebsocketWithPayload(query string, initPayload map[string]inter
 			if op.Type != dataMsg {
 				if op.Type == errorMsg {
 					return fmt.Errorf(string(op.Payload))
-				} else {
-					return fmt.Errorf("expected data message, got %#v", op)
 				}
+
+				return fmt.Errorf("expected data message, got %#v", op)
 			}
 
 			var respDataRaw Response
@@ -132,7 +132,7 @@ func (p *Client) WebsocketWithPayload(query string, initPayload map[string]inter
 			unpackErr := unpack(respDataRaw.Data, response)
 
 			if respDataRaw.Errors != nil {
-				return RawJsonError{respDataRaw.Errors}
+				return RawJSONError{respDataRaw.Errors}
 			}
 			return unpackErr
 		},

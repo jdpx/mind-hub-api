@@ -11,10 +11,10 @@ type Service struct {
 	Timemap        TimemapServicer
 }
 
-// ServiceOption ...
-type ServiceOption func(*Service)
+// Option ...
+type Option func(*Service)
 
-func New(opts ...ServiceOption) *Service {
+func New(opts ...Option) *Service {
 	s := &Service{}
 
 	for _, opt := range opts {

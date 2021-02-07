@@ -15,10 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// const (
-// 	stepProgressTableName = "step_progress"
-// )
-
 func TestProgressStoreGet(t *testing.T) {
 	cID := fake.CharactersN(10)
 	uID := fake.CharactersN(10)
@@ -212,8 +208,12 @@ func TestProgressStoreUpdate(t *testing.T) {
 			desc: "given a progress is returned from store, progress is returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
-					Set(expression.Name("dateCompleted"), expression.Value(now)).
-					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED))
+					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
+					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
+					Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
+					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED)).
+					Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(now))).
+					Set(expression.Name("dateCompleted"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
@@ -233,8 +233,12 @@ func TestProgressStoreUpdate(t *testing.T) {
 			desc: "given a generic error is returned from the store, error returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
-					Set(expression.Name("dateCompleted"), expression.Value(now)).
-					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED))
+					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
+					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
+					Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
+					Set(expression.Name("state"), expression.Value(store.STATUS_COMPLETED)).
+					Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(now))).
+					Set(expression.Name("dateCompleted"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
 
@@ -260,11 +264,15 @@ func TestProgressStoreUpdate(t *testing.T) {
 				tt.clientExpectations(clientMock)
 			}
 
+			gen := func() string {
+				return id
+			}
+
 			timer := func() time.Time {
 				return now
 			}
 
-			resolver := store.NewProgressStore(clientMock, store.WithProgressTimer(timer))
+			resolver := store.NewProgressStore(clientMock, store.WithProgressIDGenerator(gen), store.WithProgressTimer(timer))
 			ctx := context.Background()
 
 			n, err := resolver.Complete(ctx, eID, uID)

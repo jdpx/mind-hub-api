@@ -48,10 +48,10 @@ func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
 	}
 
 	return &Timemap{
-		ID:        timemap.ID,
-		UserID:    timemap.UserID,
-		Map:       timemap.Map,
-		UpdatedAt: timemap.DateUpdated,
+		ID:          timemap.ID,
+		UserID:      timemap.UserID,
+		Map:         timemap.Map,
+		DateUpdated: timemap.DateUpdated,
 	}, nil
 }
 
@@ -60,44 +60,20 @@ func (s TimemapService) Update(ctx context.Context, uID, value string) (*Timemap
 		logging.UserIDKey: uID,
 	})
 
-	timemap, err := s.store.Get(ctx, uID)
-
+	timemap, err := s.store.Update(ctx, &store.Timemap{
+		UserID: uID,
+		Map:    value,
+	})
 	if err != nil {
-		log.Error("error getting timemap from store", err)
+		log.Error("error updating timemap from store", err)
 
 		return nil, err
 	}
 
-	if timemap == nil {
-		log.Info("creating new timemap in store")
-
-		sTm := store.Timemap{
-			UserID: uID,
-			Map:    value,
-		}
-
-		timemap, err = s.store.Create(ctx, sTm)
-		if err != nil {
-			log.Error("error creating timemap from store", err)
-
-			return nil, err
-		}
-	} else {
-		log.Info("updating timemap in store")
-		timemap.Map = value
-
-		timemap, err = s.store.Update(ctx, timemap)
-		if err != nil {
-			log.Error("error updating timemap from store", err)
-
-			return nil, err
-		}
-	}
-
 	return &Timemap{
-		ID:        timemap.ID,
-		UserID:    timemap.UserID,
-		Map:       timemap.Map,
-		UpdatedAt: timemap.DateUpdated,
+		ID:          timemap.ID,
+		UserID:      timemap.UserID,
+		Map:         timemap.Map,
+		DateUpdated: timemap.DateUpdated,
 	}, nil
 }

@@ -330,7 +330,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 
 	return &model.Timemap{
 		Map:       timemap.Map,
-		UpdatedAt: timemap.UpdatedAt.String(),
+		UpdatedAt: timemap.DateUpdated.String(),
 	}, nil
 }
 
@@ -459,7 +459,7 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 	return &model.Timemap{
 		ID:        timemap.ID,
 		Map:       timemap.Map,
-		UpdatedAt: timemap.UpdatedAt.String(),
+		UpdatedAt: timemap.DateUpdated.String(),
 	}, nil
 }
 

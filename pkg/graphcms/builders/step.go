@@ -1,17 +1,30 @@
 package builder
 
-import "github.com/jdpx/mind-hub-api/pkg/graphql/model"
+import (
+	"github.com/icrowley/fake"
+	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+)
 
 // StepBuilder ...
 type StepBuilder struct {
-	step model.Step
+	step graphcms.Step
 }
 
 // NewStepBuilder ...
 func NewStepBuilder() *StepBuilder {
 	return &StepBuilder{
-		step: model.Step{},
+		step: graphcms.Step{
+			ID:          fake.CharactersN(10),
+			Title:       fake.Title(),
+			Description: fake.Sentences(),
+		},
 	}
+}
+
+// WithID ...
+func (c StepBuilder) WithID(id string) StepBuilder {
+	c.step.ID = id
+	return c
 }
 
 // WithTitle ...
@@ -21,6 +34,6 @@ func (c StepBuilder) WithTitle(title string) StepBuilder {
 }
 
 // Build ...
-func (c StepBuilder) Build() model.Step {
+func (c StepBuilder) Build() graphcms.Step {
 	return c.step
 }

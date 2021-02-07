@@ -26,20 +26,23 @@ type Course struct {
 
 // CourseProgress ...
 type CourseProgress struct {
-	ID             string    `json:"id"`
-	CourseID       string    `json:"courseID,omitempty"`
-	UserID         string    `json:"userID,omitempty"`
-	State          string    `json:"progressState,omitempty"`
-	CompletedSteps int       `json:"completedSteps"`
-	DateStarted    time.Time `json:"dateStarted,omitempty"`
+	ID             string     `json:"id"`
+	CourseID       string     `json:"courseID,omitempty"`
+	UserID         string     `json:"userID,omitempty"`
+	State          string     `json:"progressState,omitempty"`
+	CompletedSteps int        `json:"completedSteps"`
+	DateStarted    time.Time  `json:"dateStarted,omitempty"`
+	DateCompleted  *time.Time `json:"dateCompleted,omitempty"`
 }
 
 // CourseNote ...
 type CourseNote struct {
-	ID       string `json:"id"`
-	CourseID string `json:"courseID"`
-	UserID   string `json:"userID"`
-	Value    string `json:"value"`
+	ID          string    `json:"id"`
+	CourseID    string    `json:"courseID"`
+	UserID      string    `json:"userID"`
+	Value       string    `json:"value"`
+	DateCreated time.Time `json:"dateCreated"`
+	DateUpdated time.Time `json:"dateUpdated"`
 }
 
 type Session struct {
@@ -75,18 +78,20 @@ type StepProgress struct {
 
 // StepNote ...
 type StepNote struct {
-	ID     string `json:"id"`
-	StepID string `json:"stepID"`
-	UserID string `json:"userID"`
-	Value  string `json:"value"`
+	ID          string    `json:"id"`
+	StepID      string    `json:"stepID"`
+	UserID      string    `json:"userID"`
+	Value       string    `json:"value"`
+	DateCreated time.Time `json:"dateCreated"`
+	DateUpdated time.Time `json:"dateUpdated"`
 }
 
 // Timemap ...
 type Timemap struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"userID"`
-	Map       string    `json:"map"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID          string    `json:"id"`
+	UserID      string    `json:"userID"`
+	Map         string    `json:"map"`
+	DateUpdated time.Time `json:"dateUpdated"`
 }
 
 // CourseFromCMS ...

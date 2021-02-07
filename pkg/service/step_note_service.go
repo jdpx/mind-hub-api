@@ -34,24 +34,26 @@ func (s StepNoteService) Get(ctx context.Context, sID, uID string) (*StepNote, e
 		logging.UserIDKey:    uID,
 	})
 
-	cn, err := s.store.Get(ctx, sID, uID)
+	sn, err := s.store.Get(ctx, sID, uID)
 	if err != nil {
 		log.Error("error occurred getting session note from store", err)
 
 		return nil, err
 	}
 
-	if cn == nil {
+	if sn == nil {
 		log.Info("session note not found in store")
 
 		return nil, ErrNotFound
 	}
 
 	return &StepNote{
-		ID:     cn.ID,
-		StepID: cn.EntityID,
-		UserID: cn.UserID,
-		Value:  cn.Value,
+		ID:          sn.ID,
+		StepID:      sn.EntityID,
+		UserID:      sn.UserID,
+		Value:       sn.Value,
+		DateCreated: sn.DateCreated,
+		DateUpdated: sn.DateUpdated,
 	}, nil
 }
 
@@ -61,33 +63,25 @@ func (s StepNoteService) Update(ctx context.Context, sID, uID, value string) (*S
 		logging.UserIDKey:    uID,
 	})
 
-	m := store.Note{
-		// ID:       *input.ID,
+	n := store.Note{
 		EntityID: sID,
 		UserID:   uID,
 		Value:    value,
 	}
 
-	cn, err := s.store.Update(ctx, m)
+	sn, err := s.store.Update(ctx, n)
 	if err != nil {
 		log.Error("error occurred updating step note in store", err)
 
 		return nil, err
 	}
 
-	// cn, err := s.store.Get(ctx, sID, uID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// if cn == nil {
-	// 	return nil, ErrNotFound
-	// }
-
 	return &StepNote{
-		ID:     cn.ID,
-		StepID: cn.EntityID,
-		UserID: cn.UserID,
-		Value:  cn.Value,
+		ID:          sn.ID,
+		StepID:      sn.EntityID,
+		UserID:      sn.UserID,
+		Value:       sn.Value,
+		DateCreated: sn.DateCreated,
+		DateUpdated: sn.DateUpdated,
 	}, nil
 }

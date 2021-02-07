@@ -192,6 +192,7 @@ func TestNoteStoreCreate(t *testing.T) {
 
 func TestNoteStoreUpdate(t *testing.T) {
 	now := time.Now()
+	id := fake.CharactersN(10)
 	cID := fake.CharactersN(10)
 	uID := fake.CharactersN(10)
 	note := builder.NewNoteBuilder().
@@ -219,7 +220,10 @@ func TestNoteStoreUpdate(t *testing.T) {
 			desc: "given a note is returned from store, note is returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
+					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
+					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(note.EntityID))).
 					Set(expression.Name("value"), expression.Value(note.Value)).
+					Set(expression.Name("dateCreated"), expression.Name("dateCreated").IfNotExists(expression.Value(now))).
 					Set(expression.Name("dateUpdated"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
@@ -240,7 +244,10 @@ func TestNoteStoreUpdate(t *testing.T) {
 			desc: "given a generic error is returned from the store, error returned",
 			clientExpectations: func(client *storemocks.MockStorer) {
 				upBuilder := expression.
+					Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(id))).
+					Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(note.EntityID))).
 					Set(expression.Name("value"), expression.Value(note.Value)).
+					Set(expression.Name("dateCreated"), expression.Name("dateCreated").IfNotExists(expression.Value(now))).
 					Set(expression.Name("dateUpdated"), expression.Value(now))
 
 				expr, _ := expression.NewBuilder().WithUpdate(upBuilder).Build()
@@ -267,11 +274,15 @@ func TestNoteStoreUpdate(t *testing.T) {
 				tt.clientExpectations(clientMock)
 			}
 
+			gen := func() string {
+				return id
+			}
+
 			timer := func() time.Time {
 				return now
 			}
 
-			resolver := store.NewNoteStore(clientMock, store.WithNoteTimer(timer))
+			resolver := store.NewNoteStore(clientMock, store.WithNoteIDGenerator(gen), store.WithNoteTimer(timer))
 			ctx := context.Background()
 
 			n, err := resolver.Update(ctx, note)

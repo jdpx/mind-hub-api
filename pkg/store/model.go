@@ -27,55 +27,56 @@ func TimemapSK() string {
 }
 
 type BaseEntity struct {
-	PK string `json:"PK"`
-	SK string `json:"SK"`
+	PK string `dynamodbav:"PK"`
+	SK string `dynamodbav:"SK"`
 }
 
 // CourseProgress ...
 type CourseProgress struct {
 	BaseEntity
-	CourseID    string    `json:"courseID,omitempty"`
-	UserID      string    `json:"userID,omitempty"`
-	State       string    `json:"progressState,omitempty"`
-	DateStarted time.Time `json:"dateStarted,omitempty"`
+	CourseID    string    `dynamodbav:"courseID,omitempty"`
+	UserID      string    `dynamodbav:"userID,omitempty"`
+	State       string    `dynamodbav:"progressState,omitempty"`
+	DateStarted time.Time `dynamodbav:"dateStarted,omitempty"`
 }
 
 // Note ...
 type Note struct {
 	BaseEntity
-	ID          string    `json:"id"`
-	EntityID    string    `json:"entityID"`
-	UserID      string    `json:"userID"`
-	Value       string    `json:"value"`
-	DateCreated time.Time `json:"dateCreated"`
-	DateUpdated time.Time `json:"dateUpdated"`
+	ID          string    `dynamodbav:"id"`
+	EntityID    string    `dynamodbav:"entityID"`
+	UserID      string    `dynamodbav:"userID"`
+	Value       string    `dynamodbav:"value"`
+	DateCreated time.Time `dynamodbav:"dateCreated"`
+	DateUpdated time.Time `dynamodbav:"dateUpdated"`
 }
 
 // Progress ...
 type Progress struct {
 	BaseEntity
-	ID            string     `json:"id,omitempty"`
-	EntityID      string     `json:"entityID,omitempty"`
-	UserID        string     `json:"userID,omitempty"`
-	State         string     `json:"progressState,omitempty"`
-	DateStarted   time.Time  `json:"dateStarted,omitempty"`
-	DateCompleted *time.Time `json:"dateCompleted,omitempty"`
+	ID            string     `dynamodbav:"id,omitempty"`
+	EntityID      string     `dynamodbav:"entityID,omitempty"`
+	UserID        string     `dynamodbav:"userID,omitempty"`
+	State         string     `dynamodbav:"state,omitempty"`
+	DateStarted   time.Time  `dynamodbav:"dateStarted,omitempty"`
+	DateCompleted *time.Time `dynamodbav:"dateCompleted,omitempty"`
 }
 
 // StepNote ...
 type StepNote struct {
 	BaseEntity
-	ID     string `json:"id"`
-	StepID string `json:"stepID"`
-	UserID string `json:"userID"`
-	Value  string `json:"value"`
+	ID     string `dynamodbav:"id"`
+	StepID string `dynamodbav:"stepID"`
+	UserID string `dynamodbav:"userID"`
+	Value  string `dynamodbav:"value"`
 }
 
 // Timemap ...
 type Timemap struct {
 	BaseEntity
-	ID          string    `json:"id"`
-	UserID      string    `json:"userID"`
-	Map         string    `json:"map"`
-	DateUpdated time.Time `json:"dateUpdated"`
+	ID          string    `dynamodbav:"id"`
+	UserID      string    `dynamodbav:"userID"`
+	Map         string    `dynamodbav:"map"`
+	DateCreated time.Time `dynamodbav:"dateCreated"`
+	DateUpdated time.Time `dynamodbav:"dateUpdated"`
 }

@@ -109,7 +109,7 @@ func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ..
 	// 	return nil, err
 	// }
 
-	// fP := []*StepProgress{}
+	// fP := []*progressProgress{}
 
 	// for _, p := range res {
 	// 	if p.State == STATUS_COMPLETED {
@@ -139,7 +139,7 @@ func (c ProgressStore) Start(ctx context.Context, eID, uID string) (*Progress, e
 
 	err := c.db.Put(ctx, userTableName, input)
 	if err != nil {
-		log.Error(fmt.Sprintf("error completing Step %s in store", eID), err)
+		log.Error(fmt.Sprintf("error completing progress %s in store", eID), err)
 		return nil, err
 	}
 
@@ -156,34 +156,35 @@ func (c ProgressStore) Start(ctx context.Context, eID, uID string) (*Progress, e
 func (c ProgressStore) Complete(ctx context.Context, eID, uID string) (*Progress, error) {
 	builder := expression.NewBuilder()
 
-	upBuilder := expression.Set(
-		expression.Name("dateCompleted"),
-		expression.Value(c.timer()),
-	).Set(
-		expression.Name("state"),
-		expression.Value(STATUS_COMPLETED),
-	)
+	upBuilder := expression.
+		Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(c.idGenerator()))).
+		Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
+		Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
+		Set(expression.Name("state"), expression.Value(STATUS_COMPLETED)).
+		Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(c.timer()))).
+		Set(expression.Name("dateCompleted"), expression.Value(c.timer()))
 
 	builder = builder.WithUpdate(upBuilder)
 
 	expr, err := builder.Build()
 	if err != nil {
-		return nil, fmt.Errorf("error creating complete step expression %w", err)
+		return nil, fmt.Errorf("error creating complete progress expression %w", err)
 	}
 
 	res := Progress{}
 	err = c.db.Update(ctx, userTableName, UserPK(uID), ProgressSK(eID), expr, &res)
 	if err != nil {
-		log.Error(fmt.Sprintf("error completing Step %s in store", eID), err)
+		log.Error(fmt.Sprintf("error completing progress %s in store", eID), err)
 
 		return nil, err
 	}
 
 	return &Progress{
-		ID:          res.ID,
-		EntityID:    res.EntityID,
-		UserID:      res.UserID,
-		State:       res.State,
-		DateStarted: res.DateStarted,
+		ID:            res.ID,
+		EntityID:      res.EntityID,
+		UserID:        res.UserID,
+		State:         res.State,
+		DateStarted:   res.DateStarted,
+		DateCompleted: res.DateCompleted,
 	}, nil
 }

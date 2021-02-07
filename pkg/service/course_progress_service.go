@@ -51,16 +51,19 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 	}
 
 	p := CourseProgress{
-		ID:          cProgress.ID,
-		State:       cProgress.State,
-		DateStarted: cProgress.DateStarted,
+		ID:            cProgress.ID,
+		CourseID:      cProgress.EntityID,
+		UserID:        cProgress.UserID,
+		State:         cProgress.State,
+		DateStarted:   cProgress.DateStarted,
+		DateCompleted: cProgress.DateCompleted,
 	}
 
 	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, cID)
 	if err != nil {
 		log.Error("error getting course steps for course progress from store", err)
 
-		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+		return nil, fmt.Errorf("error occurred getting course step ids %w", err)
 	}
 
 	if len(courseStepIDs) == 0 {
@@ -70,7 +73,7 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 	completedSteps, err := r.progressStore.GetCompletedByIDs(ctx, uID, courseStepIDs...)
 	if err != nil {
 		log.Error("error getting completed steps for course progress from store", err)
-		return nil, fmt.Errorf("error occurred getting course progress3 %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
 	p.CompletedSteps = len(completedSteps)
@@ -94,6 +97,8 @@ func (r CourseProgressService) Start(ctx context.Context, cID, uID string) (*Cou
 
 	p := CourseProgress{
 		ID:          sProgress.ID,
+		CourseID:    sProgress.EntityID,
+		UserID:      sProgress.UserID,
 		State:       sProgress.State,
 		DateStarted: sProgress.DateStarted,
 	}

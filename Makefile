@@ -46,7 +46,7 @@ run/local-dynamo:
 
 .PHONY: run/tests
 run/tests:
-	go test -v ./...
+	go test ./...
 
 .PHONY: run/lint
 run/lint:

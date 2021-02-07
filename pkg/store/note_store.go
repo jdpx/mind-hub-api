@@ -113,7 +113,10 @@ func (c NoteStore) Create(ctx context.Context, note Note) (*Note, error) {
 // Update ...
 func (c NoteStore) Update(ctx context.Context, note Note) (*Note, error) {
 	upBuilder := expression.
+		Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(c.idGenerator()))).
+		Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(note.EntityID))).
 		Set(expression.Name("value"), expression.Value(note.Value)).
+		Set(expression.Name("dateCreated"), expression.Name("dateCreated").IfNotExists(expression.Value(c.timer()))).
 		Set(expression.Name("dateUpdated"), expression.Value(c.timer()))
 
 	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()

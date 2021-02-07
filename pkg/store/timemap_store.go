@@ -74,6 +74,7 @@ func (c TimemapStore) Get(ctx context.Context, uID string) (*Timemap, error) {
 // Create ...
 func (c TimemapStore) Create(ctx context.Context, tm Timemap) (*Timemap, error) {
 	tm.ID = c.idGenerator()
+	tm.DateCreated = c.timer()
 	tm.DateUpdated = c.timer()
 
 	tm.BaseEntity = BaseEntity{
@@ -90,19 +91,19 @@ func (c TimemapStore) Create(ctx context.Context, tm Timemap) (*Timemap, error) 
 		ID:          tm.ID,
 		UserID:      tm.UserID,
 		Map:         tm.Map,
+		DateCreated: tm.DateCreated,
 		DateUpdated: tm.DateUpdated,
 	}, nil
 }
 
 // Update ...
 func (c TimemapStore) Update(ctx context.Context, tm *Timemap) (*Timemap, error) {
-	upBuilder := expression.Set(
-		expression.Name("map"),
-		expression.Value(tm.Map),
-	).Set(
-		expression.Name("dateUpdated"),
-		expression.Value(c.timer()),
-	)
+	upBuilder := expression.
+		Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(c.idGenerator()))).
+		Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(tm.UserID))).
+		Set(expression.Name("map"), expression.Value(tm.Map)).
+		Set(expression.Name("dateCreated"), expression.Name("dateCreated").IfNotExists(expression.Value(c.timer()))).
+		Set(expression.Name("dateUpdated"), expression.Value(c.timer()))
 
 	expr, err := expression.NewBuilder().WithUpdate(upBuilder).Build()
 	if err != nil {
@@ -119,6 +120,7 @@ func (c TimemapStore) Update(ctx context.Context, tm *Timemap) (*Timemap, error)
 		ID:          res.ID,
 		UserID:      res.UserID,
 		Map:         res.Map,
+		DateCreated: res.DateCreated,
 		DateUpdated: res.DateUpdated,
 	}, nil
 }

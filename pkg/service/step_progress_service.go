@@ -36,19 +36,21 @@ func (r StepProgressService) Get(ctx context.Context, sID, uID string) (*StepPro
 
 	sProgress, err := r.store.Get(ctx, sID, uID)
 	if err != nil {
-		log.Error("error getting session progress from store", err)
+		log.Error("error getting step progress from store", err)
 
 		return nil, err
 	}
 
 	if sProgress == nil {
-		log.Info("session progress not found in store")
+		log.Info("step progress not found in store")
 
 		return nil, ErrNotFound
 	}
 
 	p := StepProgress{
 		ID:          sProgress.ID,
+		StepID:      sProgress.EntityID,
+		UserID:      sProgress.UserID,
 		State:       sProgress.State,
 		DateStarted: sProgress.DateStarted,
 	}
@@ -69,15 +71,18 @@ func (r StepProgressService) Start(ctx context.Context, sID, uID string) (*StepP
 
 	sProgress, err := r.store.Start(ctx, sID, uID)
 	if err != nil {
-		log.Error("error starting session progress in store", err)
+		log.Error("error starting step progress in store", err)
 
 		return nil, err
 	}
 
 	p := StepProgress{
-		ID:          sProgress.ID,
-		State:       sProgress.State,
-		DateStarted: sProgress.DateStarted,
+		ID:            sProgress.ID,
+		StepID:        sProgress.EntityID,
+		UserID:        sProgress.UserID,
+		State:         sProgress.State,
+		DateStarted:   sProgress.DateStarted,
+		DateCompleted: sProgress.DateCompleted,
 	}
 
 	return &p, nil
@@ -92,15 +97,18 @@ func (r StepProgressService) Complete(ctx context.Context, sID, uID string) (*St
 
 	sProgress, err := r.store.Complete(ctx, sID, uID)
 	if err != nil {
-		log.Error("error completing session progress in store", err)
+		log.Error("error completing step progress in store", err)
 
 		return nil, err
 	}
 
 	p := StepProgress{
-		ID:          sProgress.ID,
-		State:       sProgress.State,
-		DateStarted: sProgress.DateStarted,
+		ID:            sProgress.ID,
+		StepID:        sProgress.EntityID,
+		UserID:        sProgress.UserID,
+		State:         sProgress.State,
+		DateStarted:   sProgress.DateStarted,
+		DateCompleted: sProgress.DateCompleted,
 	}
 
 	return &p, nil

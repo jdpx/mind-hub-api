@@ -34,7 +34,7 @@ func (s SessionService) GetByID(ctx context.Context, id string) (*Session, error
 		logging.SessionIDKey: id,
 	})
 
-	gss, err := s.graphcms.ResolveSession(ctx, id)
+	gss, err := s.graphcms.GetSessionByID(ctx, id)
 	if err != nil {
 		log.Error("error getting session by id from cms", err)
 
@@ -57,7 +57,7 @@ func (s SessionService) GetByCourseID(ctx context.Context, id string) ([]*Sessio
 		logging.CourseIDKey: id,
 	})
 
-	gss, err := s.graphcms.ResolveCourseSessions(ctx, id)
+	gss, err := s.graphcms.GetSessionsByCourseID(ctx, id)
 	if err != nil {
 		log.Error("error getting session by course id from cms", err)
 
@@ -74,7 +74,7 @@ func (s SessionService) CountByCourseID(ctx context.Context, id string) (int, er
 		logging.CourseIDKey: id,
 	})
 
-	gss, err := s.graphcms.ResolveCourseSessions(ctx, id)
+	gss, err := s.graphcms.GetSessionsByCourseID(ctx, id)
 	if err != nil {
 		log.Error("error getting session count by course id from cms", err)
 

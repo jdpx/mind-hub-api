@@ -11,115 +11,115 @@ import (
 	reflect "reflect"
 )
 
-// MockResolverer is a mock of Resolverer interface
-type MockResolverer struct {
+// MockCMSResolver is a mock of CMSResolver interface
+type MockCMSResolver struct {
 	ctrl     *gomock.Controller
-	recorder *MockResolvererMockRecorder
+	recorder *MockCMSResolverMockRecorder
 }
 
-// MockResolvererMockRecorder is the mock recorder for MockResolverer
-type MockResolvererMockRecorder struct {
-	mock *MockResolverer
+// MockCMSResolverMockRecorder is the mock recorder for MockCMSResolver
+type MockCMSResolverMockRecorder struct {
+	mock *MockCMSResolver
 }
 
-// NewMockResolverer creates a new mock instance
-func NewMockResolverer(ctrl *gomock.Controller) *MockResolverer {
-	mock := &MockResolverer{ctrl: ctrl}
-	mock.recorder = &MockResolvererMockRecorder{mock}
+// NewMockCMSResolver creates a new mock instance
+func NewMockCMSResolver(ctrl *gomock.Controller) *MockCMSResolver {
+	mock := &MockCMSResolver{ctrl: ctrl}
+	mock.recorder = &MockCMSResolverMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockResolverer) EXPECT() *MockResolvererMockRecorder {
+func (m *MockCMSResolver) EXPECT() *MockCMSResolverMockRecorder {
 	return m.recorder
 }
 
-// ResolveCourses mocks base method
-func (m *MockResolverer) ResolveCourses(ctx context.Context) ([]*graphcms.Course, error) {
+// GetCourses mocks base method
+func (m *MockCMSResolver) GetCourses(ctx context.Context) ([]*graphcms.Course, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveCourses", ctx)
+	ret := m.ctrl.Call(m, "GetCourses", ctx)
 	ret0, _ := ret[0].([]*graphcms.Course)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveCourses indicates an expected call of ResolveCourses
-func (mr *MockResolvererMockRecorder) ResolveCourses(ctx interface{}) *gomock.Call {
+// GetCourses indicates an expected call of GetCourses
+func (mr *MockCMSResolverMockRecorder) GetCourses(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveCourses", reflect.TypeOf((*MockResolverer)(nil).ResolveCourses), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourses", reflect.TypeOf((*MockCMSResolver)(nil).GetCourses), ctx)
 }
 
-// ResolveCourse mocks base method
-func (m *MockResolverer) ResolveCourse(ctx context.Context, id string) (*graphcms.Course, error) {
+// GetCourseByID mocks base method
+func (m *MockCMSResolver) GetCourseByID(ctx context.Context, id string) (*graphcms.Course, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveCourse", ctx, id)
+	ret := m.ctrl.Call(m, "GetCourseByID", ctx, id)
 	ret0, _ := ret[0].(*graphcms.Course)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveCourse indicates an expected call of ResolveCourse
-func (mr *MockResolvererMockRecorder) ResolveCourse(ctx, id interface{}) *gomock.Call {
+// GetCourseByID indicates an expected call of GetCourseByID
+func (mr *MockCMSResolverMockRecorder) GetCourseByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveCourse", reflect.TypeOf((*MockResolverer)(nil).ResolveCourse), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCourseByID", reflect.TypeOf((*MockCMSResolver)(nil).GetCourseByID), ctx, id)
 }
 
-// ResolveCourseSessions mocks base method
-func (m *MockResolverer) ResolveCourseSessions(ctx context.Context, id string) ([]*graphcms.Session, error) {
+// GetSessionsByCourseID mocks base method
+func (m *MockCMSResolver) GetSessionsByCourseID(ctx context.Context, id string) ([]*graphcms.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveCourseSessions", ctx, id)
+	ret := m.ctrl.Call(m, "GetSessionsByCourseID", ctx, id)
 	ret0, _ := ret[0].([]*graphcms.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveCourseSessions indicates an expected call of ResolveCourseSessions
-func (mr *MockResolvererMockRecorder) ResolveCourseSessions(ctx, id interface{}) *gomock.Call {
+// GetSessionsByCourseID indicates an expected call of GetSessionsByCourseID
+func (mr *MockCMSResolverMockRecorder) GetSessionsByCourseID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveCourseSessions", reflect.TypeOf((*MockResolverer)(nil).ResolveCourseSessions), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionsByCourseID", reflect.TypeOf((*MockCMSResolver)(nil).GetSessionsByCourseID), ctx, id)
 }
 
-// ResolveSession mocks base method
-func (m *MockResolverer) ResolveSession(ctx context.Context, id string) (*graphcms.Session, error) {
+// GetSessionByID mocks base method
+func (m *MockCMSResolver) GetSessionByID(ctx context.Context, id string) (*graphcms.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveSession", ctx, id)
+	ret := m.ctrl.Call(m, "GetSessionByID", ctx, id)
 	ret0, _ := ret[0].(*graphcms.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveSession indicates an expected call of ResolveSession
-func (mr *MockResolvererMockRecorder) ResolveSession(ctx, id interface{}) *gomock.Call {
+// GetSessionByID indicates an expected call of GetSessionByID
+func (mr *MockCMSResolverMockRecorder) GetSessionByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveSession", reflect.TypeOf((*MockResolverer)(nil).ResolveSession), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionByID", reflect.TypeOf((*MockCMSResolver)(nil).GetSessionByID), ctx, id)
 }
 
-// ResolveCourseStepIDs mocks base method
-func (m *MockResolverer) ResolveCourseStepIDs(ctx context.Context, id string) ([]string, error) {
+// GetStepIDsByCourseID mocks base method
+func (m *MockCMSResolver) GetStepIDsByCourseID(ctx context.Context, id string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveCourseStepIDs", ctx, id)
+	ret := m.ctrl.Call(m, "GetStepIDsByCourseID", ctx, id)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveCourseStepIDs indicates an expected call of ResolveCourseStepIDs
-func (mr *MockResolvererMockRecorder) ResolveCourseStepIDs(ctx, id interface{}) *gomock.Call {
+// GetStepIDsByCourseID indicates an expected call of GetStepIDsByCourseID
+func (mr *MockCMSResolverMockRecorder) GetStepIDsByCourseID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveCourseStepIDs", reflect.TypeOf((*MockResolverer)(nil).ResolveCourseStepIDs), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStepIDsByCourseID", reflect.TypeOf((*MockCMSResolver)(nil).GetStepIDsByCourseID), ctx, id)
 }
 
-// ResolveStep mocks base method
-func (m *MockResolverer) ResolveStep(ctx context.Context, id string) (*graphcms.Step, error) {
+// GetStepsByID mocks base method
+func (m *MockCMSResolver) GetStepsByID(ctx context.Context, id string) (*graphcms.Step, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResolveStep", ctx, id)
+	ret := m.ctrl.Call(m, "GetStepsBySessionID", ctx, id)
 	ret0, _ := ret[0].(*graphcms.Step)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResolveStep indicates an expected call of ResolveStep
-func (mr *MockResolvererMockRecorder) ResolveStep(ctx, id interface{}) *gomock.Call {
+// GetStepsByID indicates an expected call of GetStepsByID
+func (mr *MockCMSResolverMockRecorder) GetStepsByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResolveStep", reflect.TypeOf((*MockResolverer)(nil).ResolveStep), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStepsBySessionID", reflect.TypeOf((*MockCMSResolver)(nil).GetStepsByID), ctx, id)
 }

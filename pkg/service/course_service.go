@@ -31,7 +31,7 @@ func NewCourseService(cms graphcms.CMSResolver) *CourseService {
 func (s CourseService) GetAll(ctx context.Context) ([]*Course, error) {
 	log := logging.NewFromResolver(ctx)
 
-	c, err := s.graphcms.ResolveCourses(ctx)
+	c, err := s.graphcms.GetCourses(ctx)
 	if err != nil {
 		log.Error("error getting all courses from cms", err)
 
@@ -48,7 +48,7 @@ func (s CourseService) GetByID(ctx context.Context, id string) (*Course, error) 
 		logging.CourseIDKey: id,
 	})
 
-	c, err := s.graphcms.ResolveCourse(ctx, id)
+	c, err := s.graphcms.GetCourseByID(ctx, id)
 	if err != nil {
 		log.Error("error getting course by id from cms", err)
 

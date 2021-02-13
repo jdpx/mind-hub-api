@@ -35,15 +35,15 @@ func (m *MockRequester) EXPECT() *MockRequesterMockRecorder {
 }
 
 // Run mocks base method
-func (m *MockRequester) Run(ctx context.Context, req *graphcms.Request, resp interface{}) error {
+func (m *MockRequester) Run(ctx context.Context, req *graphcms.Request, res interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Run", ctx, req, resp)
+	ret := m.ctrl.Call(m, "Run", ctx, req, res)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Run indicates an expected call of Run
-func (mr *MockRequesterMockRecorder) Run(ctx, req, resp interface{}) *gomock.Call {
+func (mr *MockRequesterMockRecorder) Run(ctx, req, res interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockRequester)(nil).Run), ctx, req, resp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockRequester)(nil).Run), ctx, req, res)
 }

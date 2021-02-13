@@ -59,7 +59,7 @@ func (r CourseProgressService) Get(ctx context.Context, cID, uID string) (*Cours
 		DateCompleted: cProgress.DateCompleted,
 	}
 
-	courseStepIDs, err := r.graphcms.ResolveCourseStepIDs(ctx, cID)
+	courseStepIDs, err := r.graphcms.GetStepIDsByCourseID(ctx, cID)
 	if err != nil {
 		log.Error("error getting course steps for course progress from store", err)
 

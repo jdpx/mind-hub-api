@@ -32,7 +32,7 @@ func (s StepService) GetByID(ctx context.Context, id string) (*Step, error) {
 		logging.StepIDKey: id,
 	})
 
-	gss, err := s.graphcms.ResolveStep(ctx, id)
+	gss, err := s.graphcms.GetStepsByID(ctx, id)
 	if err != nil {
 		log.Error("error getting step by id from cms", err)
 
@@ -55,7 +55,7 @@ func (s StepService) CountByCourseID(ctx context.Context, id string) (int, error
 		logging.CourseIDKey: id,
 	})
 
-	gss, err := s.graphcms.ResolveCourseStepIDs(ctx, id)
+	gss, err := s.graphcms.GetStepIDsByCourseID(ctx, id)
 	if err != nil {
 		log.Error("error getting step count by course id from cms", err)
 

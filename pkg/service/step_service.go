@@ -15,11 +15,11 @@ type StepServicer interface {
 }
 
 type StepService struct {
-	graphcms graphcms.Resolverer
+	graphcms graphcms.CMSResolver
 }
 
 // NewStepService ...
-func NewStepService(cms graphcms.Resolverer) *StepService {
+func NewStepService(cms graphcms.CMSResolver) *StepService {
 	r := &StepService{
 		graphcms: cms,
 	}

@@ -17,11 +17,11 @@ type SessionServicer interface {
 }
 
 type SessionService struct {
-	graphcms graphcms.Resolverer
+	graphcms graphcms.CMSResolver
 }
 
 // NewSessionService ...
-func NewSessionService(cms graphcms.Resolverer) *SessionService {
+func NewSessionService(cms graphcms.CMSResolver) *SessionService {
 	r := &SessionService{
 		graphcms: cms,
 	}

@@ -11,8 +11,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// RequestLoggerMiddleware ...
-func RequestLoggerMiddleware() gin.HandlerFunc {
+// GinRequestLoggerMiddleware ...
+func GinRequestLoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cID := request.GetCorrelationIDHeader(c.Request.Header)
 

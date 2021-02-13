@@ -16,11 +16,11 @@ type CourseServicer interface {
 }
 
 type CourseService struct {
-	graphcms graphcms.Resolverer
+	graphcms graphcms.CMSResolver
 }
 
 // NewCourseService ...
-func NewCourseService(cms graphcms.Resolverer) *CourseService {
+func NewCourseService(cms graphcms.CMSResolver) *CourseService {
 	r := &CourseService{
 		graphcms: cms,
 	}

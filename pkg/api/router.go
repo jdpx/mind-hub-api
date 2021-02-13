@@ -29,7 +29,7 @@ func NewRouter(config *Config) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(request.CORSMiddleware())
-	r.Use(logging.RequestLoggerMiddleware())
+	r.Use(logging.GinRequestLoggerMiddleware())
 	r.Use(request.ContextMiddleware())
 
 	// Setting up Gin
@@ -46,9 +46,13 @@ func NewRouter(config *Config) *gin.Engine {
 
 // Defining the Graphql handler
 func graphqlHandler(config *Config) gin.HandlerFunc {
+	cmsHTTPClient := request.DefaultHTTPClient(
+		request.WithTransport(logging.NewHTTPTransportLogger("GraphCMS")),
+	)
+
 	graphqlClient := graphqlClient.NewClient(
 		config.GraphCMSURL,
-		graphqlClient.WithHTTPClient(graphcms.DefaultHTTPClient()),
+		graphqlClient.WithHTTPClient(cmsHTTPClient),
 	)
 
 	cms := graphcms.NewClient(graphqlClient)

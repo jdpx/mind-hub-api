@@ -18,12 +18,12 @@ type CourseProgressServicer interface {
 }
 
 type CourseProgressService struct {
-	graphcms      graphcms.Resolverer
+	graphcms      graphcms.CMSResolver
 	progressStore store.ProgressRepositor
 }
 
 // NewCourseProgressService ...
-func NewCourseProgressService(c graphcms.Resolverer, spr store.ProgressRepositor) *CourseProgressService {
+func NewCourseProgressService(c graphcms.CMSResolver, spr store.ProgressRepositor) *CourseProgressService {
 	return &CourseProgressService{
 		graphcms:      c,
 		progressStore: spr,

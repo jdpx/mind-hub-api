@@ -12,7 +12,8 @@ import (
 )
 
 func TestClientRun(t *testing.T) {
-	req := graphcms.NewRequest(`{ course { title } }`)
+	ctx := context.Background()
+	req := graphcms.NewRequest(ctx, `{ course { title } }`)
 	testCases := []struct {
 		desc               string
 		req                *graphcms.Request

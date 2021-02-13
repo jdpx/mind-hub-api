@@ -20,7 +20,7 @@ func NewProgressBuilder() *ProgressBuilder {
 			ID:         fake.CharactersN(10),
 			UserID:     fake.CharactersN(10),
 			EntityID:   fake.CharactersN(10),
-			State:      store.STATUS_STARTED,
+			State:      store.StatusStarted,
 		},
 	}
 }
@@ -57,7 +57,7 @@ func (c ProgressBuilder) WithEntityID(id string) ProgressBuilder {
 
 // Completed ...
 func (c ProgressBuilder) Completed() ProgressBuilder {
-	c.progress.State = store.STATUS_COMPLETED
+	c.progress.State = store.StatusCompleted
 	return c
 }
 

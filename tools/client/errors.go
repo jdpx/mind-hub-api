@@ -2,11 +2,11 @@ package client
 
 import "encoding/json"
 
-// RawJsonError is a json formatted error from a GraphQL server.
-type RawJsonError struct {
+// RawJSONError is a json formatted error from a GraphQL server.
+type RawJSONError struct {
 	json.RawMessage
 }
 
-func (r RawJsonError) Error() string {
+func (r RawJSONError) Error() string {
 	return string(r.RawMessage)
 }

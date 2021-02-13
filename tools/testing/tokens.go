@@ -13,14 +13,14 @@ func GenerateTestUserID() string {
 }
 
 // GenerateTestToken ...
-func GenerateTestToken(tokenClaims jwt.MapClaims) *jwt.Token {
+func GenerateTestToken(tokenClaims jwt.Claims) *jwt.Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
 
 	return token
 }
 
 // GenerateTestTokenString ...
-func GenerateTestTokenString(tokenClaims jwt.MapClaims) string {
+func GenerateTestTokenString(tokenClaims jwt.Claims) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
 	ts, err := token.SignedString([]byte("secret"))
 	if err != nil {

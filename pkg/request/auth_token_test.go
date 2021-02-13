@@ -62,8 +62,8 @@ func TestGetUserID(t *testing.T) {
 
 func TestGetOrganisationID(t *testing.T) {
 	orgID := fake.CharactersN(10)
-	orgIdScope := fmt.Sprintf("read:organisation:%s", orgID)
-	testScopes := fmt.Sprintf("%s %s", fake.Words(), orgIdScope)
+	orgIDScope := fmt.Sprintf("read:organisation:%s", orgID)
+	testScopes := fmt.Sprintf("%s %s", fake.Words(), orgIDScope)
 
 	ctx := context.Background()
 

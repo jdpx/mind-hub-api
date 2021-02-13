@@ -96,7 +96,7 @@ func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ..
 	fP := []*Progress{}
 
 	for _, p := range res {
-		if p.State == STATUS_COMPLETED {
+		if p.State == StatusCompleted {
 			fP = append(fP, p)
 		}
 	}
@@ -117,7 +117,7 @@ func (c ProgressStore) Start(ctx context.Context, eID, uID string) (*Progress, e
 		ID:          id,
 		EntityID:    eID,
 		UserID:      uID,
-		State:       STATUS_STARTED,
+		State:       StatusStarted,
 		DateStarted: c.timer(),
 	}
 
@@ -131,7 +131,7 @@ func (c ProgressStore) Start(ctx context.Context, eID, uID string) (*Progress, e
 		ID:          id,
 		EntityID:    eID,
 		UserID:      uID,
-		State:       STATUS_STARTED,
+		State:       StatusStarted,
 		DateStarted: c.timer(),
 	}, nil
 }
@@ -144,7 +144,7 @@ func (c ProgressStore) Complete(ctx context.Context, eID, uID string) (*Progress
 		Set(expression.Name("id"), expression.Name("id").IfNotExists(expression.Value(c.idGenerator()))).
 		Set(expression.Name("entityID"), expression.Name("entityID").IfNotExists(expression.Value(eID))).
 		Set(expression.Name("userID"), expression.Name("userID").IfNotExists(expression.Value(uID))).
-		Set(expression.Name("state"), expression.Value(STATUS_COMPLETED)).
+		Set(expression.Name("state"), expression.Value(StatusCompleted)).
 		Set(expression.Name("dateStarted"), expression.Name("dateStarted").IfNotExists(expression.Value(c.timer()))).
 		Set(expression.Name("dateCompleted"), expression.Value(c.timer()))
 

@@ -16,7 +16,7 @@ const (
 
 // GenerateTestGinContextWithToken generates a gin context for use in tests that has an authorisation token
 // This replicates the Gin Middleware which wraps the Requests context into the Resolver context
-func GenerateTestGinContextWithToken(ctx context.Context, tokenClaims jwt.MapClaims) context.Context {
+func GenerateTestGinContextWithToken(ctx context.Context, tokenClaims jwt.Claims) context.Context {
 	ts := GenerateTestTokenString(tokenClaims)
 
 	req := http.Request{Header: http.Header{}}

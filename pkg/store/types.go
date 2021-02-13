@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	STATUS_STARTED   = "STARTED"
-	STATUS_COMPLETED = "COMPLETED"
+	StatusStarted   = "STARTED"
+	StatusCompleted = "COMPLETED"
 )
 
 type BaseEntity struct {

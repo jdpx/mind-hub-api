@@ -71,7 +71,7 @@ func (p *Client) Post(query string, response interface{}, options ...Option) err
 	unpackErr := unpack(respDataRaw.Data, response)
 
 	if respDataRaw.Errors != nil {
-		return RawJsonError{respDataRaw.Errors}
+		return RawJSONError{respDataRaw.Errors}
 	}
 	return unpackErr
 }

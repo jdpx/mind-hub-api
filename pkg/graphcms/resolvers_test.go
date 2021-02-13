@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestResolverResolveCourses(t *testing.T) {
+func TestResolverGetCourses(t *testing.T) {
 	ctx := context.Background()
 	cmsCourse := builder.NewCourseBuilder().
 		Build()
@@ -68,7 +68,7 @@ func TestResolverResolveCourses(t *testing.T) {
 			resolver := graphcms.NewResolver(clientMock)
 			ctx := context.Background()
 
-			courses, err := resolver.ResolveCourses(ctx)
+			courses, err := resolver.GetCourses(ctx)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())
@@ -80,7 +80,7 @@ func TestResolverResolveCourses(t *testing.T) {
 	}
 }
 
-func TestResolverResolveCourse(t *testing.T) {
+func TestResolverGetCourseByID(t *testing.T) {
 	ctx := context.Background()
 	cmsCourse := builder.NewCourseBuilder().
 		Build()
@@ -135,7 +135,7 @@ func TestResolverResolveCourse(t *testing.T) {
 			resolver := graphcms.NewResolver(clientMock)
 			ctx := context.Background()
 
-			course, err := resolver.ResolveCourse(ctx, cmsCourse.ID)
+			course, err := resolver.GetCourseByID(ctx, cmsCourse.ID)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())
@@ -147,7 +147,7 @@ func TestResolverResolveCourse(t *testing.T) {
 	}
 }
 
-func TestResolverResolveCourseSessions(t *testing.T) {
+func TestResolverGetSessionsByCourseID(t *testing.T) {
 	ctx := context.Background()
 	courseID := fake.CharactersN(10)
 	cmsSession := builder.NewSessionBuilder().
@@ -209,7 +209,7 @@ func TestResolverResolveCourseSessions(t *testing.T) {
 			resolver := graphcms.NewResolver(clientMock)
 			ctx := context.Background()
 
-			sessions, err := resolver.ResolveCourseSessions(ctx, courseID)
+			sessions, err := resolver.GetSessionsByCourseID(ctx, courseID)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())
@@ -221,7 +221,7 @@ func TestResolverResolveCourseSessions(t *testing.T) {
 	}
 }
 
-func TestResolverResolveSession(t *testing.T) {
+func TestResolverGetSessions(t *testing.T) {
 	ctx := context.Background()
 	cmsSession := builder.NewSessionBuilder().
 		Build()
@@ -294,7 +294,7 @@ func TestResolverResolveSession(t *testing.T) {
 			resolver := graphcms.NewResolver(clientMock)
 			ctx := context.Background()
 
-			session, err := resolver.ResolveSession(ctx, cmsSession.ID)
+			session, err := resolver.GetSessionByID(ctx, cmsSession.ID)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())

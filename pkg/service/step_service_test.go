@@ -22,15 +22,15 @@ func TestStepServiceGetByID(t *testing.T) {
 
 	testCases := []struct {
 		desc            string
-		cmsExpectations func(client *graphcmsmocks.MockResolverer)
+		cmsExpectations func(client *graphcmsmocks.MockCMSResolver)
 
 		expectedStep *service.Step
 		expectedErr  error
 	}{
 		{
 			desc: "given step returned from store, step returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveStep(gomock.Any(), sID).Return(&cmsStep, nil)
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetStepsByID(gomock.Any(), sID).Return(&cmsStep, nil)
 			},
 
 			expectedStep: &service.Step{
@@ -44,16 +44,16 @@ func TestStepServiceGetByID(t *testing.T) {
 		},
 		{
 			desc: "given a nil step is returned from graphcms, return ErroNotFound",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveStep(gomock.Any(), sID).Return(nil, nil)
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetStepsByID(gomock.Any(), sID).Return(nil, nil)
 			},
 
 			expectedErr: service.ErrNotFound,
 		},
 		{
 			desc: "given an error is returned from the when getting step, err returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveStep(gomock.Any(), sID).Return(nil, fmt.Errorf("something went wrong"))
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetStepsByID(gomock.Any(), sID).Return(nil, fmt.Errorf("something went wrong"))
 			},
 
 			expectedErr: fmt.Errorf("something went wrong"),
@@ -63,7 +63,7 @@ func TestStepServiceGetByID(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			cmsMock := graphcmsmocks.NewMockResolverer(ctrl)
+			cmsMock := graphcmsmocks.NewMockCMSResolver(ctrl)
 
 			if tt.cmsExpectations != nil {
 				tt.cmsExpectations(cmsMock)
@@ -93,15 +93,15 @@ func TestStepServiceCountByCourseID(t *testing.T) {
 
 	testCases := []struct {
 		desc            string
-		cmsExpectations func(client *graphcmsmocks.MockResolverer)
+		cmsExpectations func(client *graphcmsmocks.MockCMSResolver)
 
 		expectedStepCount int
 		expectedErr       error
 	}{
 		{
 			desc: "given steps returned from graphcms, number of steps returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseStepIDs(gomock.Any(), cID).Return([]string{
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetStepIDsByCourseID(gomock.Any(), cID).Return([]string{
 					cmsStepOne.ID,
 					cmsStepTwo.ID,
 				}, nil)
@@ -111,8 +111,8 @@ func TestStepServiceCountByCourseID(t *testing.T) {
 		},
 		{
 			desc: "given an error is returned from the when getting step step ids, err returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseStepIDs(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetStepIDsByCourseID(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
 			},
 
 			expectedErr: fmt.Errorf("something went wrong"),
@@ -122,7 +122,7 @@ func TestStepServiceCountByCourseID(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			cmsMock := graphcmsmocks.NewMockResolverer(ctrl)
+			cmsMock := graphcmsmocks.NewMockCMSResolver(ctrl)
 
 			if tt.cmsExpectations != nil {
 				tt.cmsExpectations(cmsMock)

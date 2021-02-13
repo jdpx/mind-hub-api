@@ -23,15 +23,15 @@ func TestSessionServiceGetByID(t *testing.T) {
 
 	testCases := []struct {
 		desc            string
-		cmsExpectations func(client *graphcmsmocks.MockResolverer)
+		cmsExpectations func(client *graphcmsmocks.MockCMSResolver)
 
 		expectedSession *service.Session
 		expectedErr     error
 	}{
 		{
 			desc: "given step returned from store, step returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveSession(gomock.Any(), sID).Return(&cmsSession, nil)
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionByID(gomock.Any(), sID).Return(&cmsSession, nil)
 			},
 
 			expectedSession: &service.Session{
@@ -43,16 +43,16 @@ func TestSessionServiceGetByID(t *testing.T) {
 		},
 		{
 			desc: "given a nil step is returned from graphcms, return ErroNotFound",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveSession(gomock.Any(), sID).Return(nil, nil)
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionByID(gomock.Any(), sID).Return(nil, nil)
 			},
 
 			expectedErr: service.ErrNotFound,
 		},
 		{
 			desc: "given an error is returned from the when getting step, err returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveSession(gomock.Any(), sID).Return(nil, fmt.Errorf("something went wrong"))
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionByID(gomock.Any(), sID).Return(nil, fmt.Errorf("something went wrong"))
 			},
 
 			expectedErr: fmt.Errorf("something went wrong"),
@@ -62,7 +62,7 @@ func TestSessionServiceGetByID(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			cmsMock := graphcmsmocks.NewMockResolverer(ctrl)
+			cmsMock := graphcmsmocks.NewMockCMSResolver(ctrl)
 
 			if tt.cmsExpectations != nil {
 				tt.cmsExpectations(cmsMock)
@@ -92,15 +92,15 @@ func TestSessionServiceGetByCourseID(t *testing.T) {
 
 	testCases := []struct {
 		desc            string
-		cmsExpectations func(client *graphcmsmocks.MockResolverer)
+		cmsExpectations func(client *graphcmsmocks.MockCMSResolver)
 
 		expectedSession []*service.Session
 		expectedErr     error
 	}{
 		{
 			desc: "given steps returned from graphcms, number of steps returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseSessions(gomock.Any(), cID).Return([]*graphcms.Session{
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionsByCourseID(gomock.Any(), cID).Return([]*graphcms.Session{
 					&cmsSessionOne,
 					&cmsSessionTwo,
 				}, nil)
@@ -123,8 +123,8 @@ func TestSessionServiceGetByCourseID(t *testing.T) {
 		},
 		{
 			desc: "given an error is returned from the when getting step step ids, err returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseSessions(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionsByCourseID(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
 			},
 
 			expectedErr: fmt.Errorf("something went wrong"),
@@ -134,7 +134,7 @@ func TestSessionServiceGetByCourseID(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			cmsMock := graphcmsmocks.NewMockResolverer(ctrl)
+			cmsMock := graphcmsmocks.NewMockCMSResolver(ctrl)
 
 			if tt.cmsExpectations != nil {
 				tt.cmsExpectations(cmsMock)
@@ -164,15 +164,15 @@ func TestSessionServiceCountByCourseID(t *testing.T) {
 
 	testCases := []struct {
 		desc            string
-		cmsExpectations func(client *graphcmsmocks.MockResolverer)
+		cmsExpectations func(client *graphcmsmocks.MockCMSResolver)
 
 		expectedSessionCount int
 		expectedErr          error
 	}{
 		{
 			desc: "given steps returned from graphcms, number of steps returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseSessions(gomock.Any(), cID).Return([]*graphcms.Session{
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionsByCourseID(gomock.Any(), cID).Return([]*graphcms.Session{
 					&cmsSessionOne,
 					&cmsSessionTwo,
 				}, nil)
@@ -182,8 +182,8 @@ func TestSessionServiceCountByCourseID(t *testing.T) {
 		},
 		{
 			desc: "given an error is returned from the when getting step step ids, err returned",
-			cmsExpectations: func(client *graphcmsmocks.MockResolverer) {
-				client.EXPECT().ResolveCourseSessions(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
+			cmsExpectations: func(client *graphcmsmocks.MockCMSResolver) {
+				client.EXPECT().GetSessionsByCourseID(gomock.Any(), cID).Return(nil, fmt.Errorf("something went wrong"))
 			},
 
 			expectedErr: fmt.Errorf("something went wrong"),
@@ -193,7 +193,7 @@ func TestSessionServiceCountByCourseID(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
-			cmsMock := graphcmsmocks.NewMockResolverer(ctrl)
+			cmsMock := graphcmsmocks.NewMockCMSResolver(ctrl)
 
 			if tt.cmsExpectations != nil {
 				tt.cmsExpectations(cmsMock)

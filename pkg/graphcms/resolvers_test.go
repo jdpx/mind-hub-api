@@ -14,10 +14,11 @@ import (
 )
 
 func TestResolverResolveCourses(t *testing.T) {
+	ctx := context.Background()
 	cmsCourse := builder.NewCourseBuilder().
 		Build()
 
-	req := graphcms.NewRequest(`{
+	req := graphcms.NewRequest(ctx, `{
   courses {
     id
     title
@@ -80,10 +81,11 @@ func TestResolverResolveCourses(t *testing.T) {
 }
 
 func TestResolverResolveCourse(t *testing.T) {
+	ctx := context.Background()
 	cmsCourse := builder.NewCourseBuilder().
 		Build()
 
-	req := graphcms.NewRequest(`
+	req := graphcms.NewRequest(ctx, `
   query Course($id: ID) {
       course(where: { id: $id }) {
           id
@@ -146,11 +148,12 @@ func TestResolverResolveCourse(t *testing.T) {
 }
 
 func TestResolverResolveCourseSessions(t *testing.T) {
+	ctx := context.Background()
 	courseID := fake.CharactersN(10)
 	cmsSession := builder.NewSessionBuilder().
 		Build()
 
-	req := graphcms.NewRequest(`query sessions($id: ID){
+	req := graphcms.NewRequest(ctx, `query sessions($id: ID){
   sessions(where: { course: { id: $id } }) {
     id
     title
@@ -219,10 +222,11 @@ func TestResolverResolveCourseSessions(t *testing.T) {
 }
 
 func TestResolverResolveSession(t *testing.T) {
+	ctx := context.Background()
 	cmsSession := builder.NewSessionBuilder().
 		Build()
 
-	req := graphcms.NewRequest(`query Session($id: ID) {
+	req := graphcms.NewRequest(ctx, `query Session($id: ID) {
     session(where: { id: $id }) {
         id
         title

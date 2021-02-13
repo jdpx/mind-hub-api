@@ -3,7 +3,7 @@ package request
 import "net/http"
 
 const (
-	correlationIDHeader = "X-Correlation-Id"
+	CorrelationIDHeader = "X-Correlation-Id"
 	authorizationHeader = "Authorization"
 )
 
@@ -12,7 +12,7 @@ func GetHeader(key string, header http.Header) string {
 }
 
 func GetCorrelationIDHeader(header http.Header) string {
-	return GetHeader(correlationIDHeader, header)
+	return GetHeader(CorrelationIDHeader, header)
 }
 
 func GetAuthorizationHeader(header http.Header) string {

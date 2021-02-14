@@ -175,11 +175,7 @@ resource "aws_iam_role_policy" "mind_hub_api_terraform_deploy_role_policy" {
         "*"
       ],
       "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:Describe*",
-        "logs:List*",
-        "logs:PutLogEvents"
+        "logs:*"
       ]
     },
     {

@@ -12,7 +12,7 @@ phases:
     commands:
       - make run/lint
       - make run/tests
-      - make build/lambdas -B
+      - make build/lambdas -B BUILD_NUMBER=$CODEBUILD_BUILD_NUMBER
 
 artifacts:
   files:

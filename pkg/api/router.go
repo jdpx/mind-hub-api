@@ -17,6 +17,7 @@ import (
 
 // Config ...
 type Config struct {
+	Version     string
 	Env         string
 	GraphCMSURL string
 }

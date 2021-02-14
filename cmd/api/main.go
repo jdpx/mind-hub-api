@@ -8,13 +8,19 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/api"
 )
 
-const graphCMSURLKey = "GRAPH_CMS_URL"
+const (
+	graphCMSURLKey = "GRAPH_CMS_URL"
+	environment    = "local"
+)
+
+var buildVersion = "0.0.1"
 
 func main() {
-	fmt.Println("Start Local Graphql API")
+	fmt.Println("Start Local Graphql API", buildVersion)
 
 	c := api.Config{
-		Env:         "local",
+		Version:     buildVersion,
+		Env:         environment,
 		GraphCMSURL: os.Getenv(graphCMSURLKey),
 	}
 

@@ -25,7 +25,7 @@ module "cors" {
   ]
 }
 
-module authorizer {
+module "authorizer" {
   source                  = "jdpx/auth0-authorizer/aws"
   authorizer_audience     = var.auth0_audience
   authorizer_jwks_uri     = var.auth0_jwks_uri
@@ -38,8 +38,13 @@ resource "aws_api_gateway_rest_api" "mind_hub_api" {
 
 resource "aws_api_gateway_stage" "mind_hub_api_v1_stage" {
   stage_name    = var.api_stage_name
-  rest_api_id = aws_api_gateway_rest_api.mind_hub_api.id
+  rest_api_id   = aws_api_gateway_rest_api.mind_hub_api.id
   deployment_id = aws_api_gateway_deployment.mind_hub_api_deploy.id
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.mind_hub_api_api_logs.arn
+    format          = "$context.requestId"
+  }
 
   depends_on = [aws_cloudwatch_log_group.mind_hub_api_api_logs]
 }

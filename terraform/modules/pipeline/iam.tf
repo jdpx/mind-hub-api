@@ -233,15 +233,22 @@ resource "aws_iam_role_policy" "mind_hub_api_terraform_deploy_role_policy" {
         "*"
       ],
       "Action": [
-        "lambda:List*",
-        "lambda:Describe*",
-        "lambda:Get*"
+        "dynamodb:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Resource": [
+        "*"
+      ],
+      "Action": [
+        "lambda:*"
       ]
     },
     {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
-      "Resource": "${aws_iam_role.mind_hub_api_terraform_deploy_role.arn}"
+      "Resource": "arn:aws:iam::500248363656:role/cd"
     }
   ]
 }

@@ -1,4 +1,5 @@
-GO_BUILD = GOOS=linux go build
+BUILD_NUMBER = 0.0.0
+GO_BUILD = GOOS=linux go build -ldflags="-X main.buildVersion=$(BUILD_NUMBER)"
 FUNCTIONS_LAMBDAS = $(wildcard cmd/lambdas/*/main.go)
 FUNCTIONS_DIRS = $(shell ls lambdas)
 

@@ -14,14 +14,18 @@ import (
 var ginLambda *ginadapter.GinLambda
 
 const graphCMSURLKey = "GRAPH_CMS_URL"
+const environment = "prod"
+
+var buildVersion = "0.0.1"
 
 // Handler ...
 func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if ginLambda == nil {
-		fmt.Println("Start Graphql Lambda API")
+		fmt.Println("Start Graphql Lambda API", buildVersion)
 
 		c := api.Config{
-			Env:         "prod",
+			Version:     buildVersion,
+			Env:         environment,
 			GraphCMSURL: os.Getenv(graphCMSURLKey),
 		}
 

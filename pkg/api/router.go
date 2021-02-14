@@ -32,6 +32,7 @@ func NewRouter(config *Config) *gin.Engine {
 	r.Use(request.CORSMiddleware())
 	r.Use(logging.GinRequestLoggerMiddleware())
 	r.Use(request.ContextMiddleware())
+	r.Use(request.VersionMiddleware(config.Version))
 
 	// Setting up Gin
 	r.POST("v1/query", graphqlHandler(config))

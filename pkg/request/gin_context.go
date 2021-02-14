@@ -7,10 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	mindContextKey = "mind-hub-api"
+	versionHeader  = "x-mind-api-version"
+)
+
 type contextKey string
 
 func (c contextKey) String() string {
-	return "mind-hub-api" + string(c)
+	return fmt.Sprintf("%s%s", mindContextKey, string(c))
 }
 
 const (
@@ -40,6 +45,14 @@ func ContextMiddleware() gin.HandlerFunc {
 		ctx := context.WithValue(c.Request.Context(), ContextKeyGinContext, c)
 		c.Request = c.Request.WithContext(ctx)
 
+		c.Next()
+	}
+}
+
+// VersionMiddleware ...
+func VersionMiddleware(version string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header(versionHeader, version)
 		c.Next()
 	}
 }

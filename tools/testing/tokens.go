@@ -12,6 +12,11 @@ func GenerateTestUserID() string {
 	return fmt.Sprintf("auth0|%s", fake.CharactersN(10))
 }
 
+// GenerateTestOrganisationIDScope generates a test Auth0 User ID
+func GenerateTestOrganisationIDScope(id string) string {
+	return fmt.Sprintf("read:organisation:%s", id)
+}
+
 // GenerateTestToken ...
 func GenerateTestToken(tokenClaims jwt.Claims) *jwt.Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)

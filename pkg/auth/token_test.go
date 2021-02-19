@@ -60,7 +60,7 @@ func TestTokenGetUserClaims(t *testing.T) {
 
 func TestTokenGetOrganisationID(t *testing.T) {
 	orgID := fake.CharactersN(10)
-	orgIDScope := fmt.Sprintf("read:organisation:%s", orgID)
+	orgIDScope := tTools.GenerateTestOrganisationIDScope(orgID)
 	testScopes := fmt.Sprintf("%s %s", fake.Words(), orgIDScope)
 
 	testCases := []struct {

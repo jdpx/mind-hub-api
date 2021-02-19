@@ -8,10 +8,8 @@ import (
 )
 
 // NewRouter ...
-func NewRouter(config *Config) *gin.Engine {
-	log := logging.New()
-
-	log = log.WithFields(
+func NewRouter(config Config) *gin.Engine {
+	log := logging.New().WithFields(
 		logrus.Fields{
 			logging.APIVersionKey:     config.Version,
 			logging.APIEnvironmentKey: config.Env,

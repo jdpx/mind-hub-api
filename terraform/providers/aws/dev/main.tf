@@ -33,7 +33,7 @@ module "mind-hub-ui" {
   auth0_audience        = var.auth0_audience
   auth0_jwks_uri        = var.auth0_jwks_uri
   auth0_token_issuer    = var.auth0_token_issuer
-  graph_cms_url_mapping = "1ohTDUgTsyvWet5lJFCCqnA2F1S:api-eu-central-1.graphcms.com/v2/ckftjhf769ysi01z7ari84qio/master"
+  graph_cms_url_mapping = "1ohTDUgTsyvWet5lJFCCqnA2F1S:ckftjhf769ysi01z7ari84qio/master"
 
   providers = {
     aws         = aws

@@ -72,9 +72,19 @@ func NewFromResolver(ctx context.Context) *logrus.Entry {
 
 	cID, err := request.ContextCorrelationID(ctx)
 	if err != nil {
-		log.WithContext(ctx)
+		log.WithError(err).Error("Error occurred getting context correlation ID")
+	}
+
+	oID, err := request.GetOrganisationID(ctx)
+	if err != nil {
+		log.WithError(err).Error("Error occurred getting context organisation ID")
 	}
 
 	return log.WithContext(ctx).
-		WithField(CorrelationIDKey, cID)
+		WithFields(
+			logrus.Fields{
+				CorrelationIDKey:  cID,
+				OrganisationIDKey: oID,
+			},
+		)
 }

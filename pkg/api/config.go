@@ -6,12 +6,15 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+const (
+	localEnv = "local"
+)
+
 // Config ...
 type Config struct {
-	Version     string            `ignored:"true"`
-	Env         string            `default:"local"`
-	CMSMapping  map[string]string `envconfig:"MIND_GRAPH_CMS_URL_MAPPING" required:"true"`
-	GraphCMSURL string
+	Version    string            `ignored:"true"`
+	Env        string            `default:"local"`
+	CMSMapping map[string]string `envconfig:"MIND_GRAPH_CMS_URL_MAPPING" required:"true"`
 }
 
 func NewConfig() Config {
@@ -22,4 +25,8 @@ func NewConfig() Config {
 	}
 
 	return c
+}
+
+func (c Config) IsLocal() bool {
+	return c.Env == localEnv
 }

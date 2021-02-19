@@ -17,7 +17,7 @@ func main() {
 	c := api.NewConfig()
 	c.Version = buildVersion
 
-	router := api.NewRouter(&c)
+	router := api.NewRouter(c)
 
 	err := http.ListenAndServe(apiPort, router)
 	if err != nil {

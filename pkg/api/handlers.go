@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/gin-gonic/gin"
@@ -15,33 +17,14 @@ import (
 )
 
 // Defining the Graphql handler
-func graphqlHandler(config *Config) gin.HandlerFunc {
-	cmsHTTPClient := request.DefaultHTTPClient(
-		request.WithTransport(logging.NewHTTPTransportLogger("GraphCMS")),
-	)
+func graphqlHandler(config Config) gin.HandlerFunc {
+	cmsClient := newCMSClient(config)
+	storeClient := newStoreClient(config)
 
-	graphqlClient := graphqlClient.NewClient(
-		config.GraphCMSURL,
-		graphqlClient.WithHTTPClient(cmsHTTPClient),
-	)
-
-	cms := graphcms.NewClient(graphqlClient)
-	cmsResolver := graphcms.NewResolver(cms)
-
-	var dynamoClient *dynamodb.Client
-	if config.Env == "local" {
-		dynamoClient = store.NewLocalClient()
-	} else {
-		dynamoClient = store.NewClient()
-	}
-
-	s := store.NewStore(
-		store.WithDynamoDB(dynamoClient),
-	)
-
-	noteStore := store.NewNoteStore(s)
-	progressStore := store.NewProgressStore(s)
-	timemapStore := store.NewTimemapStore(s)
+	cmsResolver := graphcms.NewResolver(cmsClient)
+	noteStore := store.NewNoteStore(storeClient)
+	progressStore := store.NewProgressStore(storeClient)
+	timemapStore := store.NewTimemapStore(storeClient)
 
 	courseProgressService := service.NewCourseProgressService(cmsResolver, progressStore)
 	courseService := service.NewCourseService(cmsResolver)
@@ -74,4 +57,41 @@ func graphqlHandler(config *Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func newCMSClient(config Config) *graphcms.Client {
+	log := logging.New()
+	cmsHTTPClient := request.DefaultHTTPClient(
+		request.WithTransport(logging.NewHTTPTransportLogger("GraphCMS")),
+	)
+
+	var cmsClients []graphcms.Option
+
+	for key, cmsURL := range config.CMSMapping {
+		log.Info(fmt.Sprintf("Registered Organisation %s GraphCMS Client", key))
+
+		graphqlClient := graphqlClient.NewClient(
+			graphcms.NewCMSUrl(cmsURL),
+			graphqlClient.WithHTTPClient(cmsHTTPClient),
+		)
+
+		cmsClients = append(cmsClients, graphcms.WithOrganisationClient(key, graphqlClient))
+	}
+
+	return graphcms.NewClient(cmsClients...)
+}
+
+func newStoreClient(config Config) *store.Store {
+	var dynamoClient *dynamodb.Client
+	if config.IsLocal() {
+		dynamoClient = store.NewLocalClient()
+	} else {
+		dynamoClient = store.NewClient()
+	}
+
+	s := store.NewStore(
+		store.WithDynamoDB(dynamoClient),
+	)
+
+	return s
 }

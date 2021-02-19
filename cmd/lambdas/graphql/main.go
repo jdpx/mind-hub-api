@@ -22,7 +22,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		c := api.NewConfig()
 		c.Version = buildVersion
 
-		router := api.NewRouter(&c)
+		router := api.NewRouter(c)
 
 		ginLambda = ginadapter.New(router)
 	}

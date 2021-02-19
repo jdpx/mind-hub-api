@@ -24,8 +24,7 @@ variable "api_stage_name" {
   default     = "v1"
 }
 
-
-variable "graph_cms_url" {
+variable "graph_cms_url_mapping" {
   type        = string
-  description = "GraphCMS API URL"
+  description = "A string representation for the mapping from organisation id to GraphCMS API URL"
 }

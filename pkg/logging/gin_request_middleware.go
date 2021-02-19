@@ -29,7 +29,7 @@ func GinRequestLoggerMiddleware() gin.HandlerFunc {
 			OrganisationIDKey: orgID,
 		})
 
-		log.Info(fmt.Sprintf("Request %s starting", c.Request.URL.Path))
+		log.Info(fmt.Sprintf("API Request %s starting", c.Request.URL.Path))
 
 		t := time.Now()
 
@@ -41,6 +41,6 @@ func GinRequestLoggerMiddleware() gin.HandlerFunc {
 		log.WithFields(logrus.Fields{
 			RequestDurationKey: latency,
 			HTTPStatusKey:      status,
-		}).Info(fmt.Sprintf("Request %s completed ", c.Request.URL.Path))
+		}).Info(fmt.Sprintf("API Request %s completed ", c.Request.URL.Path))
 	}
 }

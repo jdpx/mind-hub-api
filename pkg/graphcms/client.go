@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jdpx/mind-hub-api/pkg/logging"
+	"github.com/jdpx/mind-hub-api/pkg/request"
 	"github.com/machinebox/graphql"
 )
 
@@ -17,16 +18,32 @@ type Requester interface {
 
 // Client makes request to GraphCMS
 type Client struct {
-	client Requester
+	client map[string]Requester
 }
 
 // Request ...
 type Request = graphql.Request
 
+// Option ...
+type Option func(*Client)
+
 // NewClient initialises a new Client
-func NewClient(client Requester) *Client {
-	return &Client{
-		client: client,
+func NewClient(opts ...Option) *Client {
+	c := &Client{
+		client: map[string]Requester{},
+	}
+
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	return c
+}
+
+// WithOrganisationClient sets a client for a specific Organisation
+func WithOrganisationClient(orgID string, client Requester) func(r *Client) {
+	return func(r *Client) {
+		r.client[orgID] = client
 	}
 }
 
@@ -34,7 +51,22 @@ func NewClient(client Requester) *Client {
 func (c Client) Run(ctx context.Context, req *Request, res interface{}) error {
 	log := logging.NewFromResolver(ctx)
 
-	err := c.client.Run(ctx, req, res)
+	oID, err := request.GetOrganisationID(ctx)
+	if err != nil {
+		log.WithError(err).
+			Error("no organisation ID in context")
+
+		return fmt.Errorf("no organisation ID in context %w", err)
+	}
+
+	client, ok := c.client[oID]
+	if !ok {
+		log.Error(fmt.Errorf("no client registered for organisation %s", oID))
+
+		return fmt.Errorf("no client registered for organisation %s", oID)
+	}
+
+	err = client.Run(ctx, req, res)
 	if err != nil {
 		log.WithError(err).
 			Error("Error occurred making request to GraphCMS")

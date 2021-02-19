@@ -14,7 +14,8 @@ resource "aws_lambda_function" "mind_hub_api_graphql_api_lambda" {
 
   environment {
     variables = {
-      GRAPH_CMS_URL = var.graph_cms_url
+      MIND_ENV = var.env
+      MIND_GRAPH_CMS_URL_MAPPING = var.graph_cms_url_mapping
     }
   }
 }

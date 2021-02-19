@@ -18,10 +18,13 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang/mock v1.4.4
+	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
+	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/gommon v0.3.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
@@ -35,8 +38,8 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser/v2 v2.1.0
-	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
-	golang.org/x/sys v0.0.0-20201029080932-201ba4db2418 // indirect
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
+	golang.org/x/sys v0.0.0-20201214210602-f9fddec55a1e // indirect
 	golang.org/x/text v0.3.4 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )

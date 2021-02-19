@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"
+	"github.com/jdpx/mind-hub-api/pkg/graphcms/builder"
 	graphcmsmocks "github.com/jdpx/mind-hub-api/pkg/graphcms/mocks"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,11 +15,14 @@ import (
 func TestClientRun(t *testing.T) {
 	ctx := context.Background()
 	req := graphcms.NewRequest(ctx, `{ course { title } }`)
+	course := builder.NewCourseBuilder().Build()
+
 	testCases := []struct {
 		desc               string
 		req                *graphcms.Request
 		clientExpectations func(client *graphcmsmocks.MockRequester)
 
+		expectedRes graphcms.Course
 		expectedErr error
 	}{
 		{
@@ -26,8 +30,10 @@ func TestClientRun(t *testing.T) {
 			req:  req,
 
 			clientExpectations: func(client *graphcmsmocks.MockRequester) {
-				client.EXPECT().Run(gomock.Any(), req, gomock.Any())
+				client.EXPECT().Run(gomock.Any(), req, gomock.Any()).SetArg(2, course)
 			},
+
+			expectedRes: course,
 		},
 		{
 			desc: "given the client returns an error, wrapper error returned",
@@ -53,12 +59,14 @@ func TestClientRun(t *testing.T) {
 			client := graphcms.NewClient(clientMock)
 
 			ctx := context.Background()
-			err := client.Run(ctx, tt.req, "test")
+			var res graphcms.Course
+			err := client.Run(ctx, tt.req, &res)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())
 			} else {
 				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedRes, res)
 			}
 		})
 	}

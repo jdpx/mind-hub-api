@@ -34,7 +34,7 @@ func NewResolver(client Requester) *Resolver {
 // GetCourses retrieves Courses from GraphCMS
 func (r Resolver) GetCourses(ctx context.Context) ([]*Course, error) {
 	log := logging.NewFromResolver(ctx)
-	log.Info("Resolving Courses")
+	log.Info("Resolving GraphCMS Courses")
 
 	req := NewRequest(ctx, getAllCoursesQuery)
 	res := coursesResponse{}
@@ -98,7 +98,7 @@ func (r Resolver) GetSessionByID(ctx context.Context, id string) (*Session, erro
 	return res.Session, err
 }
 
-// GetStepIDsByCourseID retreives a Session from GraphCMS based on the Session ID
+// GetStepIDsByCourseID retrieves a Session from GraphCMS based on the Session ID
 func (r Resolver) GetStepIDsByCourseID(ctx context.Context, id string) ([]string, error) {
 	log := logging.NewFromResolver(ctx).WithField(logging.SessionIDKey, id)
 	log.Info(fmt.Sprintf("Resolving GraphCMS Step IDs for Course %s", id))
@@ -123,7 +123,7 @@ func (r Resolver) GetStepIDsByCourseID(ctx context.Context, id string) ([]string
 	return ids, err
 }
 
-// GetStepsByID retreives Steps from GraphCMS based on the Step ID
+// GetStepsByID retrieves Steps from GraphCMS based on the Step ID
 func (r Resolver) GetStepsByID(ctx context.Context, id string) (*Step, error) {
 	log := logging.NewFromResolver(ctx).WithField(logging.StepIDKey, id)
 	log.Info(fmt.Sprintf("Resolving GraphCMS Step %s", id))

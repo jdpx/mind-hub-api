@@ -1,0 +1,21 @@
+{
+  "name": "mind-api-dev",
+  "identifier": "https://api.dev.mind.jdpx.co.uk",
+  "allow_offline_access": false,
+  "skip_consent_for_verifiable_first_party_clients": true,
+  "token_lifetime": 86400,
+  "token_lifetime_for_web": 7200,
+  "signing_alg": "RS256",
+  "scopes": [
+    {
+      "value": "mind:admin",
+      "description": "Admin Access"
+    },
+    {
+      "value": "read:organisation:1ohTDUgTsyvWet5lJFCCqnA2F1S",
+      "description": "Allow Test Organisation Access"
+    }
+  ],
+  "enforce_policies": true,
+  "token_dialect": "access_token"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "OrganisationTest",
+  "description": "Test Organisation",
+  "permissions": [
+    {
+      "permission_name": "read:organisation:1ohTDUgTsyvWet5lJFCCqnA2F1S",
+      "resource_server_identifier": "https://api.dev.mind.jdpx.co.uk"
+    }
+  ]
+}

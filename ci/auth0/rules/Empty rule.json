@@ -1,0 +1,7 @@
+{
+  "enabled": false,
+  "script": "./Empty rule.js",
+  "name": "Empty rule",
+  "order": 1,
+  "stage": "login_success"
+}

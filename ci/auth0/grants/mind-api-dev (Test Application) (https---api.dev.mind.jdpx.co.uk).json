@@ -1,0 +1,5 @@
+{
+  "client_id": "mind-api-dev (Test Application)",
+  "audience": "https://api.dev.mind.jdpx.co.uk",
+  "scope": []
+}

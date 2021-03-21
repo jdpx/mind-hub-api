@@ -1,0 +1,29 @@
+{
+  "default_audience": "",
+  "default_directory": "mind-local-users",
+  "enabled_locales": [
+    "en"
+  ],
+  "flags": {
+    "change_pwd_flow_v1": false,
+    "enable_apis_section": false,
+    "enable_client_connections": false,
+    "enable_custom_domain_in_emails": false,
+    "enable_dynamic_client_registration": false,
+    "enable_legacy_logs_search_v2": false,
+    "enable_public_signup_user_exists_error": false,
+    "new_universal_login_experience_enabled": true,
+    "universal_login": true,
+    "use_scope_descriptions_for_consent": false,
+    "dashboard_ui_next": true,
+    "disable_clickjack_protection_headers": false,
+    "enable_pipeline2": false
+  },
+  "friendly_name": "Mind Hub",
+  "universal_login": {
+    "colors": {
+      "primary": "#0059d6",
+      "page_background": "#000000"
+    }
+  }
+}

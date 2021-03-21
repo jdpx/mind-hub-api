@@ -1,0 +1,10 @@
+{
+  "name": "Admin User dev",
+  "description": "Admin User dev",
+  "permissions": [
+    {
+      "permission_name": "mind:admin",
+      "resource_server_identifier": "https://api.dev.mind.jdpx.co.uk"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "options": {
+    "import_mode": false,
+    "disable_signup": true,
+    "passwordPolicy": "good",
+    "password_history": {
+      "size": 3,
+      "enable": false
+    },
+    "requires_username": false,
+    "brute_force_protection": false,
+    "enabledDatabaseCustomization": false
+  },
+  "strategy": "auth0",
+  "name": "mind-dev-users",
+  "is_domain_connection": false,
+  "realms": [
+    "mind-dev-users"
+  ],
+  "enabled_clients": [
+    "mind-terraform-dev",
+    "mind-ui-dev"
+  ]
+}

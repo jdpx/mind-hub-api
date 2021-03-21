@@ -7,7 +7,7 @@ resource "auth0_resource_server" "mind_ui_api" {
   allow_offline_access                            = false
   enforce_policies                                = true
   skip_consent_for_verifiable_first_party_clients = true
-  token_dialect                                   = "access_token"
+  token_dialect                                   = "access_token" #tfsec:ignore:GEN003
   token_lifetime                                  = 86400
 
   scopes {

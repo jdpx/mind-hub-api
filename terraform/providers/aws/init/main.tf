@@ -2,18 +2,18 @@ terraform {
   required_version = ">= 0.14.2"
 
   backend "s3" {
-    bucket         = "mind-hub-api-tf-init-state"
-    key            = "terraform.tfstate"
-    region         = "eu-west-1"
+    bucket = "mind-hub-api-tf-init-state"
+    key    = "terraform.tfstate"
+    region = "eu-west-1"
   }
 
   required_providers {
-    aws =  "~> 3.21"
+    aws = "~> 3.21"
   }
 }
 
 provider "aws" {
-  region                  = "eu-west-1"
+  region = "eu-west-1"
 }
 
 

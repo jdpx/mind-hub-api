@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.14.2"
+  required_version = "0.14.2"
 
   backend "s3" {
     bucket         = "mind-hub-api-dev-tf-state"
@@ -11,6 +11,10 @@ terraform {
 
   required_providers {
     aws = "~> 3.21"
+    auth0 = {
+      source  = "alexkappa/auth0"
+      version = "0.19.0"
+    }
   }
 }
 
@@ -25,14 +29,23 @@ provider "aws" {
   region = "us-east-1"
 }
 
+module "auth0" {
+  source = "../../../modules/auth0"
+
+  env                         = "dev"
+  auth0_client_domain         = var.auth0_client_domain
+  auth0_client_id             = var.auth0_client_id
+  auth0_client_secret         = var.auth0_client_secret
+  auth0_user_default_password = var.auth0_user_default_password
+}
 
 module "mind-hub-ui" {
   source = "../../../modules/mind-hub-api"
 
   env                   = "dev"
-  auth0_audience        = var.auth0_audience
-  auth0_jwks_uri        = var.auth0_jwks_uri
-  auth0_token_issuer    = var.auth0_token_issuer
+  auth0_audience        = module.auth0.api_audience
+  auth0_jwks_uri        = "https://${module.auth0.tenant_id}.eu.auth0.com/.well-known/jwks.json"
+  auth0_token_issuer    = "https://${module.auth0.tenant_id}.eu.auth0.com/"
   graph_cms_url_mapping = "1ohTDUgTsyvWet5lJFCCqnA2F1S:ckftjhf769ysi01z7ari84qio/master"
 
   providers = {

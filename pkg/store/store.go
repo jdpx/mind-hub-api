@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/jdpx/mind-hub-api/pkg/logging"
 	"github.com/sirupsen/logrus"
 )
@@ -55,7 +54,7 @@ func (c Store) Get(ctx context.Context, tableName string, pk, sk string, i inter
 	})
 
 	input := dynamodb.GetItemInput{
-		TableName: aws.String(tableName),
+		TableName: &tableName,
 		Key: map[string]types.AttributeValue{
 			"PK": &types.AttributeValueMemberS{
 				Value: pk,
@@ -168,7 +167,7 @@ func (c Store) Query(ctx context.Context, tableName string, ex expression.Expres
 		ProjectionExpression:      ex.Projection(),
 		ExpressionAttributeNames:  ex.Names(),
 		ExpressionAttributeValues: ex.Values(),
-		TableName:                 aws.String(tableName),
+		TableName:                 &tableName,
 	}
 
 	result, err := c.db.Query(ctx, &queryInput)
@@ -210,7 +209,7 @@ func (c Store) Put(ctx context.Context, tableName string, body interface{}) erro
 	}
 
 	_, err = c.db.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(tableName),
+		TableName: &tableName,
 		Item:      av,
 	})
 
@@ -244,7 +243,7 @@ func (c Store) Update(ctx context.Context, tableName string, pk, sk string, ex e
 				Value: sk,
 			},
 		},
-		TableName:                 aws.String(tableName),
+		TableName:                 &tableName,
 		ExpressionAttributeNames:  ex.Names(),
 		ExpressionAttributeValues: ex.Values(),
 		ReturnValues:              types.ReturnValueUpdatedNew,

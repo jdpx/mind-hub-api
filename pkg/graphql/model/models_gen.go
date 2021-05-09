@@ -12,6 +12,7 @@ type Course struct {
 	Sessions     []*Session      `json:"sessions"`
 	Note         *CourseNote     `json:"note"`
 	Progress     *CourseProgress `json:"progress"`
+	Timemaps     []*Timemap      `json:"timemaps"`
 }
 
 type CourseNote struct {
@@ -92,9 +93,19 @@ type StepStarted struct {
 }
 
 type Timemap struct {
-	ID        string `json:"id"`
-	Map       string `json:"map"`
-	UpdatedAt string `json:"updatedAt"`
+	ID        string  `json:"id"`
+	Map       string  `json:"map"`
+	UpdatedAt string  `json:"updatedAt"`
+	Course    *Course `json:"course"`
+}
+
+type TimemapQuery struct {
+	ID       string `json:"id"`
+	CourseID string `json:"courseID"`
+}
+
+type TimemapsByCourseIDQuery struct {
+	ID string `json:"id"`
 }
 
 type UpdatedCourseNote struct {
@@ -110,5 +121,7 @@ type UpdatedStepNote struct {
 }
 
 type UpdatedTimemap struct {
-	Map string `json:"map"`
+	ID       *string `json:"id"`
+	CourseID string  `json:"courseID"`
+	Map      string  `json:"map"`
 }

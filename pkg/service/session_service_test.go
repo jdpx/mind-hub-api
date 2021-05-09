@@ -107,13 +107,13 @@ func TestSessionServiceGetByCourseID(t *testing.T) {
 			},
 
 			expectedSession: []*service.Session{
-				&service.Session{
+				{
 					ID:          cmsSessionOne.ID,
 					Title:       cmsSessionOne.Title,
 					Description: cmsSessionOne.Description,
 					Steps:       []*service.Step{},
 				},
-				&service.Session{
+				{
 					ID:          cmsSessionTwo.ID,
 					Title:       cmsSessionTwo.Title,
 					Description: cmsSessionTwo.Description,

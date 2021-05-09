@@ -66,6 +66,8 @@ models:
         resolver: true
       note:
         resolver: true
+      timemaps:
+        resolver: true
   Step:
     fields:
       progress:

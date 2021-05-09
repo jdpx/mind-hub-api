@@ -11,8 +11,9 @@ import (
 )
 
 type TimemapServicer interface {
-	Get(ctx context.Context, uID string) (*Timemap, error)
-	Update(ctx context.Context, uID, value string) (*Timemap, error)
+	Get(ctx context.Context, uID, cID, tID string) (*Timemap, error)
+	GetByCourseID(ctx context.Context, uID, cID string) ([]Timemap, error)
+	Update(ctx context.Context, uID, cID string, tID *string, value string) (*Timemap, error)
 }
 
 type TimemapService struct {
@@ -28,12 +29,14 @@ func NewTimemapService(cms store.TimemapRepositor) *TimemapService {
 	return r
 }
 
-func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
+func (s TimemapService) Get(ctx context.Context, uID, cID, tID string) (*Timemap, error) {
 	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
-		logging.UserIDKey: uID,
+		logging.UserIDKey:    uID,
+		logging.CourseIDKey:  cID,
+		logging.TimemapIDKey: tID,
 	})
 
-	timemap, err := s.store.Get(ctx, uID)
+	timemap, err := s.store.Get(ctx, uID, cID, tID)
 
 	if err != nil {
 		log.Error("error getting timemap by id from store", err)
@@ -49,6 +52,7 @@ func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
 
 	return &Timemap{
 		ID:          timemap.ID,
+		CourseID:    timemap.CourseID,
 		UserID:      timemap.UserID,
 		Map:         timemap.Map,
 		DateCreated: timemap.DateCreated,
@@ -56,15 +60,58 @@ func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
 	}, nil
 }
 
-func (s TimemapService) Update(ctx context.Context, uID, value string) (*Timemap, error) {
+func (s TimemapService) GetByCourseID(ctx context.Context, uID, cID string) ([]Timemap, error) {
 	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
-		logging.UserIDKey: uID,
+		logging.UserIDKey:   uID,
+		logging.CourseIDKey: cID,
 	})
 
-	timemap, err := s.store.Update(ctx, &store.Timemap{
-		UserID: uID,
-		Map:    value,
+	tms, err := s.store.GetByCourseID(ctx, uID, cID)
+
+	if err != nil {
+		log.Error("error getting timemap by courseID from store", err)
+
+		return nil, err
+	}
+
+	timemaps := []Timemap{}
+
+	if len(tms) == 0 {
+		return timemaps, nil
+	}
+
+	for _, tm := range tms {
+		timemaps = append(timemaps, Timemap{
+			ID:          tm.ID,
+			CourseID:    tm.CourseID,
+			UserID:      tm.UserID,
+			Map:         tm.Map,
+			DateCreated: tm.DateCreated,
+			DateUpdated: tm.DateUpdated,
+		})
+	}
+
+	return timemaps, nil
+}
+
+func (s TimemapService) Update(ctx context.Context, uID, cID string, tID *string, value string) (*Timemap, error) {
+	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
+		logging.UserIDKey:    uID,
+		logging.CourseIDKey:  cID,
+		logging.TimemapIDKey: tID,
 	})
+
+	tm := store.Timemap{
+		CourseID: cID,
+		UserID:   uID,
+		Map:      value,
+	}
+
+	if tID != nil {
+		tm.ID = *tID
+	}
+
+	timemap, err := s.store.Update(ctx, tm)
 	if err != nil {
 		log.Error("error updating timemap from store", err)
 
@@ -73,6 +120,7 @@ func (s TimemapService) Update(ctx context.Context, uID, value string) (*Timemap
 
 	return &Timemap{
 		ID:          timemap.ID,
+		CourseID:    timemap.CourseID,
 		UserID:      timemap.UserID,
 		Map:         timemap.Map,
 		DateCreated: timemap.DateCreated,

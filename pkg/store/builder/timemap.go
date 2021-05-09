@@ -18,6 +18,7 @@ func NewTimemapBuilder() *TimemapBuilder {
 		timemap: store.Timemap{
 			BaseEntity: store.BaseEntity{},
 			ID:         fake.CharactersN(10),
+			CourseID:   fake.CharactersN(10),
 			UserID:     fake.CharactersN(10),
 			Map:        fake.CharactersN(10),
 		},
@@ -39,6 +40,12 @@ func (c TimemapBuilder) WithPK(pk string) TimemapBuilder {
 // WithSK ...
 func (c TimemapBuilder) WithSK(sk string) TimemapBuilder {
 	c.timemap.BaseEntity.SK = sk
+	return c
+}
+
+// WithCourseID ...
+func (c TimemapBuilder) WithCourseID(id string) TimemapBuilder {
+	c.timemap.CourseID = id
 	return c
 }
 

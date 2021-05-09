@@ -87,6 +87,7 @@ type StepNote struct {
 // Timemap ...
 type Timemap struct {
 	ID          string    `json:"id"`
+	CourseID    string    `json:"courseID"`
 	UserID      string    `json:"userID"`
 	Map         string    `json:"map"`
 	DateCreated time.Time `json:"dateCreated"`

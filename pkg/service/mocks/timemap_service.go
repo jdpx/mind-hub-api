@@ -35,31 +35,46 @@ func (m *MockTimemapServicer) EXPECT() *MockTimemapServicerMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockTimemapServicer) Get(ctx context.Context, uID string) (*service.Timemap, error) {
+func (m *MockTimemapServicer) Get(ctx context.Context, uID, cID, tID string) (*service.Timemap, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, uID)
+	ret := m.ctrl.Call(m, "Get", ctx, uID, cID, tID)
 	ret0, _ := ret[0].(*service.Timemap)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get
-func (mr *MockTimemapServicerMockRecorder) Get(ctx, uID interface{}) *gomock.Call {
+func (mr *MockTimemapServicerMockRecorder) Get(ctx, uID, cID, tID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockTimemapServicer)(nil).Get), ctx, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockTimemapServicer)(nil).Get), ctx, uID, cID, tID)
+}
+
+// GetByCourseID mocks base method
+func (m *MockTimemapServicer) GetByCourseID(ctx context.Context, uID, cID string) ([]service.Timemap, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByCourseID", ctx, uID, cID)
+	ret0, _ := ret[0].([]service.Timemap)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByCourseID indicates an expected call of GetByCourseID
+func (mr *MockTimemapServicerMockRecorder) GetByCourseID(ctx, uID, cID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCourseID", reflect.TypeOf((*MockTimemapServicer)(nil).GetByCourseID), ctx, uID, cID)
 }
 
 // Update mocks base method
-func (m *MockTimemapServicer) Update(ctx context.Context, uID, value string) (*service.Timemap, error) {
+func (m *MockTimemapServicer) Update(ctx context.Context, uID, cID string, tID *string, value string) (*service.Timemap, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, uID, value)
+	ret := m.ctrl.Call(m, "Update", ctx, uID, cID, tID, value)
 	ret0, _ := ret[0].(*service.Timemap)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Update indicates an expected call of Update
-func (mr *MockTimemapServicerMockRecorder) Update(ctx, uID, value interface{}) *gomock.Call {
+func (mr *MockTimemapServicerMockRecorder) Update(ctx, uID, cID, tID, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTimemapServicer)(nil).Update), ctx, uID, value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTimemapServicer)(nil).Update), ctx, uID, cID, tID, value)
 }

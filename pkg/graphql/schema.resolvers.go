@@ -54,7 +54,7 @@ func (r *courseResolver) Sessions(ctx context.Context, obj *model.Course) ([]*mo
 		return nil, err
 	}
 
-	ss := SessionsFromCMS(gss)
+	ss := SessionsFromServices(gss)
 
 	return ss, nil
 }
@@ -93,7 +93,7 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	if err != nil {
 		log.Error("error occurred getting request user", err)
 
-		return nil, fmt.Errorf("error occurred getting course progress1 %w", err)
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
 	}
 
 	cp, err := r.service.CourseProgress.Get(ctx, obj.ID, userID)
@@ -109,6 +109,27 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	}
 
 	return CourseProgressFromService(cp), nil
+}
+
+func (r *courseResolver) Timemaps(ctx context.Context, obj *model.Course) ([]*model.Timemap, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("get timemaps by course resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error occurred getting request user", err)
+
+		return nil, fmt.Errorf("error occurred getting course progress %w", err)
+	}
+
+	tms, err := r.service.Timemap.GetByCourseID(ctx, userID, obj.ID)
+	if err != nil {
+		log.Error("error starting Course", err)
+
+		return nil, err
+	}
+
+	return TimemapsFromServices(tms), nil
 }
 
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
@@ -238,7 +259,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	timemap, err := r.service.Timemap.Update(ctx, userID, input.Map)
+	timemap, err := r.service.Timemap.Update(ctx, userID, input.CourseID, input.ID, input.Map)
 	if err != nil {
 		log.Error("An error occurred getting Timemap", err)
 
@@ -246,6 +267,7 @@ func (r *mutationResolver) UpdateTimemap(ctx context.Context, input model.Update
 	}
 
 	return &model.Timemap{
+		ID:        timemap.ID,
 		Map:       timemap.Map,
 		UpdatedAt: timemap.DateUpdated.String(),
 	}, nil
@@ -262,7 +284,7 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 		return nil, err
 	}
 
-	cs := CoursesFromCMS(cgs)
+	cs := CoursesFromServices(cgs)
 
 	return cs, nil
 }
@@ -284,7 +306,7 @@ func (r *queryResolver) Course(ctx context.Context, where model.CourseQuery) (*m
 		return nil, err
 	}
 
-	c := CourseFromCMS(cg)
+	c := CourseFromServices(cg)
 
 	return c, nil
 }
@@ -306,7 +328,7 @@ func (r *queryResolver) Session(ctx context.Context, where model.SessionQuery) (
 		return nil, err
 	}
 
-	s := SessionFromCMS(gs)
+	s := SessionFromServices(gs)
 
 	return s, nil
 }
@@ -328,7 +350,7 @@ func (r *queryResolver) Step(ctx context.Context, where model.StepQuery) (*model
 		return nil, err
 	}
 
-	s := StepFromCMS(gs)
+	s := StepFromServices(gs)
 
 	return s, nil
 }
@@ -344,12 +366,12 @@ func (r *queryResolver) SessionsByCourseID(ctx context.Context, where model.Sess
 		return nil, err
 	}
 
-	ss := SessionsFromCMS(gss)
+	ss := SessionsFromServices(gss)
 
 	return ss, nil
 }
 
-func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
+func (r *queryResolver) Timemap(ctx context.Context, where model.TimemapQuery) (*model.Timemap, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("Timemap resolver got called")
 
@@ -360,7 +382,7 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
 	}
 
-	timemap, err := r.service.Timemap.Get(ctx, userID)
+	timemap, err := r.service.Timemap.Get(ctx, userID, where.CourseID, where.ID)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			log.Error("timemap not found")
@@ -378,6 +400,27 @@ func (r *queryResolver) Timemap(ctx context.Context) (*model.Timemap, error) {
 		Map:       timemap.Map,
 		UpdatedAt: timemap.DateUpdated.String(),
 	}, nil
+}
+
+func (r *queryResolver) TimemapsByCourseID(ctx context.Context, where model.TimemapsByCourseIDQuery) ([]*model.Timemap, error) {
+	log := logging.NewFromResolver(ctx)
+	log.Info("Timemap by courseID resolver got called")
+
+	userID, err := request.GetUserID(ctx)
+	if err != nil {
+		log.Error("error occurred getting request user", err)
+
+		return nil, fmt.Errorf("error occurred getting request user ID %w", err)
+	}
+
+	tms, err := r.service.Timemap.GetByCourseID(ctx, userID, where.ID)
+	if err != nil {
+		log.Error("error starting Course", err)
+
+		return nil, err
+	}
+
+	return TimemapsFromServices(tms), nil
 }
 
 func (r *stepResolver) Note(ctx context.Context, obj *model.Step) (*model.StepNote, error) {

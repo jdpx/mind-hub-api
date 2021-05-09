@@ -35,18 +35,33 @@ func (m *MockTimemapRepositor) EXPECT() *MockTimemapRepositorMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockTimemapRepositor) Get(ctx context.Context, uID string) (*store.Timemap, error) {
+func (m *MockTimemapRepositor) Get(ctx context.Context, uID, cID, tID string) (*store.Timemap, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, uID)
+	ret := m.ctrl.Call(m, "Get", ctx, uID, cID, tID)
 	ret0, _ := ret[0].(*store.Timemap)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get
-func (mr *MockTimemapRepositorMockRecorder) Get(ctx, uID interface{}) *gomock.Call {
+func (mr *MockTimemapRepositorMockRecorder) Get(ctx, uID, cID, tID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockTimemapRepositor)(nil).Get), ctx, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockTimemapRepositor)(nil).Get), ctx, uID, cID, tID)
+}
+
+// GetByCourseID mocks base method
+func (m *MockTimemapRepositor) GetByCourseID(ctx context.Context, uID, cID string) ([]store.Timemap, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByCourseID", ctx, uID, cID)
+	ret0, _ := ret[0].([]store.Timemap)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByCourseID indicates an expected call of GetByCourseID
+func (mr *MockTimemapRepositorMockRecorder) GetByCourseID(ctx, uID, cID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCourseID", reflect.TypeOf((*MockTimemapRepositor)(nil).GetByCourseID), ctx, uID, cID)
 }
 
 // Create mocks base method
@@ -65,7 +80,7 @@ func (mr *MockTimemapRepositorMockRecorder) Create(ctx, tm interface{}) *gomock.
 }
 
 // Update mocks base method
-func (m *MockTimemapRepositor) Update(ctx context.Context, tm *store.Timemap) (*store.Timemap, error) {
+func (m *MockTimemapRepositor) Update(ctx context.Context, tm store.Timemap) (*store.Timemap, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, tm)
 	ret0, _ := ret[0].(*store.Timemap)

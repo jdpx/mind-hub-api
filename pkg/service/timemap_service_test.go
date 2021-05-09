@@ -275,7 +275,7 @@ func TestTimemapServiceUpdate(t *testing.T) {
 			resolver := service.NewTimemapService(clientMock)
 			ctx := context.Background()
 
-			n, err := resolver.Update(ctx, uID, cID, tID, value)
+			n, err := resolver.Update(ctx, uID, cID, &tID, value)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())

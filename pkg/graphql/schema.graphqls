@@ -78,6 +78,15 @@ input StepQuery {
   id: ID!
 }
 
+input TimemapQuery {
+  id: ID!
+  courseID: ID!
+}
+
+input TimemapsByCourseIDQuery {
+  id: ID!
+}
+
 type CourseNote {
   id: ID!
   courseID: ID!
@@ -99,7 +108,8 @@ type Query {
   session(where: SessionQuery!): Session
   step(where: StepQuery!): Step
   sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
-  timemap: Timemap
+  timemap(where: TimemapQuery!): Timemap
+  timemapsByCourseID(where: TimemapsByCourseIDQuery!): [Timemap]
 }
 
 input CourseStarted {
@@ -127,6 +137,8 @@ input UpdatedStepNote {
 }
 
 input UpdatedTimemap {
+  id: ID
+  courseID: ID!
   map: String!
 }
 

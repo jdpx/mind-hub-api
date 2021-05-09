@@ -13,7 +13,7 @@ import (
 type TimemapServicer interface {
 	Get(ctx context.Context, uID, cID, tID string) (*Timemap, error)
 	GetByCourseID(ctx context.Context, uID, cID string) ([]Timemap, error)
-	Update(ctx context.Context, uID, cID, tID, value string) (*Timemap, error)
+	Update(ctx context.Context, uID, cID string, tID *string, value string) (*Timemap, error)
 }
 
 type TimemapService struct {
@@ -94,19 +94,24 @@ func (s TimemapService) GetByCourseID(ctx context.Context, uID, cID string) ([]T
 	return timemaps, nil
 }
 
-func (s TimemapService) Update(ctx context.Context, uID, cID, tID, value string) (*Timemap, error) {
+func (s TimemapService) Update(ctx context.Context, uID, cID string, tID *string, value string) (*Timemap, error) {
 	log := logging.NewFromResolver(ctx).WithFields(logrus.Fields{
 		logging.UserIDKey:    uID,
 		logging.CourseIDKey:  cID,
 		logging.TimemapIDKey: tID,
 	})
 
-	timemap, err := s.store.Update(ctx, &store.Timemap{
-		ID:       tID,
+	tm := store.Timemap{
 		CourseID: cID,
 		UserID:   uID,
 		Map:      value,
-	})
+	}
+
+	if tID != nil {
+		tm.ID = *tID
+	}
+
+	timemap, err := s.store.Update(ctx, &tm)
 	if err != nil {
 		log.Error("error updating timemap from store", err)
 

@@ -5,8 +5,8 @@ import (
 	"github.com/jdpx/mind-hub-api/pkg/service"
 )
 
-// CourseFromCMS ...
-func CourseFromCMS(gc *service.Course) *model.Course {
+// CourseFromServices ...
+func CourseFromServices(gc *service.Course) *model.Course {
 	return &model.Course{
 		ID:          gc.ID,
 		Title:       gc.Title,
@@ -35,19 +35,19 @@ func CourseNoteFromService(cn *service.CourseNote) *model.CourseNote {
 	}
 }
 
-// CoursesFromCMS ...
-func CoursesFromCMS(gcs []*service.Course) []*model.Course {
+// CoursesFromServices ...
+func CoursesFromServices(gcs []*service.Course) []*model.Course {
 	cs := []*model.Course{}
 
 	for _, gc := range gcs {
-		cs = append(cs, CourseFromCMS(gc))
+		cs = append(cs, CourseFromServices(gc))
 	}
 
 	return cs
 }
 
-// SessionFromCMS ...
-func SessionFromCMS(gs *service.Session) *model.Session {
+// SessionFromServices ...
+func SessionFromServices(gs *service.Session) *model.Session {
 	s := &model.Session{
 		ID:          gs.ID,
 		Title:       gs.Title,
@@ -56,29 +56,29 @@ func SessionFromCMS(gs *service.Session) *model.Session {
 	}
 
 	for _, step := range gs.Steps {
-		s.Steps = append(s.Steps, StepFromCMS(step))
+		s.Steps = append(s.Steps, StepFromServices(step))
 	}
 
 	if gs.Course != nil {
-		s.Course = CourseFromCMS(gs.Course)
+		s.Course = CourseFromServices(gs.Course)
 	}
 
 	return s
 }
 
-// SessionsFromCMS ...
-func SessionsFromCMS(gcs []*service.Session) []*model.Session {
+// SessionsFromServices ...
+func SessionsFromServices(gcs []*service.Session) []*model.Session {
 	cs := []*model.Session{}
 
 	for _, gc := range gcs {
-		cs = append(cs, SessionFromCMS(gc))
+		cs = append(cs, SessionFromServices(gc))
 	}
 
 	return cs
 }
 
-// StepFromCMS ...
-func StepFromCMS(gc *service.Step) *model.Step {
+// StepFromServices ...
+func StepFromServices(gc *service.Step) *model.Step {
 	return &model.Step{
 		ID:          gc.ID,
 		Title:       gc.Title,
@@ -87,5 +87,25 @@ func StepFromCMS(gc *service.Step) *model.Step {
 		VideoURL:    gc.VideoURL,
 		AudioURL:    gc.AudioURL,
 		Question:    gc.Question,
+	}
+}
+
+// TimemapsFromServices ...
+func TimemapsFromServices(stm []service.Timemap) []*model.Timemap {
+	tms := []*model.Timemap{}
+
+	for _, gc := range stm {
+		tms = append(tms, TimemapFromServices(gc))
+	}
+
+	return tms
+}
+
+// TimemapFromServices ...
+func TimemapFromServices(tm service.Timemap) *model.Timemap {
+	return &model.Timemap{
+		ID:        tm.ID,
+		Map:       tm.Map,
+		UpdatedAt: tm.DateUpdated.String(),
 	}
 }

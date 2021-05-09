@@ -65,7 +65,7 @@ func (mr *MockTimemapServicerMockRecorder) GetByCourseID(ctx, uID, cID interface
 }
 
 // Update mocks base method
-func (m *MockTimemapServicer) Update(ctx context.Context, uID, cID, tID, value string) (*service.Timemap, error) {
+func (m *MockTimemapServicer) Update(ctx context.Context, uID, cID string, tID *string, value string) (*service.Timemap, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, uID, cID, tID, value)
 	ret0, _ := ret[0].(*service.Timemap)

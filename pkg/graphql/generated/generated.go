@@ -87,7 +87,8 @@ type ComplexityRoot struct {
 		Session            func(childComplexity int, where model.SessionQuery) int
 		SessionsByCourseID func(childComplexity int, where model.SessionsByCourseIDQuery) int
 		Step               func(childComplexity int, where model.StepQuery) int
-		Timemap            func(childComplexity int) int
+		Timemap            func(childComplexity int, where model.TimemapQuery) int
+		TimemapsByCourseID func(childComplexity int, where model.TimemapsByCourseIDQuery) int
 	}
 
 	Session struct {
@@ -156,7 +157,8 @@ type QueryResolver interface {
 	Session(ctx context.Context, where model.SessionQuery) (*model.Session, error)
 	Step(ctx context.Context, where model.StepQuery) (*model.Step, error)
 	SessionsByCourseID(ctx context.Context, where model.SessionsByCourseIDQuery) ([]*model.Session, error)
-	Timemap(ctx context.Context) (*model.Timemap, error)
+	Timemap(ctx context.Context, where model.TimemapQuery) (*model.Timemap, error)
+	TimemapsByCourseID(ctx context.Context, where model.TimemapsByCourseIDQuery) ([]*model.Timemap, error)
 }
 type StepResolver interface {
 	Note(ctx context.Context, obj *model.Step) (*model.StepNote, error)
@@ -436,7 +438,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Timemap(childComplexity), true
+		args, err := ec.field_Query_timemap_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Timemap(childComplexity, args["where"].(model.TimemapQuery)), true
+
+	case "Query.timemapsByCourseID":
+		if e.complexity.Query.TimemapsByCourseID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_timemapsByCourseID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TimemapsByCourseID(childComplexity, args["where"].(model.TimemapsByCourseIDQuery)), true
 
 	case "Session.course":
 		if e.complexity.Session.Course == nil {
@@ -771,6 +790,15 @@ input StepQuery {
   id: ID!
 }
 
+input TimemapQuery {
+  id: ID!
+  courseID: ID!
+}
+
+input TimemapsByCourseIDQuery {
+  id: ID!
+}
+
 type CourseNote {
   id: ID!
   courseID: ID!
@@ -792,7 +820,8 @@ type Query {
   session(where: SessionQuery!): Session
   step(where: StepQuery!): Step
   sessionsByCourseID(where: SessionsByCourseIDQuery!): [Session]
-  timemap: Timemap
+  timemap(where: TimemapQuery!): Timemap
+  timemapsByCourseID(where: TimemapsByCourseIDQuery!): [Timemap]
 }
 
 input CourseStarted {
@@ -820,6 +849,8 @@ input UpdatedStepNote {
 }
 
 input UpdatedTimemap {
+  id: ID
+  courseID: ID!
   map: String!
 }
 
@@ -997,6 +1028,36 @@ func (ec *executionContext) field_Query_step_args(ctx context.Context, rawArgs m
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg0, err = ec.unmarshalNStepQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐStepQuery(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_timemap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.TimemapQuery
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg0, err = ec.unmarshalNTimemapQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemapQuery(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_timemapsByCourseID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.TimemapsByCourseIDQuery
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg0, err = ec.unmarshalNTimemapsByCourseIDQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemapsByCourseIDQuery(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2123,9 +2184,16 @@ func (ec *executionContext) _Query_timemap(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_timemap_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Timemap(rctx)
+		return ec.resolvers.Query().Timemap(rctx, args["where"].(model.TimemapQuery))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2137,6 +2205,45 @@ func (ec *executionContext) _Query_timemap(ctx context.Context, field graphql.Co
 	res := resTmp.(*model.Timemap)
 	fc.Result = res
 	return ec.marshalOTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_timemapsByCourseID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_timemapsByCourseID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TimemapsByCourseID(rctx, args["where"].(model.TimemapsByCourseIDQuery))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Timemap)
+	fc.Result = res
+	return ec.marshalOTimemap2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4364,6 +4471,54 @@ func (ec *executionContext) unmarshalInputStepStarted(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTimemapQuery(ctx context.Context, obj interface{}) (model.TimemapQuery, error) {
+	var it model.TimemapQuery
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseID"))
+			it.CourseID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTimemapsByCourseIDQuery(ctx context.Context, obj interface{}) (model.TimemapsByCourseIDQuery, error) {
+	var it model.TimemapsByCourseIDQuery
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdatedCourseNote(ctx context.Context, obj interface{}) (model.UpdatedCourseNote, error) {
 	var it model.UpdatedCourseNote
 	var asMap = obj.(map[string]interface{})
@@ -4442,6 +4597,22 @@ func (ec *executionContext) unmarshalInputUpdatedTimemap(ctx context.Context, ob
 
 	for k, v := range asMap {
 		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseID"))
+			it.CourseID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "map":
 			var err error
 
@@ -4803,6 +4974,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_timemap(ctx, field)
+				return res
+			})
+		case "timemapsByCourseID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_timemapsByCourseID(ctx, field)
 				return res
 			})
 		case "__type":
@@ -5568,6 +5750,16 @@ func (ec *executionContext) marshalNTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhub�
 	return ec._Timemap(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNTimemapQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemapQuery(ctx context.Context, v interface{}) (model.TimemapQuery, error) {
+	res, err := ec.unmarshalInputTimemapQuery(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNTimemapsByCourseIDQuery2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemapsByCourseIDQuery(ctx context.Context, v interface{}) (model.TimemapsByCourseIDQuery, error) {
+	res, err := ec.unmarshalInputTimemapsByCourseIDQuery(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdatedCourseNote2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐUpdatedCourseNote(ctx context.Context, v interface{}) (model.UpdatedCourseNote, error) {
 	res, err := ec.unmarshalInputUpdatedCourseNote(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6002,6 +6194,46 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) marshalOTimemap2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx context.Context, sel ast.SelectionSet, v []*model.Timemap) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx context.Context, sel ast.SelectionSet, v *model.Timemap) graphql.Marshaler {

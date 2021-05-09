@@ -99,6 +99,15 @@ type Timemap struct {
 	Course    *Course `json:"course"`
 }
 
+type TimemapQuery struct {
+	ID       string `json:"id"`
+	CourseID string `json:"courseID"`
+}
+
+type TimemapsByCourseIDQuery struct {
+	ID string `json:"id"`
+}
+
 type UpdatedCourseNote struct {
 	ID       *string `json:"id"`
 	CourseID string  `json:"courseID"`
@@ -112,5 +121,7 @@ type UpdatedStepNote struct {
 }
 
 type UpdatedTimemap struct {
-	Map string `json:"map"`
+	ID       *string `json:"id"`
+	CourseID string  `json:"courseID"`
+	Map      string  `json:"map"`
 }

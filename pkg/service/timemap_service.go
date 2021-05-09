@@ -111,7 +111,7 @@ func (s TimemapService) Update(ctx context.Context, uID, cID string, tID *string
 		tm.ID = *tID
 	}
 
-	timemap, err := s.store.Update(ctx, &tm)
+	timemap, err := s.store.Update(ctx, tm)
 	if err != nil {
 		log.Error("error updating timemap from store", err)
 

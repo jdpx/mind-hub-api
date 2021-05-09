@@ -80,7 +80,7 @@ func (mr *MockTimemapRepositorMockRecorder) Create(ctx, tm interface{}) *gomock.
 }
 
 // Update mocks base method
-func (m *MockTimemapRepositor) Update(ctx context.Context, tm *store.Timemap) (*store.Timemap, error) {
+func (m *MockTimemapRepositor) Update(ctx context.Context, tm store.Timemap) (*store.Timemap, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, tm)
 	ret0, _ := ret[0].(*store.Timemap)

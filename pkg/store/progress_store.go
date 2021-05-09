@@ -86,10 +86,6 @@ func (c ProgressStore) GetCompletedByIDs(ctx context.Context, uID string, ids ..
 
 	err := c.db.BatchGet(ctx, userTableName, UserPK(uID), progressKeys, &res)
 	if err != nil {
-		if errors.Is(err, ErrNotFound) {
-			return nil, nil
-		}
-
 		return nil, err
 	}
 

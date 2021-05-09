@@ -238,7 +238,7 @@ func TestTimemapServiceUpdate(t *testing.T) {
 			clientExpectations: func(client *storemocks.MockTimemapRepositor) {
 				client.EXPECT().Update(
 					gomock.Any(),
-					&uTimemap,
+					uTimemap,
 				).Return(&timemap, nil)
 			},
 
@@ -256,7 +256,7 @@ func TestTimemapServiceUpdate(t *testing.T) {
 			clientExpectations: func(client *storemocks.MockTimemapRepositor) {
 				client.EXPECT().Update(
 					gomock.Any(),
-					&uTimemap,
+					uTimemap,
 				).Return(nil, fmt.Errorf("something went wrong"))
 			},
 

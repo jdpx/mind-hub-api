@@ -89,7 +89,7 @@ func TestUserTimemapSK(t *testing.T) {
 			courseID:  "Foo",
 			timemapID: "Bar",
 
-			expected: "COURSE#FooTIMEMAP#Bar",
+			expected: "COURSE#Foo#TIMEMAP#Bar",
 		},
 	}
 	for _, tt := range testCases {
@@ -113,7 +113,7 @@ func TestUserCourseTimemapSK(t *testing.T) {
 			desc:     "given id, it returns corret key",
 			courseID: "Foo",
 
-			expected: "COURSE#FooTIMEMAP",
+			expected: "COURSE#Foo#TIMEMAP",
 		},
 	}
 	for _, tt := range testCases {

@@ -105,6 +105,104 @@ func TestProgressStoreGet(t *testing.T) {
 	}
 }
 
+func TestProgressStoreGetCompletedByIDs(t *testing.T) {
+	cID := fake.CharactersN(10)
+	uID := fake.CharactersN(10)
+
+	progressOne := builder.NewProgressBuilder().
+		WithEntityID(cID).
+		WithUserID(uID).
+		Completed().
+		Build()
+
+	progressTwo := builder.NewProgressBuilder().
+		WithEntityID(cID).
+		WithUserID(uID).
+		Build()
+
+	inputIDs := []string{
+		progressOne.ID,
+		progressTwo.ID,
+	}
+
+	skIDs := []string{
+		store.ProgressSK(progressOne.ID),
+		store.ProgressSK(progressTwo.ID),
+	}
+
+	progresses := []*store.Progress{
+		&progressOne,
+		&progressTwo,
+	}
+
+	testCases := []struct {
+		desc               string
+		userID             string
+		courseID           string
+		clientExpectations func(client *storemocks.MockStorer)
+
+		expectedProgress []*store.Progress
+		expectedErr      error
+	}{
+		{
+			desc:     "given a completed progress is returned from store, progresses is returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().BatchGet(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					skIDs,
+					gomock.Any(),
+				).SetArg(4, progresses)
+			},
+
+			expectedProgress: []*store.Progress{
+				&progressOne,
+			},
+		},
+		{
+			desc:     "given a generic error is returned from the store, error returned",
+			userID:   uID,
+			courseID: cID,
+			clientExpectations: func(client *storemocks.MockStorer) {
+				client.EXPECT().BatchGet(
+					gomock.Any(),
+					userTableName,
+					fmt.Sprintf("USER#%s", uID),
+					skIDs,
+					gomock.Any(),
+				).Return(fmt.Errorf("error occurred"))
+			},
+
+			expectedErr: fmt.Errorf("error occurred"),
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.desc, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			clientMock := storemocks.NewMockStorer(ctrl)
+
+			if tt.clientExpectations != nil {
+				tt.clientExpectations(clientMock)
+			}
+
+			resolver := store.NewProgressStore(clientMock)
+			ctx := context.Background()
+
+			n, err := resolver.GetCompletedByIDs(ctx, uID, inputIDs...)
+
+			if tt.expectedErr != nil {
+				assert.EqualError(t, err, tt.expectedErr.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedProgress, n)
+			}
+		})
+	}
+}
+
 func TestProgressStoreCreate(t *testing.T) {
 	now := time.Now()
 	id := fake.CharactersN(10)

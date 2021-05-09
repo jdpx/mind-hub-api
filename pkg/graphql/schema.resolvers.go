@@ -111,6 +111,10 @@ func (r *courseResolver) Progress(ctx context.Context, obj *model.Course) (*mode
 	return CourseProgressFromService(cp), nil
 }
 
+func (r *courseResolver) Timemaps(ctx context.Context, obj *model.Course) ([]*model.Timemap, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error) {
 	log := logging.NewFromResolver(ctx)
 	log.Info("course started resolver got called")

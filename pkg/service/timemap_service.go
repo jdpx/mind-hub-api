@@ -33,7 +33,7 @@ func (s TimemapService) Get(ctx context.Context, uID string) (*Timemap, error) {
 		logging.UserIDKey: uID,
 	})
 
-	timemap, err := s.store.Get(ctx, uID)
+	timemap, err := s.store.GetByUserID(ctx, uID)
 
 	if err != nil {
 		log.Error("error getting timemap by id from store", err)

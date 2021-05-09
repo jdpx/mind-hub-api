@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTimemapServiceGet(t *testing.T) {
+func TestTimemapServiceGetByUserID(t *testing.T) {
 	uID := fake.CharactersN(10)
 	timemap := builder.NewTimemapBuilder().
 		WithUserID(uID).
@@ -30,7 +30,7 @@ func TestTimemapServiceGet(t *testing.T) {
 		{
 			desc: "given map returned from store, map returned",
 			clientExpectations: func(client *storemocks.MockTimemapRepositor) {
-				client.EXPECT().Get(
+				client.EXPECT().GetByUserID(
 					gomock.Any(),
 					uID,
 				).Return(&timemap, nil)
@@ -47,7 +47,7 @@ func TestTimemapServiceGet(t *testing.T) {
 		{
 			desc: "given an error is returned from the store, err returned",
 			clientExpectations: func(client *storemocks.MockTimemapRepositor) {
-				client.EXPECT().Get(
+				client.EXPECT().GetByUserID(
 					gomock.Any(),
 					uID,
 				).Return(nil, fmt.Errorf("something went wrong"))
@@ -58,7 +58,7 @@ func TestTimemapServiceGet(t *testing.T) {
 		{
 			desc: "given the returned entity is nil, ErrNotFound returned",
 			clientExpectations: func(client *storemocks.MockTimemapRepositor) {
-				client.EXPECT().Get(
+				client.EXPECT().GetByUserID(
 					gomock.Any(),
 					uID,
 				).Return(nil, nil)
@@ -79,7 +79,7 @@ func TestTimemapServiceGet(t *testing.T) {
 			resolver := service.NewTimemapService(clientMock)
 			ctx := context.Background()
 
-			n, err := resolver.Get(ctx, uID)
+			n, err := resolver.GetByUserID(ctx, uID)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())

@@ -14,6 +14,7 @@ type Course {
 
   note: CourseNote
   progress: CourseProgress
+  timemaps: [Timemap]!
 }
 
 type Session {
@@ -23,7 +24,6 @@ type Session {
 
   steps: [Step]
   course: Course!
-  # progress: SessionProgress
 }
 
 type Step {
@@ -47,11 +47,6 @@ type CourseProgress {
   dateStarted: String!
 }
 
-# type SessionProgress {
-#   id: ID!
-#   dateStarted: String!
-# }
-
 type StepProgress {
   id: ID!
   state: String!
@@ -63,6 +58,8 @@ type Timemap {
   id: ID!
   map: String!
   updatedAt: String!
+
+  course: Course!
 }
 
 input CourseQuery {

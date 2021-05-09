@@ -58,6 +58,7 @@ type StepNote struct {
 type Timemap struct {
 	BaseEntity
 	ID          string    `dynamodbav:"id"`
+	CourseID    string    `dynamodbav:"courseID,omitempty"`
 	UserID      string    `dynamodbav:"userID"`
 	Map         string    `dynamodbav:"map"`
 	DateCreated time.Time `dynamodbav:"dateCreated"`

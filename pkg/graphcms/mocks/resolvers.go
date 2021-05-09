@@ -112,7 +112,7 @@ func (mr *MockCMSResolverMockRecorder) GetStepIDsByCourseID(ctx, id interface{})
 // GetStepsByID mocks base method
 func (m *MockCMSResolver) GetStepsByID(ctx context.Context, id string) (*graphcms.Step, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetStepsBySessionID", ctx, id)
+	ret := m.ctrl.Call(m, "GetStepsByID", ctx, id)
 	ret0, _ := ret[0].(*graphcms.Step)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -121,5 +121,5 @@ func (m *MockCMSResolver) GetStepsByID(ctx context.Context, id string) (*graphcm
 // GetStepsByID indicates an expected call of GetStepsByID
 func (mr *MockCMSResolverMockRecorder) GetStepsByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStepsBySessionID", reflect.TypeOf((*MockCMSResolver)(nil).GetStepsByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStepsByID", reflect.TypeOf((*MockCMSResolver)(nil).GetStepsByID), ctx, id)
 }

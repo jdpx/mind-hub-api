@@ -54,6 +54,7 @@ type ComplexityRoot struct {
 		SessionCount func(childComplexity int) int
 		Sessions     func(childComplexity int) int
 		StepCount    func(childComplexity int) int
+		Timemaps     func(childComplexity int) int
 		Title        func(childComplexity int) int
 	}
 
@@ -125,6 +126,7 @@ type ComplexityRoot struct {
 	}
 
 	Timemap struct {
+		Course    func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Map       func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
@@ -138,6 +140,7 @@ type CourseResolver interface {
 	Sessions(ctx context.Context, obj *model.Course) ([]*model.Session, error)
 	Note(ctx context.Context, obj *model.Course) (*model.CourseNote, error)
 	Progress(ctx context.Context, obj *model.Course) (*model.CourseProgress, error)
+	Timemaps(ctx context.Context, obj *model.Course) ([]*model.Timemap, error)
 }
 type MutationResolver interface {
 	CourseStarted(ctx context.Context, input model.CourseStarted) (*model.Course, error)
@@ -230,6 +233,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Course.StepCount(childComplexity), true
+
+	case "Course.timemaps":
+		if e.complexity.Course.Timemaps == nil {
+			break
+		}
+
+		return e.complexity.Course.Timemaps(childComplexity), true
 
 	case "Course.title":
 		if e.complexity.Course.Title == nil {
@@ -589,6 +599,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StepProgress.State(childComplexity), true
 
+	case "Timemap.course":
+		if e.complexity.Timemap.Course == nil {
+			break
+		}
+
+		return e.complexity.Timemap.Course(childComplexity), true
+
 	case "Timemap.id":
 		if e.complexity.Timemap.ID == nil {
 			break
@@ -690,6 +707,7 @@ type Course {
 
   note: CourseNote
   progress: CourseProgress
+  timemaps: [Timemap]!
 }
 
 type Session {
@@ -699,7 +717,6 @@ type Session {
 
   steps: [Step]
   course: Course!
-  # progress: SessionProgress
 }
 
 type Step {
@@ -723,11 +740,6 @@ type CourseProgress {
   dateStarted: String!
 }
 
-# type SessionProgress {
-#   id: ID!
-#   dateStarted: String!
-# }
-
 type StepProgress {
   id: ID!
   state: String!
@@ -739,6 +751,8 @@ type Timemap {
   id: ID!
   map: String!
   updatedAt: String!
+
+  course: Course!
 }
 
 input CourseQuery {
@@ -1333,6 +1347,41 @@ func (ec *executionContext) _Course_progress(ctx context.Context, field graphql.
 	res := resTmp.(*model.CourseProgress)
 	fc.Result = res
 	return ec.marshalOCourseProgress2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourseProgress(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Course_timemaps(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Course",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Course().Timemaps(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Timemap)
+	fc.Result = res
+	return ec.marshalNTimemap2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseNote_id(ctx context.Context, field graphql.CollectedField, obj *model.CourseNote) (ret graphql.Marshaler) {
@@ -3053,6 +3102,41 @@ func (ec *executionContext) _Timemap_updatedAt(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Timemap_course(ctx context.Context, field graphql.CollectedField, obj *model.Timemap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Timemap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Course, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Course)
+	fc.Result = res
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐCourse(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4472,6 +4556,20 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 				res = ec._Course_progress(ctx, field, obj)
 				return res
 			})
+		case "timemaps":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Course_timemaps(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4951,6 +5049,11 @@ func (ec *executionContext) _Timemap(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "course":
+			out.Values[i] = ec._Timemap_course(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5416,6 +5519,43 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 
 func (ec *executionContext) marshalNTimemap2githubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx context.Context, sel ast.SelectionSet, v model.Timemap) graphql.Marshaler {
 	return ec._Timemap(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTimemap2ᚕᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx context.Context, sel ast.SelectionSet, v []*model.Timemap) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalNTimemap2ᚖgithubᚗcomᚋjdpxᚋmindᚑhubᚑapiᚋpkgᚋgraphqlᚋmodelᚐTimemap(ctx context.Context, sel ast.SelectionSet, v *model.Timemap) graphql.Marshaler {

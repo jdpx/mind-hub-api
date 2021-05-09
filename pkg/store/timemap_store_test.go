@@ -16,8 +16,12 @@ import (
 )
 
 func TestTimemapStoreGet(t *testing.T) {
+	tID := fake.CharactersN(10)
 	uID := fake.CharactersN(10)
+	cID := fake.CharactersN(10)
 	timemap := builder.NewTimemapBuilder().
+		WithID(tID).
+		WithCourseID(cID).
 		WithUserID(uID).
 		Build()
 
@@ -35,7 +39,7 @@ func TestTimemapStoreGet(t *testing.T) {
 					gomock.Any(),
 					userTableName,
 					fmt.Sprintf("USER#%s", uID),
-					"TIMEMAP",
+					fmt.Sprintf("COURSE#%s#TIMEMAP#%s", cID, tID),
 					gomock.Any(),
 				).SetArg(4, timemap)
 			},
@@ -49,7 +53,7 @@ func TestTimemapStoreGet(t *testing.T) {
 					gomock.Any(),
 					userTableName,
 					fmt.Sprintf("USER#%s", uID),
-					"TIMEMAP",
+					fmt.Sprintf("COURSE#%s#TIMEMAP#%s", cID, tID),
 					gomock.Any(),
 				).Return(store.ErrNotFound)
 			},
@@ -63,7 +67,7 @@ func TestTimemapStoreGet(t *testing.T) {
 					gomock.Any(),
 					userTableName,
 					fmt.Sprintf("USER#%s", uID),
-					"TIMEMAP",
+					fmt.Sprintf("COURSE#%s#TIMEMAP#%s", cID, tID),
 					gomock.Any(),
 				).Return(fmt.Errorf("error occurred"))
 			},
@@ -83,7 +87,7 @@ func TestTimemapStoreGet(t *testing.T) {
 			resolver := store.NewTimemapStore(clientMock)
 			ctx := context.Background()
 
-			n, err := resolver.Get(ctx, uID)
+			n, err := resolver.Get(ctx, uID, cID, tID)
 
 			if tt.expectedErr != nil {
 				assert.EqualError(t, err, tt.expectedErr.Error())

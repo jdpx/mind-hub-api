@@ -3,10 +3,11 @@ package store
 import "fmt"
 
 const (
-	usersKey    = "USER#%s"
-	progressKey = "PROGRESS#%s"
-	noteKey     = "NOTE#%s"
-	timemapKey  = "TIMEMAP"
+	usersKey         = "USER#%s"
+	progressKey      = "PROGRESS#%s"
+	noteKey          = "NOTE#%s"
+	timemapKey       = "COURSE#%s#TIMEMAP#%s"
+	courseTimemapKey = "COURSE#%s#TIMEMAP"
 )
 
 func UserPK(id string) string {
@@ -21,6 +22,10 @@ func NoteSK(id string) string {
 	return fmt.Sprintf(noteKey, id)
 }
 
-func TimemapSK() string {
-	return timemapKey
+func CourseTimemapsSK(cID string) string {
+	return fmt.Sprintf(courseTimemapKey, cID)
+}
+
+func TimemapSK(cID, tID string) string {
+	return fmt.Sprintf(timemapKey, cID, tID)
 }

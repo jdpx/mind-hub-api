@@ -34,19 +34,19 @@ func (m *MockTimemapRepositor) EXPECT() *MockTimemapRepositorMockRecorder {
 	return m.recorder
 }
 
-// Get mocks base method
-func (m *MockTimemapRepositor) Get(ctx context.Context, uID string) (*store.Timemap, error) {
+// GetByUserID mocks base method
+func (m *MockTimemapRepositor) GetByUserID(ctx context.Context, uID string) (*store.Timemap, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", ctx, uID)
+	ret := m.ctrl.Call(m, "GetByUserID", ctx, uID)
 	ret0, _ := ret[0].(*store.Timemap)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get
-func (mr *MockTimemapRepositorMockRecorder) Get(ctx, uID interface{}) *gomock.Call {
+// GetByUserID indicates an expected call of GetByUserID
+func (mr *MockTimemapRepositorMockRecorder) GetByUserID(ctx, uID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockTimemapRepositor)(nil).Get), ctx, uID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUserID", reflect.TypeOf((*MockTimemapRepositor)(nil).GetByUserID), ctx, uID)
 }
 
 // Create mocks base method

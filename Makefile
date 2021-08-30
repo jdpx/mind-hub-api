@@ -35,7 +35,7 @@ validate-terraform:
 
 .PHONY: run/tfsec
 run/tfsec:
-	tfsec . -e AWS002,AWS017
+	tfsec . --exclude AWS002,AWS017,AWS089,AWS086,AWS092,AWS099,aws-api-gateway-enable-tracing,aws-lambda-enable-tracing,aws-api-gateway-enable-cache-encryption
 
 .PHONY: run/api
 run/api:

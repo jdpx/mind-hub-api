@@ -60,14 +60,6 @@ func WithNoteTimer(c Timer) func(*NoteStore) {
 	}
 }
 
-func (c NoteStore) SetIDGenerator(g IDGenerator) {
-	c.idGenerator = g
-}
-
-func (c NoteStore) SetTimer(t Timer) {
-	c.timer = t
-}
-
 // Get ...
 func (c NoteStore) Get(ctx context.Context, id, uID string) (*Note, error) {
 	res := Note{}

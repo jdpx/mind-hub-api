@@ -1,5 +1,9 @@
 # Mind Hub API
 
+## Architecture
+
+![architecture](./docs/architecture/mind-api.svg)
+
 ## Setup
 
 - Clone the project from Github

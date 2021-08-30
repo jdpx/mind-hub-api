@@ -32,3 +32,19 @@ resource "aws_s3_bucket" "dev_state_bucket" {
     enabled = true
   }
 }
+
+resource "aws_s3_bucket_public_access_block" "management_state_bucket_block" {
+  bucket                  = aws_s3_bucket.management_state_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+}
+
+resource "aws_s3_bucket_public_access_block" "dev_state_bucket_block" {
+  bucket                  = aws_s3_bucket.dev_state_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+}

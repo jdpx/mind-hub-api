@@ -35,7 +35,7 @@ validate-terraform:
 
 .PHONY: run/tfsec
 run/tfsec:
-	tfsec . -e AWS002,AWS017,AWS089,AWS086,AWS092
+	tfsec . --exclude AWS002,AWS017,AWS089,AWS086,AWS092
 
 .PHONY: run/api
 run/api:

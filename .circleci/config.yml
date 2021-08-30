@@ -25,11 +25,11 @@ jobs:
       - run:
           name: "Validate lint"
           command: |
-            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.31.0
+            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.41.0
             make lint
       - run:
           name: "Running TFSec"
           command: |
-            go get -u github.com/tfsec/tfsec/cmd/tfsec
+            go get -u github.com/aquasecurity/tfsec/cmd/tfsec
             make run/tfsec
       - run: go test -v ./...

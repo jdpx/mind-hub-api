@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/golang/mock/gomock"
 	"github.com/icrowley/fake"
 	"github.com/jdpx/mind-hub-api/pkg/graphcms"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/jdpx/mind-hub-api/pkg/request"
 	tools "github.com/jdpx/mind-hub-api/tools/testing"
 	"github.com/stretchr/testify/assert"

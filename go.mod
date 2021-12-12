@@ -28,12 +28,12 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.14.1 // indirect
 	github.com/onsi/gomega v1.10.2 // indirect
 	github.com/segmentio/ksuid v1.0.4
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser/v2 v2.2.0
 	golang.org/x/sys v0.0.0-20201214210602-f9fddec55a1e // indirect

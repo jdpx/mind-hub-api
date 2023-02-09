@@ -15,7 +15,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.11.0
 	github.com/corpix/uarand v0.1.1 // indirect
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.7.7
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.4.4

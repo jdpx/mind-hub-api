@@ -6,12 +6,12 @@ require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/aws/aws-lambda-go v1.19.1
 	github.com/aws/aws-sdk-go v1.35.19
-	github.com/aws/aws-sdk-go-v2 v1.9.0
+	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.2.0
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.0.0
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.13
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.40
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.2.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.0
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.18.3
 	github.com/awslabs/aws-lambda-go-api-proxy v0.11.0
 	github.com/corpix/uarand v0.1.1 // indirect
 	github.com/gin-contrib/cors v1.3.1

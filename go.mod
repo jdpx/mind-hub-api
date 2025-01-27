@@ -32,6 +32,6 @@ require (
 	github.com/onsi/gomega v1.10.2 // indirect
 	github.com/segmentio/ksuid v1.0.4
 	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.10.0
 	github.com/vektah/gqlparser/v2 v2.2.0
 )
